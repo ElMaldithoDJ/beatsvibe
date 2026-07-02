@@ -2,12 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:beatsvibe/models/mediaitem_data.dart';
+import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AudioItem extends StatefulWidget {
   final MediaItemData song;
   final bool isSelected;
+  final bool showIsSelected;
+  final bool showIsPlaying;
   final int index;
   final List<MediaItemData>? playlist;
 
@@ -17,6 +21,8 @@ class AudioItem extends StatefulWidget {
     required this.index,
     this.isSelected = false,
     this.playlist,
+    this.showIsSelected = true,
+    this.showIsPlaying = false,
   });
 
   @override
@@ -53,6 +59,7 @@ class _AudioItemState extends State<AudioItem> {
 
   @override
   Widget build(BuildContext context) {
+    final player = Provider.of<PlayerViewModel>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: Row(
@@ -124,98 +131,55 @@ class _AudioItemState extends State<AudioItem> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                    if (widget.song.format != null &&
-                        widget.song.bitrate != null) ...[
-                      _buildFormatTag(
-                        widget.song.format!,
-                        widget.song.bitrate!,
-                      ),
-                    ],
                     const Spacer(),
                   ],
                 ),
               ],
             ),
           ),
+          SizedBox(width: 10,),
+          if (widget.isSelected) ...[
+            SizedBox(
+              width: 25,
+              height: 25,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).primaryColor.withValues(alpha: .15),
+                ),
+                child: Center(
+                  child: Icon(
+                    CupertinoIcons.check_mark,
+                    color: Theme.of(context).primaryColor,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+          ],
+          if (player.currentItem?.id == widget.song.id && widget.showIsPlaying) ...[
+            SizedBox(
+              width: 25,
+              height: 25,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).primaryColor.withValues(alpha: .15),
+                ),
+                child: Center(
+                  child: Icon(
+                    player.isPlaying
+                        ? CupertinoIcons.pause
+                        : CupertinoIcons.play,
+                    color: Theme.of(context).primaryColor,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
-  }
-
-  Widget _buildFormatTag(AudioFormat format, int bitrate) {
-    int bt = (bitrate / 1000).toInt();
-    if (format == AudioFormat.mp3) {
-      if (bt < 192) {
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).primaryColor.withValues(alpha: .5),
-            ),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Padding(
-            padding: const .all(4),
-            child: Text(
-              'SD',
-              style: TextStyle(
-                fontSize: 10,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        );
-      }
-      if (bt >= 192 && bt < 256) {
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).primaryColor.withValues(alpha: .5),
-            ),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Padding(
-            padding: const .all(4),
-            child: Text(
-              'HD',
-              style: TextStyle(
-                fontSize: 10,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        );
-      }
-      if (bt >= 256) {
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.amberAccent),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Padding(
-            padding: const .all(4),
-            child: Text(
-              'Hi-Res',
-              style: TextStyle(fontSize: 10, color: Colors.amberAccent),
-            ),
-          ),
-        );
-      }
-    }
-    if (format == AudioFormat.flac) {
-      return DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.greenAccent),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Padding(
-          padding: const .all(4),
-          child: Text(
-            'Lossless',
-            style: TextStyle(fontSize: 10, color: Colors.greenAccent),
-          ),
-        ),
-      );
-    }
-    return SizedBox.shrink();
   }
 }

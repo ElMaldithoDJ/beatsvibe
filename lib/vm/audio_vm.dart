@@ -20,10 +20,11 @@ class AudioViewModel extends ChangeNotifier {
   }
 
   Future<void> onInit() async {
-    if ((await _hiveService.getAllSongs()).isNotEmpty) {
-      await _hiveService
-          .getAllSongs()
+    final songs = _hiveService.getAllSongs();
+    if ((await songs).isNotEmpty) {
+          await songs
           .then((data) {
+            data.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
             _songs = data;
             _songsCopy = data;
             notifyListeners();
@@ -34,7 +35,11 @@ class AudioViewModel extends ChangeNotifier {
 
   Future<void> fetchSongs() async {
     _setLoadingState(true);
-    await FetchAudioService.scanLocalFiles().whenComplete(() async {
+    await FetchAudioService.scanLocalFiles()
+    .then((songs) async {
+      await _hiveService.saveAllSongs(songs);
+    })
+    .whenComplete(() async {
       await onInit();
       _setLoadingState(false);
     });

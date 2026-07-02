@@ -48,9 +48,9 @@ class HiveService {
   }
 
   // Remove favorite song
-  Future<void> removeFavoriteSong(MediaItemData song) async {
+  Future<void> removeFavoriteSong(String id) async {
     final box = await Hive.openBox(_favoriteSongsBox);
-    await box.delete(song.id);
+    await box.delete(id);
   }
 
   // Get recently played songs
@@ -88,9 +88,9 @@ class HiveService {
   }
 
   // Remove playlist
-  Future<void> removePlaylist(String id) async {
+  Future<void> removePlaylist(String title) async {
     final box = await Hive.openBox(_playlistsBox);
-    await box.delete(id);
+    await box.delete(title);
   }
 
   // Update playlist
@@ -100,9 +100,9 @@ class HiveService {
   }
 
   // Check if song is favorite
-  Future<bool> isFavorite(String id) async {
+  Future<bool> isFavorite(String title) async {
     final box = await Hive.openBox(_favoriteSongsBox);
-    return box.containsKey(id);
+    return box.containsKey(title);
   }
 
   // save last played song

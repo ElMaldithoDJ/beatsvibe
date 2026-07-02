@@ -40,14 +40,7 @@ class _NoSongsState extends State<NoSongs> {
           ),
           const SizedBox(height: 10),
           Text(
-            "No songs found",
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(color: Colors.grey),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            "Scan your device for songs",
+            "No se encontraron canciones",
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(color: Colors.grey),
@@ -71,7 +64,7 @@ class _NoSongsState extends State<NoSongs> {
               backgroundColor: Theme.of(context).primaryColor,
               foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
             ),
-            child: const Text("Scan"),
+            child: const Text("Escanear", style: TextStyle(color: Colors.white),),
           ),
         ],
       ),

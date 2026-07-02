@@ -1,6 +1,7 @@
+import 'package:beatsvibe/components/audio_cupertino.dart';
 import 'package:beatsvibe/components/audio_item.dart' show AudioItem;
 import 'package:beatsvibe/vm/favorites_vm.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
 class FavoritesView extends StatefulWidget {
@@ -20,9 +21,32 @@ class _FavoritesViewState extends State<FavoritesView> {
           itemCount: favoritesVM.favorites.length,
           itemBuilder: (context, index) {
             final song = favoritesVM.favorites[index];
-            return AudioItem(
-              song: song,
-              index: index,
+            return GestureDetector(
+              onTap: () {},
+              child: AudioCupertinoContextMenu(
+                actions: [
+                  AudioCupertinoMenuItem(title: "Seleccionar", onTap: () {}),
+                  AudioCupertinoMenuItem(
+                    title: "Agregar a playlist",
+                    icon: CupertinoIcons.add_circled,
+                    onTap: () {},
+                  ),
+                  AudioCupertinoMenuItem(
+                    title: "Info",
+                    icon: CupertinoIcons.info_circle,
+                    onTap: () {},
+                  ),
+                  AudioCupertinoMenuItem(
+                    title: "Eliminar",
+                    icon: CupertinoIcons.delete_solid,
+                    isDestructive: true,
+                    onTap: () {
+                      favoritesVM.toggleFavorite(song: song.toMediaItem());
+                    },
+                  ),
+                ],
+                child: AudioItem(song: song, index: index),
+              ),
             );
           },
         );

@@ -103,7 +103,14 @@ class _PlayerViewState extends State<PlayerView> {
                                     height: 55,
                                     child: GestureDetector(
                                       onTap: () async {
-                                        await playerVM.likeSong(null);
+                                        if (playerVM.currentItem != null ||
+                                            playerVM.lastPlayed != null) {
+                                          favoritesVM.toggleFavorite(
+                                            song:
+                                                playerVM.currentItem ??
+                                                playerVM.lastPlayed!,
+                                          );
+                                        }
                                       },
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(
@@ -120,11 +127,27 @@ class _PlayerViewState extends State<PlayerView> {
                                             ),
                                             child: Center(
                                               child: Icon(
-                                                playerVM.isFavorite
+                                                favoritesVM.favorites.any(
+                                                  (element) =>
+                                                      element.title ==
+                                                      (playerVM.currentItem
+                                                                  ?.title ??
+                                                              playerVM
+                                                                  .lastPlayed
+                                                                  ?.title),
+                                                )
                                                     ? CupertinoIcons.heart_fill
                                                     : CupertinoIcons.heart,
-                                                color: playerVM.isFavorite
-                                                    ? Colors.red
+                                                color: favoritesVM.favorites.any(
+                                                  (element) =>
+                                                      element.title ==
+                                                      (playerVM.currentItem
+                                                                  ?.title ??
+                                                              playerVM
+                                                                  .lastPlayed
+                                                                  ?.title),
+                                                )
+                                                    ? Colors.pinkAccent
                                                     : Colors.white,
                                                 size: 25,
                                               ),
@@ -145,9 +168,7 @@ class _PlayerViewState extends State<PlayerView> {
                                     width: 55,
                                     height: 55,
                                     child: GestureDetector(
-                                      onTap: () async {
-                                        await playerVM.likeSong(null);
-                                      },
+                                      onTap: () async {},
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
                                         child: BackdropFilter(
@@ -180,20 +201,37 @@ class _PlayerViewState extends State<PlayerView> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text(
-                  playerVM.currentItem != null
-                      ? playerVM.currentItem!.title
-                      : "",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                if (playerVM.currentItem?.artist != null) ...[
-                  Text(
-                    playerVM.currentItem!.artist!,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      Text(
+                        playerVM.currentItem != null
+                            ? playerVM.currentItem!.title
+                            : "",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (playerVM.currentItem?.artist != null) ...[
+                        Text(
+                          playerVM.currentItem!.artist!,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
                   ),
-                ],
+                ),
                 SliderTheme(
                   data: SliderThemeData(
                     trackHeight: 3,
@@ -359,63 +397,7 @@ class _PlayerViewState extends State<PlayerView> {
                           width: 45,
                           height: 45,
                           child: GestureDetector(
-                            onTap: () {
-                              Get.bottomSheet(
-                                Container(
-                                  width: .maxFinite,
-                                  constraints: BoxConstraints(
-                                    maxHeight: Get.height * .50,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color: Theme.brightnessOf(context) == .dark
-                                        ? Theme.of(
-                                            context,
-                                          ).scaffoldBackgroundColor
-                                        : Colors.white,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const .symmetric(
-                                          horizontal: 10,
-                                          vertical: 10,
-                                        ),
-                                        child: Text(
-                                          "Lista de reproducción",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: ListView.builder(
-                                          itemCount: playerVM.queue.length,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 8,
-                                          ),
-                                          itemBuilder: (context, index) {
-                                            return GestureDetector(
-                                              onTap: () {
-                                                playerVM.play(index);
-                                              },
-                                              child: AudioItem(
-                                                song: playerVM.queue[index],
-                                                index: index,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
+                            onTap: () => openQueue(context),
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 color: Theme.brightnessOf(context) == .dark
@@ -445,6 +427,56 @@ class _PlayerViewState extends State<PlayerView> {
           ),
         );
       },
+    );
+  }
+
+  void openQueue(BuildContext context) {
+    final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
+    Get.bottomSheet(
+      Container(
+        width: .maxFinite,
+        constraints: BoxConstraints(maxHeight: Get.height * .50),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Theme.brightnessOf(context) == .dark
+              ? Theme.of(context).scaffoldBackgroundColor
+              : Colors.white,
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const .symmetric(horizontal: 10, vertical: 10),
+              child: Text(
+                "Lista de reproducción",
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: playerVM.queue.length,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      playerVM.play(index);
+                    },
+                    child: AudioItem(
+                      song: playerVM.queue[index],
+                      index: index,
+                      showIsPlaying: true,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

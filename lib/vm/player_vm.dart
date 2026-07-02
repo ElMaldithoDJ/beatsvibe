@@ -3,7 +3,6 @@ import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/service/audio_handler.dart';
 import 'package:beatsvibe/service/hive_service.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class PlayerViewModel extends ChangeNotifier {
   final _hiveService = HiveService();
@@ -44,20 +43,22 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   void onInit() async {
-    final songs = await _getSongs();
+    final songs = _getSongs();
+    if ((await songs).isNotEmpty) {
+      await songs.then((data){
+        data.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+        _queue = data;
+        notifyListeners();
+        audioHandler.initPlayer(songs: _queue);
+      });
+    }
     final lastPlayedData = await _hiveService.getLastPlayed();
     if (lastPlayedData != null) {
       _lastPlayed = lastPlayedData.toMediaItem();
       notifyListeners();
       await audioHandler.jumpToQueueItem(
-        songs.indexWhere((e) => e.id == lastPlayedData.id),
+        _queue.indexWhere((e) => e.id == _lastPlayed?.id),
       );
-    }
-
-    if (songs.isNotEmpty) {
-      await audioHandler.initPlayer(songs: songs);
-      _queue = songs;
-      notifyListeners();
     }
     audioHandler.playbackState.listen((state) {
       _playingState(state.playing);
@@ -127,12 +128,22 @@ class PlayerViewModel extends ChangeNotifier {
 
   //skip
   void skipToNext() async {
-    await audioHandler.skipToNext();
+    final index = globalAudioHandler.queue.value.length - 1;
+    if (globalAudioHandler.player.currentIndex! < index) {
+      await audioHandler.skipToNext();
+    } else if (globalAudioHandler.player.currentIndex == index) {
+      await audioHandler.skipToQueueItem(0);
+    }
   }
 
   //back
   void skipToPrevious() async {
-    await audioHandler.skipToPrevious();
+    final index = globalAudioHandler.queue.value.length - 1;
+    if (globalAudioHandler.player.currentIndex! > 0) {
+      await audioHandler.skipToPrevious();
+    } else if (globalAudioHandler.player.currentIndex == 0) {
+      await audioHandler.skipToQueueItem(index);
+    }
   }
 
   //shuffle
@@ -144,72 +155,6 @@ class PlayerViewModel extends ChangeNotifier {
   // Playing State
   void _playingState(bool state) {
     _isPlaying = state;
-    notifyListeners();
-  }
-
-  // like song event
-  Future<void> likeSong(MediaItemData? song) async {
-    if (song != null) {
-      final isFavorite = await _hiveService.isFavorite(song.id);
-      if (isFavorite) {
-        await _hiveService.removeFavoriteSong(song).whenComplete(() {
-          _isFavorite = false;
-          notifyListeners();
-        });
-      } else {
-        await _hiveService.addFavoriteSong(song).whenComplete(() {
-          _isFavorite = true;
-          notifyListeners();
-          Fluttertoast.showToast(
-            msg: "Canción agregada a favoritos",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.pink,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
-        });
-      }
-    } else {
-      if (currentItem != null) {
-        final songData = MediaItemData.fromMediaItem(currentItem);
-        if (songData != null) {
-          final isFavorite = await _hiveService.isFavorite(songData.id);
-          if (isFavorite) {
-            await _hiveService.removeFavoriteSong(songData).whenComplete(() {
-              _isFavorite = false;
-              notifyListeners();
-            });
-          } else {
-            await _hiveService.addFavoriteSong(songData).whenComplete(() {
-              _isFavorite = true;
-              notifyListeners();
-              Fluttertoast.showToast(
-                msg: "Canción agregada a favoritos",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.pink,
-                textColor: Colors.white,
-                fontSize: 16.0,
-              );
-            });
-          }
-        }
-      }
-    }
-  }
-
-  // add To favorite
-  void addToFavorite(MediaItemData song) async {
-    await _hiveService.addFavoriteSong(song);
-    notifyListeners();
-  }
-
-  // remove from favorite
-  void removeFromFavorite(MediaItemData song) async {
-    await _hiveService.removeFavoriteSong(song);
     notifyListeners();
   }
 

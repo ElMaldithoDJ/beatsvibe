@@ -115,6 +115,7 @@ class _MusicViewState extends State<MusicView> {
                             song: song,
                             index: index,
                             playlist: audioVM.songs,
+                            showIsPlaying: true,
                           ),
                         ),
                       ),

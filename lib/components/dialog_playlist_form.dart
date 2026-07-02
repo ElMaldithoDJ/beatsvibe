@@ -5,14 +5,14 @@ import 'package:provider/provider.dart';
 
 import '../vm/playlist_vm.dart' show PlaylistViewModel;
 
-class DialogPlaylistForm extends StatefulWidget {
-  const DialogPlaylistForm({super.key});
+class PlayListFormView extends StatefulWidget {
+  const PlayListFormView({super.key});
 
   @override
-  State<DialogPlaylistForm> createState() => _DialogPlaylistFormState();
+  State<PlayListFormView> createState() => _PlayListFormViewState();
 }
 
-class _DialogPlaylistFormState extends State<DialogPlaylistForm> {
+class _PlayListFormViewState extends State<PlayListFormView> {
   final _nameController = TextEditingController();
   FocusNode nameFocusNode = FocusNode();
 
@@ -25,18 +25,12 @@ class _DialogPlaylistFormState extends State<DialogPlaylistForm> {
 
   @override
   Widget build(BuildContext context) {
-    final playlistVm = Provider.of<PlaylistViewModel>(context, listen: false);
-    return Container(
-      width: Get.width * .85,
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Material(
-        borderRadius: BorderRadius.circular(20),
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
+    final playlistVm = Provider.of<PlaylistViewModel>(context, listen: true);
+    return Scaffold(
+      appBar: AppBar(title: Text("Crear Playlist")),
+      body: Padding(
+        padding: const .symmetric(vertical: 8, horizontal: 16),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -57,36 +51,27 @@ class _DialogPlaylistFormState extends State<DialogPlaylistForm> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      onTapOutside: (event) {
+                        nameFocusNode.unfocus();
+                      },
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: double.maxFinite,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Theme.of(context).colorScheme.surface,
-                        ),
-                        child: Center(
-                          child: Text(
-                            "+ Agregar Canciónes",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+              ElevatedButton.icon(
+                onPressed: () {},
+                label: Text("Agregar Canciónes"),
+                icon: Icon(Icons.add),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                ],
+                ),
               ),
               SizedBox(height: 20),
               Row(
@@ -98,13 +83,16 @@ class _DialogPlaylistFormState extends State<DialogPlaylistForm> {
                   ),
                   SizedBox(width: 10),
                   TextButton(
-                    onPressed: () async {
-                      final playlist = PlaylistModelData(
-                        title: _nameController.text,
-                        songs: [],
-                      );
-                      playlistVm.createPlaylist(playlist).whenComplete(() => Get.back());
-                    },
+                    onPressed: _nameController.text.isNotEmpty
+                        ? () async {
+                            final playlist = PlaylistModelData(
+                              title: _nameController.text,
+                            );
+                            playlistVm
+                                .createPlaylist(playlist)
+                                .whenComplete(() => Get.back());
+                          }
+                        : null,
                     child: Text("Crear"),
                   ),
                 ],

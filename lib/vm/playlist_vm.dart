@@ -1,3 +1,4 @@
+import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/models/playlist_data.dart';
 import 'package:beatsvibe/service/hive_service.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,21 @@ class PlaylistViewModel extends ChangeNotifier {
 
   List<PlaylistModelData> _playlists = [];
   List<PlaylistModelData> get playlists => _playlists;
+
+  final List<MediaItemData> _selectedSongs = [];
+  List<MediaItemData> get selectedSongs => _selectedSongs;
+
+  void addSelectedSong(MediaItemData song) {
+    if (!_selectedSongs.contains(song)) {
+      _selectedSongs.add(song);
+      notifyListeners();
+    }
+  }
+
+  void removeSelectedSong(MediaItemData song) {
+    _selectedSongs.remove(song);
+    notifyListeners();
+  }
 
   PlaylistViewModel() {
     onInit();

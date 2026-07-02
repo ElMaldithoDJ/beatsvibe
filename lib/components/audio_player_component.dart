@@ -72,7 +72,8 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                         Center(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(360),
-                            child: playerVM.currentItem!.artUri!.scheme == 'file'
+                            child:
+                                playerVM.currentItem!.artUri!.scheme == 'file'
                                 ? Image.file(
                                     File.fromUri(playerVM.currentItem!.artUri!),
                                     gaplessPlayback: true,
@@ -82,12 +83,16 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                     errorBuilder: (context, error, stackTrace) {
                                       return DecoratedBox(
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(360),
+                                          borderRadius: BorderRadius.circular(
+                                            360,
+                                          ),
                                         ),
                                         child: Center(
                                           child: Icon(
                                             CupertinoIcons.music_note,
-                                            color: Theme.of(context).primaryColor,
+                                            color: Theme.of(
+                                              context,
+                                            ).primaryColor,
                                             size: 20,
                                           ),
                                         ),
@@ -105,12 +110,16 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                     errorBuilder: (context, error, stackTrace) {
                                       return DecoratedBox(
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(360),
+                                          borderRadius: BorderRadius.circular(
+                                            360,
+                                          ),
                                         ),
                                         child: Center(
                                           child: Icon(
                                             CupertinoIcons.music_note,
-                                            color: Theme.of(context).primaryColor,
+                                            color: Theme.of(
+                                              context,
+                                            ).primaryColor,
                                             size: 20,
                                           ),
                                         ),
@@ -190,14 +199,29 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
               const SizedBox(width: 5),
               IconButton(
                 icon: Icon(
-                  playerVM.isFavorite
+                  favoritesVM.favorites.any(
+                        (element) =>
+                            element.title == playerVM.currentItem?.title,
+                      )
                       ? CupertinoIcons.heart_fill
                       : CupertinoIcons.heart,
                   color: Theme.brightnessOf(context) == .dark
                       ? Colors.white
-                      : Theme.of(context).primaryColor,
+                      : favoritesVM.favorites.any(
+                          (element) =>
+                              element.title == playerVM.currentItem?.title,
+                        )
+                      ? Colors.pinkAccent
+                      : Colors.black26,
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  if (playerVM.currentItem != null ||
+                      playerVM.lastPlayed != null) {
+                    await favoritesVM.toggleFavorite(
+                      song: playerVM.currentItem ?? playerVM.lastPlayed!,
+                    );
+                  }
+                },
               ),
             ],
           ),

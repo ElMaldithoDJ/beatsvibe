@@ -1,5 +1,5 @@
-import 'package:beatsvibe/components/dialog_playlist_form.dart';
 import 'package:beatsvibe/components/playlist_cupertino.dart';
+import 'package:beatsvibe/routes.dart';
 import 'package:beatsvibe/theme.dart';
 import 'package:beatsvibe/vm/playlist_vm.dart';
 import 'package:flutter/cupertino.dart';
@@ -132,7 +132,7 @@ class _PlaylistsViewState extends State<PlaylistsView> {
               right: 20,
               child: FloatingActionButton(
                 onPressed: () {
-                  Get.dialog(Center(child: DialogPlaylistForm()));
+                  Get.toNamed(AppRoutes.createPlaylist);
                 },
                 backgroundColor: AppTheme.primaryColor,
                 child: Icon(CupertinoIcons.add),

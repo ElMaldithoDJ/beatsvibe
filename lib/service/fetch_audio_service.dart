@@ -5,7 +5,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:audio_info/audio_info.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/models/storage_isolate_model.dart';
-import 'package:beatsvibe/service/hive_service.dart';
 import 'package:beatsvibe/service/utfconverter_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -21,28 +20,27 @@ const List<String> _validExtensions = [
 ];
 
 class FetchAudioService {
-  static final HiveService _hiveService = HiveService();
-  static Future<void> scanLocalFiles() async {
+  static Future<List<MediaItemData>> scanLocalFiles() async {
     String dir = (await FilePicker.platform.getDirectoryPath(
       dialogTitle: 'S1elecciona una carpeta de música',
     ))!;
 
     final RootIsolateToken? token = RootIsolateToken.instance;
-    if (token == null) return;
-    
+    if (token == null) return [];
+
     final Directory appDocDir = await getApplicationDocumentsDirectory();
 
     StorageIsolateModel model = StorageIsolateModel(
-      path: dir, 
+      path: dir,
       token: token,
       appDocDir: appDocDir.path,
     );
 
     try {
-      await compute(_scanFiles, model).then((songs) async {
-        await _hiveService.saveAllSongs(songs);
-      });
-    } catch (_) {}
+      return await compute(_scanFiles, model);
+    } catch (_) {
+      return [];
+    }
   }
 }
 
@@ -57,7 +55,9 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
   if (!await musicDirectory.exists()) {
     await musicDirectory.create(recursive: true);
   }
-  List<FileSystemEntity> files = (await musicDirectory.list(recursive: false).toList());
+  List<FileSystemEntity> files = (await musicDirectory
+      .list(recursive: false)
+      .toList());
   try {
     for (int i = 0; i < files.length; i++) {
       FileSystemEntity file = files[i];
@@ -66,7 +66,7 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
         if (_validExtensions.contains('.$ext')) {
           AudioData? metadata = await AudioInfo.getAudioInfo(file.path);
           Uint8List? artwork = await AudioInfo.getAudioImage(file.path);
-          
+
           Directory coversDir = Directory('${model.appDocDir}/covers');
           if (!await coversDir.exists()) {
             await coversDir.create(recursive: true);
@@ -74,9 +74,17 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
 
           Uri? artUri;
           if (metadata != null && metadata.hasArtwork && artwork != null) {
-            String sanitizedTitle = (metadata.title).replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
-            String sanitizedArtist = (metadata.artist).replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
-            File artworkFile = File('${coversDir.path}/${sanitizedTitle}_$sanitizedArtist.jpg');
+            String sanitizedTitle = (metadata.title).replaceAll(
+              RegExp(r'[\\/:*?"<>|]'),
+              '_',
+            );
+            String sanitizedArtist = (metadata.artist).replaceAll(
+              RegExp(r'[\\/:*?"<>|]'),
+              '_',
+            );
+            File artworkFile = File(
+              '${coversDir.path}/${sanitizedTitle}_$sanitizedArtist.jpg',
+            );
             if (!await artworkFile.exists()) {
               await artworkFile.writeAsBytes(artwork);
             }
@@ -102,7 +110,9 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
                 ),
                 duration: Duration(seconds: metadata?.durationSec ?? 0),
                 artUri: artUri,
-                format: AudioFormat.values.firstWhere((e) => e.name.startsWith(ext)),
+                format: AudioFormat.values.firstWhere(
+                  (e) => e.name.startsWith(ext),
+                ),
                 bitrate: metadata?.bitrate,
               ),
             );
@@ -117,7 +127,9 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
                 genre: 'Genero Desconocido',
                 duration: Duration(seconds: metadata?.durationSec ?? 0),
                 artUri: artUri,
-                format: AudioFormat.values.firstWhere((e) => e.name.startsWith(ext)),
+                format: AudioFormat.values.firstWhere(
+                  (e) => e.name.startsWith(ext),
+                ),
                 bitrate: metadata?.bitrate,
               ),
             );
