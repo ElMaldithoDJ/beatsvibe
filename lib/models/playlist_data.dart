@@ -38,4 +38,20 @@ class PlaylistModelData {
       'songs': songs?.map((e) => e.toJson()).toList(),
     };
   }
+
+  PlaylistModelData copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? artwork,
+    List<MediaItemData>? songs,
+  }) {
+    return PlaylistModelData(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      artwork: artwork ?? this.artwork,
+      songs: songs ?? this.songs,
+    );
+  }
 }

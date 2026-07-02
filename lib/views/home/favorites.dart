@@ -16,6 +16,20 @@ class _FavoritesViewState extends State<FavoritesView> {
   Widget build(BuildContext context) {
     return Consumer<FavoritesViewModel>(
       builder: (context, favoritesVM, child) {
+        if (favoritesVM.favorites.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(CupertinoIcons.heart, size: 50),
+                Text(
+                  "No hay canciones favoritas",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          );
+        }
         return ListView.builder(
           physics: const BouncingScrollPhysics(),
           itemCount: favoritesVM.favorites.length,

@@ -63,7 +63,12 @@ class _PlaylistsViewState extends State<PlaylistsView> {
                   itemBuilder: (context, index) {
                     final playlist = playlistVM.playlists[index];
                     return GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Get.toNamed(
+                          AppRoutes.playlistView,
+                          arguments: playlist,
+                        );
+                      },
                       child: PlaylistContextMenu(
                         actions: [
                           PlaylistMenuItem(
@@ -94,7 +99,9 @@ class _PlaylistsViewState extends State<PlaylistsView> {
                               Icon(
                                 CupertinoIcons.music_albums,
                                 size: 50,
-                                color: Colors.white,
+                                color: Theme.brightnessOf(context) == .dark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                               SizedBox(height: 5),
                               Text(

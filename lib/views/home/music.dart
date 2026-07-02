@@ -83,7 +83,7 @@ class _MusicViewState extends State<MusicView> {
                       child: GestureDetector(
                         onTap: () {
                           if (playerVM.currentItem?.title != song.title) {
-                            playerVM.play(index, playlist: audioVM.songs);
+                            playerVM.play(song, playlist: audioVM.songs);
                           }
                           Get.toNamed(AppRoutes.player);
                         },

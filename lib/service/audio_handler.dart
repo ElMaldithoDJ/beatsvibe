@@ -1,6 +1,5 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
-import 'package:beatsvibe/variables.dart';
 import 'package:just_audio/just_audio.dart';
 
 late AudioHandlerService globalAudioHandler;
@@ -17,22 +16,7 @@ class AudioHandlerService extends BaseAudioHandler
   UriAudioSource _createAudioSource(MediaItemData item) {
     return ProgressiveAudioSource(
       Uri.parse(item.audioUrl),
-      tag: MediaItem(
-        id: item.id,
-        title: item.title,
-        album: item.album,
-        artist: item.artist,
-        genre: item.genre,
-        artUri: item.artUri == null
-            ? Uri.parse('asset:///${AppVariables.noCoverArt}')
-            : item.artUri!,
-        duration: item.duration,
-        extras: <String, dynamic>{
-          'audioUrl': item.audioUrl,
-          'format': item.format?.name,
-          'bitrate': item.bitrate,
-        },
-      ),
+      tag: item.toMediaItem(),
     );
   }
 

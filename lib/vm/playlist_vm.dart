@@ -51,11 +51,20 @@ class PlaylistViewModel extends ChangeNotifier {
     await _hiveService.addPlaylist(newPlaylist).whenComplete(() => onInit());
   }
 
+  Future<PlaylistModelData?> getPlaylist(String id) async {
+    return await _hiveService.getPlaylist(id);
+  }
+
   Future<void> removePlaylist(String id) async {
     await _hiveService.removePlaylist(id).whenComplete(() => onInit());
   }
 
   Future<void> updatePlaylist(PlaylistModelData playlist) async {
     await _hiveService.updatePlaylist(playlist).whenComplete(() => onInit());
+  }
+
+  void clearSelectedSongs() {
+    _selectedSongs.clear();
+    notifyListeners();
   }
 }

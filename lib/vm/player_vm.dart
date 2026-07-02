@@ -45,8 +45,10 @@ class PlayerViewModel extends ChangeNotifier {
   void onInit() async {
     final songs = _getSongs();
     if ((await songs).isNotEmpty) {
-      await songs.then((data){
-        data.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+      await songs.then((data) {
+        data.sort(
+          (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+        );
         _queue = data;
         notifyListeners();
         audioHandler.initPlayer(songs: _queue);
@@ -60,20 +62,20 @@ class PlayerViewModel extends ChangeNotifier {
         _queue.indexWhere((e) => e.id == _lastPlayed?.id),
       );
     }
-    audioHandler.playbackState.listen((state) {
+    globalAudioHandler.playbackState.listen((state) {
       _playingState(state.playing);
     });
-    audioHandler.positionStream.listen((position) {
+    globalAudioHandler.positionStream.listen((position) {
       _currentPosition = position;
       notifyListeners();
     });
-    audioHandler.durationStream.listen((duration) {
+    globalAudioHandler.durationStream.listen((duration) {
       if (duration != null) {
         _duration = duration;
         notifyListeners();
       }
     });
-    audioHandler.mediaItem.listen((mediaItem) async {
+    globalAudioHandler.mediaItem.listen((mediaItem) async {
       if (mediaItem != null) {
         _lastPlayed = mediaItem;
         _isFavorite = await _hiveService.isFavorite(mediaItem.id);
@@ -87,32 +89,42 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   //Play
-  Future<void> play(int? index, {List<MediaItemData>? playlist}) async {
+  Future<void> play(
+    MediaItemData? song, {
+    List<MediaItemData>? playlist,
+  }) async {
     if (playlist != null) {
       bool isSame = false;
-      if (audioHandler.queue.value.length == playlist.length) {
+      if (globalAudioHandler.queue.value.length == playlist.length) {
         isSame = true;
         for (int i = 0; i < playlist.length; i++) {
-          if (audioHandler.queue.value[i].id != playlist[i].id.toString()) {
+          if (globalAudioHandler.queue.value[i].id !=
+              playlist[i].id.toString()) {
             isSame = false;
             break;
           }
         }
       }
       if (!isSame) {
-        await audioHandler.initPlayer(songs: playlist);
+        await globalAudioHandler.initPlayer(songs: playlist);
       }
-    } else {
+    } else if (song != null) {
       final songs = await _getSongs();
-      if (audioHandler.queue.value.length != songs.length) {
-        await audioHandler.initPlayer(songs: songs);
+      if (globalAudioHandler.queue.value.length != songs.length) {
+        await globalAudioHandler.initPlayer(songs: songs);
       }
     }
 
-    if (index != null) {
-      await audioHandler.skipToQueueItem(index);
+    if (song != null) {
+      await globalAudioHandler.skipToQueueItem(
+        _queue.indexWhere((e) => e.id == song.id),
+      );
+    } else if (lastPlayed != null) {
+      await globalAudioHandler.skipToQueueItem(
+        _queue.indexWhere((e) => e.id == lastPlayed!.id),
+      );
     }
-    await audioHandler.play();
+    await globalAudioHandler.play();
     notifyListeners();
   }
 
@@ -130,9 +142,9 @@ class PlayerViewModel extends ChangeNotifier {
   void skipToNext() async {
     final index = globalAudioHandler.queue.value.length - 1;
     if (globalAudioHandler.player.currentIndex! < index) {
-      await audioHandler.skipToNext();
+      await globalAudioHandler.skipToNext();
     } else if (globalAudioHandler.player.currentIndex == index) {
-      await audioHandler.skipToQueueItem(0);
+      await globalAudioHandler.skipToQueueItem(0);
     }
   }
 
@@ -140,15 +152,15 @@ class PlayerViewModel extends ChangeNotifier {
   void skipToPrevious() async {
     final index = globalAudioHandler.queue.value.length - 1;
     if (globalAudioHandler.player.currentIndex! > 0) {
-      await audioHandler.skipToPrevious();
+      await globalAudioHandler.skipToPrevious();
     } else if (globalAudioHandler.player.currentIndex == 0) {
-      await audioHandler.skipToQueueItem(index);
+      await globalAudioHandler.skipToQueueItem(index);
     }
   }
 
   //shuffle
   void setShuffle() {
-    audioHandler.setShuffleMode(AudioServiceShuffleMode.all);
+    globalAudioHandler.setShuffleMode(AudioServiceShuffleMode.all);
     notifyListeners();
   }
 
