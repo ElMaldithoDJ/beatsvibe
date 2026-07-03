@@ -1,10 +1,13 @@
 import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/models/playlist_data.dart';
 import 'package:beatsvibe/service/hive_service.dart';
+import 'package:beatsvibe/service/audio_handler.dart';
+import 'package:beatsvibe/util/id_generator.dart';
 import 'package:flutter/material.dart';
 
 class PlaylistViewModel extends ChangeNotifier {
   final HiveService _hiveService = HiveService();
+  final audioHandler = globalAudioHandler;
 
   List<PlaylistModelData> _playlists = [];
   List<PlaylistModelData> get playlists => _playlists;
@@ -40,9 +43,8 @@ class PlaylistViewModel extends ChangeNotifier {
   }
 
   Future<void> createPlaylist(PlaylistModelData playlist) async {
-    final id = await _hiveService.getPlaylists();
     final newPlaylist = PlaylistModelData(
-      id: "${id.length + 1}",
+      id: IDGenerator.generateId(),
       title: playlist.title,
       description: playlist.description,
       artwork: playlist.artwork,
@@ -60,7 +62,22 @@ class PlaylistViewModel extends ChangeNotifier {
   }
 
   Future<void> updatePlaylist(PlaylistModelData playlist) async {
-    await _hiveService.updatePlaylist(playlist).whenComplete(() => onInit());
+    await _hiveService.updatePlaylist(playlist).whenComplete(() {
+      onInit();
+      notifyListeners();
+    });
+  }
+
+  void playPlaylist(List<MediaItemData> songs) async {
+    await audioHandler.initPlayer(songs: songs);
+    await audioHandler.play();
+    notifyListeners();
+  }
+
+  void playSong(MediaItemData song, List<MediaItemData> songs) async {
+    await audioHandler.initPlayer(songs: songs);
+    await audioHandler.skipToQueueItem(songs.indexOf(song));
+    notifyListeners();
   }
 
   void clearSelectedSongs() {

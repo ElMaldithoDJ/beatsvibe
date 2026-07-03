@@ -28,8 +28,8 @@ dependencies:
   path_provider:
   asset_cache:
   json_annotation:
-  cached_network_image:
   fluttertoast:
+  open_file_manager:
 
 dev_dependencies:
   flutter_test:

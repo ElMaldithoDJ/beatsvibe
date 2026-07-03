@@ -80,8 +80,9 @@ class _PlaylistsViewState extends State<PlaylistsView> {
                             title: "Eliminar",
                             icon: CupertinoIcons.trash,
                             isDestructive: true,
-                            onTap: () {
-                              playlistVM.removePlaylist(playlist.id!);
+                            onTap: () async {
+                              print("Playlist ID: ${playlist.id}");
+                              await playlistVM.removePlaylist(playlist.id!);
                             },
                           ),
                         ],
@@ -135,7 +136,7 @@ class _PlaylistsViewState extends State<PlaylistsView> {
               ),
             ],
             Positioned(
-              bottom: 80,
+              bottom: (playlistVM.audioHandler.mediaItem.value != null) ? 80 : 20,
               right: 20,
               child: FloatingActionButton(
                 onPressed: () {

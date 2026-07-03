@@ -103,11 +103,19 @@ class AudioHandlerService extends BaseAudioHandler
   // Skip song (next or previous)
   @override
   Future<void> skipToNext() async {
-    await player.seekToNext();
+    if (player.currentIndex == queue.value.length - 1) {
+      await player.seek(Duration.zero, index: 0);
+    } else if (player.currentIndex! < queue.value.length - 1) {
+      await player.seekToNext();
+    }
   }
 
   @override
   Future<void> skipToPrevious() async {
-    await player.seekToPrevious();
+    if (player.currentIndex == 0) {
+      await player.seek(Duration.zero, index: queue.value.length - 1);
+    } else if (player.currentIndex! > 0) {
+      await player.seekToPrevious();
+    }
   }
 }

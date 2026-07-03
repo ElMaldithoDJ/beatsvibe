@@ -40,6 +40,28 @@ class _PlayListFormViewState extends State<PlayListFormView> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
+            Center(
+              child: SizedBox(
+                width: 150,
+                height: 150,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.brightnessOf(context) == .dark
+                        ? Colors.white.withValues(alpha: .1)
+                        : Colors.black.withValues(alpha: .05),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    CupertinoIcons.music_albums,
+                    size: 50,
+                    color: Theme.brightnessOf(context) == .dark
+                        ? Colors.white
+                        : Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
@@ -50,6 +72,10 @@ class _PlayListFormViewState extends State<PlayListFormView> {
                       hintText: "Nombre de la Playlist",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 0,
                       ),
                     ),
                     onChanged: (value) {
@@ -86,7 +112,7 @@ class _PlayListFormViewState extends State<PlayListFormView> {
                   final song = playlistVM.selectedSongs[index];
                   return ListTile(
                     title: Text(song.title),
-                    subtitle: song.artist != null
+                    subtitle: song.artist != null && song.artist!.isNotEmpty
                         ? Text(
                             song.artist!,
                             maxLines: 1,
@@ -94,7 +120,7 @@ class _PlayListFormViewState extends State<PlayListFormView> {
                           )
                         : null,
                     trailing: IconButton(
-                      icon: const Icon(CupertinoIcons.delete),
+                      icon: const Icon(CupertinoIcons.delete, color: Colors.red, size: 20,),
                       onPressed: () {
                         playlistVM.removeSelectedSong(song);
                       },

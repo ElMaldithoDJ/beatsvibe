@@ -1,11 +1,12 @@
 import 'package:beatsvibe/components/audio_cupertino.dart';
 import 'package:beatsvibe/components/audio_item.dart' show AudioItem;
 import 'package:beatsvibe/vm/favorites_vm.dart';
+import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
 class FavoritesView extends StatefulWidget {
-  const new({super.key});
+  const FavoritesView({super.key});
 
   @override
   State<FavoritesView> createState() => _FavoritesViewState();
@@ -14,6 +15,7 @@ class FavoritesView extends StatefulWidget {
 class _FavoritesViewState extends State<FavoritesView> {
   @override
   Widget build(BuildContext context) {
+    final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
     return Consumer<FavoritesViewModel>(
       builder: (context, favoritesVM, child) {
         if (favoritesVM.favorites.isEmpty) {
@@ -36,7 +38,10 @@ class _FavoritesViewState extends State<FavoritesView> {
           itemBuilder: (context, index) {
             final song = favoritesVM.favorites[index];
             return GestureDetector(
-              onTap: () {},
+              onTap: () {
+                //play song
+                playerVM.play(song);
+              },
               child: AudioCupertinoContextMenu(
                 actions: [
                   AudioCupertinoMenuItem(title: "Seleccionar", onTap: () {}),
@@ -51,9 +56,13 @@ class _FavoritesViewState extends State<FavoritesView> {
                     onTap: () {},
                   ),
                   AudioCupertinoMenuItem(
-                    title: "Eliminar",
-                    icon: CupertinoIcons.delete_solid,
-                    isDestructive: true,
+                    title: favoritesVM.favorites.contains(song)
+                        ? "Ya no me gusta"
+                        : "Me gusta",
+                    icon:
+                        favoritesVM.favorites.contains(song)
+                            ? CupertinoIcons.heart_fill
+                            : CupertinoIcons.heart,
                     onTap: () {
                       favoritesVM.toggleFavorite(song: song.toMediaItem());
                     },

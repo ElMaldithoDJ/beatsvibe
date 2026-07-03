@@ -7,6 +7,7 @@ import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:beatsvibe/vm/favorites_vm.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:beatsvibe/vm/playlist_vm.dart';
+import 'package:beatsvibe/vm/settings_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/route_manager.dart';
@@ -21,7 +22,7 @@ Future<void> main() async {
       androidNotificationChannelId: "com.ryanheise.bg_demo.channel.audio",
       androidNotificationChannelName: 'Audio Playback',
       androidNotificationOngoing: true,
-      androidStopForegroundOnPause: true
+      androidStopForegroundOnPause: true,
     ),
   );
   await Hive.initFlutter();
@@ -45,15 +46,20 @@ class _BeatsVibeState extends State<BeatsVibe> {
         ChangeNotifierProvider(create: (_) => FavoritesViewModel()),
         ChangeNotifierProvider(create: (_) => PlayerViewModel()),
         ChangeNotifierProvider(create: (_) => PlaylistViewModel()),
+        ChangeNotifierProvider(create: (_) => SettingsViewModel()),
       ],
-      child: GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: AppVariables.appName,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        initialRoute: AppRoutes.splash,
-        getPages: AppRoutes.pages,
+      child: Consumer<SettingsViewModel>(
+        builder: (context, settingsViewModel, child) {
+          return GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: AppVariables.appName,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: settingsViewModel.themeMode,
+            initialRoute: AppRoutes.splash,
+            getPages: AppRoutes.pages,
+          );
+        },
       ),
     );
   }

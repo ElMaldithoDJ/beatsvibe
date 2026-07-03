@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/models/playlist_data.dart';
 import 'package:flutter/material.dart' show ThemeMode;
@@ -86,14 +84,13 @@ class HiveService {
   // Add playlist
   Future<void> addPlaylist(PlaylistModelData playlist) async {
     final box = await Hive.openBox(_playlistsBox);
-    final id = generatePlaylistId();
-    await box.put(id, playlist.toJson());
+    await box.put(playlist.id, playlist.toJson());
   }
 
   // Remove playlist
-  Future<void> removePlaylist(String title) async {
+  Future<void> removePlaylist(String id) async {
     final box = await Hive.openBox(_playlistsBox);
-    await box.delete(title);
+    await box.delete(id);
   }
 
   // Update playlist
@@ -132,12 +129,5 @@ class HiveService {
       return PlaylistModelData.fromJson(value as Map<dynamic, dynamic>);
     }
     return null;
-  }
-
-  // generate random letters and numbers for id
-  String generatePlaylistId() {
-    final random = Random();
-    const String chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    return String.fromEnvironment(chars[random.nextInt(chars.length)]);
   }
 }

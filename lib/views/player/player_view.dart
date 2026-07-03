@@ -461,12 +461,15 @@ class _PlayerViewState extends State<PlayerView> {
                   vertical: 8,
                 ),
                 itemBuilder: (context, index) {
+                  final song = playerVM.queue[index];
                   return GestureDetector(
                     onTap: () {
-                      playerVM.play(playerVM.queue[index]);
+                      if (song.id != playerVM.currentItem?.id) {
+                        playerVM.play(song);
+                      }
                     },
                     child: AudioItem(
-                      song: playerVM.queue[index],
+                      song: song,
                       index: index,
                       showIsPlaying: true,
                     ),
