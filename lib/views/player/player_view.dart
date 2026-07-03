@@ -217,7 +217,7 @@ class _PlayerViewState extends State<PlayerView> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (playerVM.currentItem?.artist != null) ...[
+                      if (playerVM.currentItem?.artist != null && playerVM.currentItem!.artist!.isNotEmpty) ...[
                         Text(
                           playerVM.currentItem!.artist!,
                           style: TextStyle(

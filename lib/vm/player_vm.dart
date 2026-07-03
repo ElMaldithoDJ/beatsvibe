@@ -122,17 +122,14 @@ class PlayerViewModel extends ChangeNotifier {
       final songs = await _getSongs();
       if (audioHandler.queue.value.length != songs.length) {
         await audioHandler.initPlayer(songs: songs);
-      }
-    }
-
-    if (song != null) {
-      await audioHandler.skipToQueueItem(
-        _queue.indexWhere((e) => e.id == song.id),
-      );
-    } else if (lastPlayed != null) {
+        await audioHandler.skipToQueueItem(
+          _queue.indexWhere((e) => e.id == song.id),
+        );
+      } else if (lastPlayed != null) {
       await audioHandler.skipToQueueItem(
         _queue.indexWhere((e) => e.id == lastPlayed!.id),
       );
+    }
     }
     await audioHandler.play();
     notifyListeners();

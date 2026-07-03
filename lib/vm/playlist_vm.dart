@@ -42,9 +42,25 @@ class PlaylistViewModel extends ChangeNotifier {
     }
   }
 
+  void getAllPlaylists() async {
+    final lists = await _hiveService.getPlaylists();
+    if (lists.isNotEmpty) {
+      _playlists = lists;
+      notifyListeners();
+    } else {
+      _playlists = [];
+      notifyListeners();
+    }
+  }
+
   Future<void> createPlaylist(PlaylistModelData playlist) async {
+    String id = IDGenerator.generateId(length: 100);
+    bool isIncluded = _playlists.any((e) => e.id == id);
+    while (isIncluded) {
+      id = IDGenerator.generateId(length: 100);
+    }
     final newPlaylist = PlaylistModelData(
-      id: IDGenerator.generateId(length: 100),
+      id: id,
       title: playlist.title,
       description: playlist.description,
       artwork: playlist.artwork,
