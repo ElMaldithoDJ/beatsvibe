@@ -20,7 +20,7 @@ class FavoritesViewModel extends ChangeNotifier {
   }
 
   Future<void> toggleFavorite({required MediaItem song}) async {
-    final isFavorite = _favorites.any((e) => e.title == song.title);
+    final isFavorite = _favorites.any((e) => e.id == song.id);
     if (isFavorite) {
       await _hiveService.removeFavoriteSong(song.id);
       await _init();

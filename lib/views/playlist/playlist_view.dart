@@ -1,6 +1,7 @@
 import 'package:beatsvibe/components/audio_cupertino.dart';
 import 'package:beatsvibe/components/audio_item.dart';
 import 'package:beatsvibe/models/playlist_data.dart';
+import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:beatsvibe/vm/playlist_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _PlaylistViewState extends State<PlaylistView> {
   @override
   Widget build(BuildContext context) {
     final playlistVM = Provider.of<PlaylistViewModel>(context, listen: false);
+    final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -131,41 +133,46 @@ class _PlaylistViewState extends State<PlaylistView> {
               ),
             ),
             SizedBox(height: 15),
-            for (int i = 0; i < widget.playlist.songs!.length; i++) ...[
-              GestureDetector(
-                onTap: () {
-                  playlistVM.playSong(
-                    widget.playlist.songs![i],
-                    widget.playlist.songs!,
-                  );
-                },
-                child: AudioCupertinoContextMenu(
-                  actions: [
-                    AudioCupertinoMenuItem(
-                      title: 'Agregar a favoritos',
-                      icon: CupertinoIcons.heart,
-                      onTap: () {},
-                    ),
-                    AudioCupertinoMenuItem(
-                      title: 'Agregar a playlist',
-                      icon: CupertinoIcons.add,
-                      onTap: () {},
-                    ),
-                    AudioCupertinoMenuItem(
-                      title: 'Agregar a cola',
-                      icon: CupertinoIcons.list_bullet,
-                      onTap: () {},
-                    ),
-                    AudioCupertinoMenuItem(
-                      title: 'Información',
-                      icon: CupertinoIcons.info,
-                      onTap: () {},
-                    ),
-                  ],
-                  child: AudioItem(song: widget.playlist.songs![i], index: i),
-                ),
-              ),
-            ],
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: widget.playlist.songs!.length,
+              itemBuilder: (context, index) {
+                final song = widget.playlist.songs![index];
+                return GestureDetector(
+                  onTap: () {
+                    if (song.id != playerVM.currentItem?.id) {
+                      playlistVM.playSong(song, widget.playlist.songs!);
+                    }
+                  },
+                  child: AudioCupertinoContextMenu(
+                    actions: [
+                      AudioCupertinoMenuItem(
+                        title: 'Agregar a favoritos',
+                        icon: CupertinoIcons.heart,
+                        onTap: () {},
+                      ),
+                      AudioCupertinoMenuItem(
+                        title: 'Agregar a playlist',
+                        icon: CupertinoIcons.add,
+                        onTap: () {},
+                      ),
+                      AudioCupertinoMenuItem(
+                        title: 'Agregar a cola',
+                        icon: CupertinoIcons.list_bullet,
+                        onTap: () {},
+                      ),
+                      AudioCupertinoMenuItem(
+                        title: 'Información',
+                        icon: CupertinoIcons.info,
+                        onTap: () {},
+                      ),
+                    ],
+                    child: AudioItem(song: song, index: index),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),

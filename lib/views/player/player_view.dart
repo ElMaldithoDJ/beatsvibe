@@ -129,23 +129,23 @@ class _PlayerViewState extends State<PlayerView> {
                                               child: Icon(
                                                 favoritesVM.favorites.any(
                                                   (element) =>
-                                                      element.title ==
+                                                      element.id ==
                                                       (playerVM.currentItem
-                                                                  ?.title ??
+                                                                  ?.id ??
                                                               playerVM
                                                                   .lastPlayed
-                                                                  ?.title),
+                                                                  ?.id),
                                                 )
                                                     ? CupertinoIcons.heart_fill
                                                     : CupertinoIcons.heart,
                                                 color: favoritesVM.favorites.any(
                                                   (element) =>
-                                                      element.title ==
+                                                      element.id ==
                                                       (playerVM.currentItem
-                                                                  ?.title ??
+                                                                  ?.id ??
                                                               playerVM
                                                                   .lastPlayed
-                                                                  ?.title),
+                                                                  ?.id),
                                                 )
                                                     ? Colors.pinkAccent
                                                     : Colors.white,

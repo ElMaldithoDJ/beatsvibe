@@ -201,7 +201,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                 icon: Icon(
                   favoritesVM.favorites.any(
                         (element) =>
-                            element.title == playerVM.currentItem?.title,
+                            element.id == playerVM.currentItem?.id,
                       )
                       ? CupertinoIcons.heart_fill
                       : CupertinoIcons.heart,
@@ -209,7 +209,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                       ? Colors.white
                       : favoritesVM.favorites.any(
                           (element) =>
-                              element.title == playerVM.currentItem?.title,
+                              element.id == playerVM.currentItem?.id,
                         )
                       ? Colors.pinkAccent
                       : Colors.black26,

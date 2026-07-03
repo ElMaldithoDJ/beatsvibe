@@ -39,8 +39,9 @@ class _FavoritesViewState extends State<FavoritesView> {
             final song = favoritesVM.favorites[index];
             return GestureDetector(
               onTap: () {
-                //play song
-                playerVM.play(song);
+                if (playerVM.currentItem?.id != song.id) {
+                  playerVM.play(song, playlist: favoritesVM.favorites);
+                }
               },
               child: AudioCupertinoContextMenu(
                 actions: [

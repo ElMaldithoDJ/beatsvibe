@@ -44,7 +44,7 @@ class PlaylistViewModel extends ChangeNotifier {
 
   Future<void> createPlaylist(PlaylistModelData playlist) async {
     final newPlaylist = PlaylistModelData(
-      id: IDGenerator.generateId(),
+      id: IDGenerator.generateId(length: 100),
       title: playlist.title,
       description: playlist.description,
       artwork: playlist.artwork,

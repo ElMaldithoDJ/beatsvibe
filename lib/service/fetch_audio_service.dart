@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:beatsvibe/util/id_generator.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:audio_info/audio_info.dart';
@@ -92,9 +93,14 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
           }
 
           try {
+            String id = IDGenerator.generateId(length: 35);
+            bool isIncluded = songs.any((e) => e.id == id);
+            while (isIncluded) {
+              id = IDGenerator.generateId(length: 35);
+            }
             songs.add(
               MediaItemData(
-                id: (i + 1).toString(),
+                id: id,
                 audioUrl: file.path,
                 title: utfConverter.convertToUtf8(
                   metadata?.title ?? 'Titulo Desconocido',
@@ -117,9 +123,14 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
               ),
             );
           } catch (_) {
+            String id = IDGenerator.generateId(length: 35);
+            bool isIncluded = songs.any((e) => e.id == id);
+            while (isIncluded) {
+              id = IDGenerator.generateId(length: 35);
+            }
             songs.add(
               MediaItemData(
-                id: (songs.length + 1).toString(),
+                id: id,
                 title: file.path.split('/').last.split('.').first,
                 audioUrl: file.path,
                 artist: 'Artista Desconocido',
