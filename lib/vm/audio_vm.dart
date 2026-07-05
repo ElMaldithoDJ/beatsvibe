@@ -4,6 +4,7 @@ import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/service/fetch_audio_service.dart';
 import 'package:beatsvibe/service/hive_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:string_normalizer/string_normalizer.dart';
 
 class AudioViewModel extends ChangeNotifier {
   final HiveService _hiveService = HiveService();
@@ -14,6 +15,7 @@ class AudioViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
   List<MediaItemData> get songs => _songs;
+  List<MediaItemData> get songsCopy => _songsCopy;
 
   AudioViewModel() {
     onInit();
@@ -46,14 +48,15 @@ class AudioViewModel extends ChangeNotifier {
   }
 
   void onSearch(String query) {
-    if (query.isEmpty) {
+    if (query.isEmpty || query == "") {
       _songs = _songsCopy;
       notifyListeners();
-      return;
+    } else {
+      final q = StringNormalizer.normalize(query.toLowerCase());
+      _songs = _songsCopy.where((song) {
+        return StringNormalizer.normalize(song.title.toLowerCase()).indexOf(q) >= 0;
+      }).toList();
     }
-    _songs = _songsCopy.where((song) {
-      return song.title.toLowerCase().indexOf(query.toLowerCase()) >= 0;
-    }).toList();
     notifyListeners();
   }
 

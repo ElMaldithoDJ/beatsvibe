@@ -253,7 +253,7 @@ class _CupertinoContextMenuRoutePageState
   void _onVerticalDragEnd(DragEndDetails details) {
     // If dragged past 80px, dismiss the route. Else, snap it back.
     if (_dragOffset.abs() > 80.0) {
-      Navigator.of(context).pop();
+      Get.back();
     } else {
       _dragOffsetAtRelease = _dragOffset;
       _dragController.forward(from: 0.0);
@@ -343,7 +343,7 @@ class _CupertinoContextMenuRoutePageState
 
         // Menu width and horizontal alignment
         const double menuWidth = 260.0;
-        final double menuX = (screenSize.width - menuWidth) / 2;
+        final double menuX = (screenSize.width - ((widget.size.width - 60) + menuWidth)) / 2;
 
         return Stack(
           children: [

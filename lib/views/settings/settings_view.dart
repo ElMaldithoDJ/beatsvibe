@@ -27,19 +27,21 @@ class _SettingsViewState extends State<SettingsView> {
           body: SingleChildScrollView(
             child: Column(
               children: [
+                SizedBox(height: 20),
                 Center(
                   child: CircleAvatar(
-                    radius: 70,
+                    radius: 50,
                     backgroundColor: Theme.brightnessOf(context) == .dark
                         ? Colors.white.withValues(alpha: .1)
                         : Colors.grey.shade100,
                     child: Icon(
                       CupertinoIcons.gear,
-                      size: 70,
+                      size: 45,
                       color: Colors.grey,
                     ),
                   ),
                 ),
+                SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: ListView.builder(

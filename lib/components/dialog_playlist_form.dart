@@ -1,5 +1,6 @@
 import 'package:beatsvibe/models/playlist_data.dart';
 import 'package:beatsvibe/routes.dart';
+import 'package:beatsvibe/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,84 +31,80 @@ class _PlayListFormViewState extends State<PlayListFormView> {
     final playlistVM = Provider.of<PlaylistViewModel>(context, listen: true);
     return Scaffold(
       appBar: AppBar(title: Text("Crear Playlist")),
-      body: Padding(
-        padding: const .symmetric(vertical: 8, horizontal: 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Crear Playlist",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Center(
-              child: SizedBox(
-                width: 150,
-                height: 150,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Theme.brightnessOf(context) == .dark
-                        ? Colors.white.withValues(alpha: .1)
-                        : Colors.black.withValues(alpha: .05),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const .symmetric(vertical: 8, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: SizedBox(
+                  width: 150,
+                  height: 150,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Theme.brightnessOf(context) == .dark
+                          ? Colors.white.withValues(alpha: .1)
+                          : Colors.black.withValues(alpha: .05),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      CupertinoIcons.music_albums,
+                      size: 50,
+                      color: Theme.brightnessOf(context) == .dark
+                          ? Colors.white
+                          : Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _nameController,
+                      focusNode: nameFocusNode,
+                      decoration: InputDecoration(
+                        hintText: "Nombre de la Playlist",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 0,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      onTapOutside: (event) {
+                        nameFocusNode.unfocus();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Get.toNamed(AppRoutes.songSelector);
+                },
+                label: const Text("Seleccionar Canciónes"),
+                icon: const Icon(CupertinoIcons.music_note),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
-                    CupertinoIcons.music_albums,
-                    size: 50,
-                    color: Theme.brightnessOf(context) == .dark
-                        ? Colors.white
-                        : Colors.grey,
-                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _nameController,
-                    focusNode: nameFocusNode,
-                    decoration: InputDecoration(
-                      hintText: "Nombre de la Playlist",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 0,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                    onTapOutside: (event) {
-                      nameFocusNode.unfocus();
-                    },
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () {
-                Get.toNamed(AppRoutes.songSelector);
-              },
-              label: const Text("Seleccionar Canciónes"),
-              icon: const Icon(CupertinoIcons.music_note),
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
+              SizedBox(height: 20),
+              ListView.builder(
                 itemCount: playlistVM.selectedSongs.length,
                 shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   final song = playlistVM.selectedSongs[index];
                   return ListTile(
@@ -120,7 +117,11 @@ class _PlayListFormViewState extends State<PlayListFormView> {
                           )
                         : null,
                     trailing: IconButton(
-                      icon: const Icon(CupertinoIcons.delete, color: Colors.red, size: 20,),
+                      icon: const Icon(
+                        CupertinoIcons.delete,
+                        color: Colors.red,
+                        size: 20,
+                      ),
                       onPressed: () {
                         playlistVM.removeSelectedSong(song);
                       },
@@ -128,8 +129,8 @@ class _PlayListFormViewState extends State<PlayListFormView> {
                   );
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: SafeArea(
@@ -138,25 +139,36 @@ class _PlayListFormViewState extends State<PlayListFormView> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(onPressed: () => Get.back(), child: Text("Cancelar")),
+              TextButton(
+                onPressed: () {
+                  playlistVM.clearSelectedSongs();
+                  setState(() {
+                    _nameController.clear();
+                  });
+                  Get.back();
+                },
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: Text("Cancelar"),
+              ),
               SizedBox(width: 10),
               TextButton(
                 onPressed:
                     _nameController.text.isNotEmpty &&
-                    playlistVM.selectedSongs.isNotEmpty
+                        playlistVM.selectedSongs.isNotEmpty
                     ? () async {
                         final playlist = PlaylistModelData(
                           title: _nameController.text,
-                          songs: playlistVM.selectedSongs
+                          songs: playlistVM.selectedSongs,
                         );
-                        await playlistVM
-                            .createPlaylist(playlist)
-                            .whenComplete(() {
-                              playlistVM.clearSelectedSongs();
-                              Get.back();
-                            });
+                        await playlistVM.createPlaylist(playlist).whenComplete(
+                          () {
+                            playlistVM.clearSelectedSongs();
+                            Get.back();
+                          },
+                        );
                       }
                     : null,
+                style: TextButton.styleFrom(foregroundColor: AppTheme.primaryColor),
                 child: Text("Crear"),
               ),
             ],

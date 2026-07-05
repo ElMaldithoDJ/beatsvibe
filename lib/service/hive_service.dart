@@ -1,3 +1,4 @@
+import 'package:beatsvibe/models/folders_model.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/models/playlist_data.dart';
 import 'package:flutter/material.dart' show ThemeMode;
@@ -10,6 +11,7 @@ class HiveService {
   static final String _recentlyPlayedBox = 'recently_played';
   static final String _lastPlayedSongBox = 'last_played';
   static final String _themeBox = 'theme';
+  static final String _filesFolder = 'files_folder';
 
   // Get all songs
   Future<List<MediaItemData>> getAllSongs() async {
@@ -23,7 +25,6 @@ class HiveService {
   }
 
   Future<void> saveAllSongs(List<MediaItemData> songs) async {
-    songs.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     final box = await Hive.openBox(_songsBox);
     for (var song in songs) {
       await box.put(song.id, song.toJson());
@@ -129,5 +130,31 @@ class HiveService {
       return PlaylistModelData.fromJson(value as Map<dynamic, dynamic>);
     }
     return null;
+  }
+
+  // Files Folder
+  Future<List<FoldersModel>> getFilesFolder() async {
+    final box = await Hive.openBox(_filesFolder);
+    if (box.isNotEmpty) {
+      return box.values
+          .map((e) => FoldersModel.fromJson(e as Map<dynamic, dynamic>))
+          .toList();
+    }
+    return [];
+  }
+
+  // Save Files Folder
+  Future<void> saveFilesFolder(List<FoldersModel> folderPath) async {
+    final box = await Hive.openBox(_filesFolder);
+    await box.clear();
+    for (var folder in folderPath) {
+      await box.put(folder.id, folder.toJson());
+    }
+  }
+
+  // Remove Files Folder
+  Future<void> removeFilesFolder(String id) async {
+    final box = await Hive.openBox(_filesFolder);
+    await box.delete(id);
   }
 }

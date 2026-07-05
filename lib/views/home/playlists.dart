@@ -81,7 +81,6 @@ class _PlaylistsViewState extends State<PlaylistsView> {
                             icon: CupertinoIcons.trash,
                             isDestructive: true,
                             onTap: () async {
-                              print("Playlist ID: ${playlist.id}");
                               await playlistVM.removePlaylist(playlist.id!);
                             },
                           ),
@@ -90,7 +89,7 @@ class _PlaylistsViewState extends State<PlaylistsView> {
                           decoration: BoxDecoration(
                             color: Theme.brightnessOf(context) == .dark
                                 ? AppTheme.playerDarkBgColor
-                                : AppTheme.playerLightBgColor,
+                                : Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Column(
@@ -143,7 +142,7 @@ class _PlaylistsViewState extends State<PlaylistsView> {
                   Get.toNamed(AppRoutes.createPlaylist);
                 },
                 backgroundColor: AppTheme.primaryColor,
-                child: Icon(CupertinoIcons.add),
+                child: Icon(CupertinoIcons.add, color: Colors.white,),
               ),
             ),
           ],

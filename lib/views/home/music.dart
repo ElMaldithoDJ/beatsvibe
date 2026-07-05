@@ -51,7 +51,7 @@ class _MusicViewState extends State<MusicView> {
                   horizontal: 16,
                 ),
                 child: SizedBox(
-                  height: 40,
+                  height: 45,
                   child: TextField(
                     controller: _searchController,
                     focusNode: _searchNode,
@@ -82,8 +82,9 @@ class _MusicViewState extends State<MusicView> {
                       width: .maxFinite,
                       child: GestureDetector(
                         onTap: () {
-                          if (playerVM.currentItem?.id != song.id) {
-                            playerVM.play(song, playlist: audioVM.songs);
+                          if (playerVM.currentItem?.id != song.id ||
+                              playerVM.lastPlayed?.id != song.id) {
+                            playerVM.play(song, playlist: audioVM.songsCopy);
                           }
                           Get.toNamed(AppRoutes.player);
                         },
@@ -114,7 +115,6 @@ class _MusicViewState extends State<MusicView> {
                           child: AudioItem(
                             song: song,
                             index: index,
-                            playlist: audioVM.songs,
                             showIsPlaying: true,
                           ),
                         ),

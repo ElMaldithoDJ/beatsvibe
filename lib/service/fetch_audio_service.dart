@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:beatsvibe/models/folders_model.dart';
+import 'package:beatsvibe/service/hive_service.dart';
 import 'package:beatsvibe/util/id_generator.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -21,9 +23,13 @@ const List<String> _validExtensions = [
 ];
 
 class FetchAudioService {
+  static final HiveService _hiveService = HiveService();
   static Future<List<MediaItemData>> scanLocalFiles() async {
+    String id;
+    bool isIncluded;
+
     String dir = (await FilePicker.platform.getDirectoryPath(
-      dialogTitle: 'S1elecciona una carpeta de música',
+      dialogTitle: 'Selecciona una carpeta de música',
     ))!;
 
     final RootIsolateToken? token = RootIsolateToken.instance;
@@ -38,7 +44,21 @@ class FetchAudioService {
     );
 
     try {
-      return await compute(_scanFiles, model);
+      return await compute(_scanFiles, model).whenComplete(() async {
+        final existingFolders = await _hiveService.getFilesFolder();
+        do {
+          id = IDGenerator.generateId(length: 25);
+          isIncluded = existingFolders.any((e) => e.id == id);
+        } while (isIncluded);
+
+        final folder = FoldersModel(
+          id: id,
+          name: dir.split('/').last,
+          path: dir,
+        );
+        await _hiveService.saveFilesFolder([folder]);
+        
+      });
     } catch (_) {
       return [];
     }
@@ -48,6 +68,8 @@ class FetchAudioService {
 @pragma('vm:entry-point')
 Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
   final UtfConverterService utfConverter = UtfConverterService();
+  String id;
+  bool isIncluded;
   List<MediaItemData> songs = [];
   Directory musicDirectory = Directory(model.path);
 
@@ -93,57 +115,59 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
           }
 
           try {
-            String id = IDGenerator.generateId(length: 35);
-            bool isIncluded = songs.any((e) => e.id == id);
-            while (isIncluded) {
+            // Generar un id unico para la cancion
+            do {
               id = IDGenerator.generateId(length: 35);
-            }
-            songs.add(
-              MediaItemData(
-                id: id,
-                audioUrl: file.path,
-                title: utfConverter.convertToUtf8(
-                  metadata?.title ?? 'Titulo Desconocido',
-                ),
-                artist: utfConverter.convertToUtf8(
-                  metadata?.artist ?? 'Artista Desconocido',
-                ),
-                album: utfConverter.convertToUtf8(
-                  metadata?.album ?? 'Album Desconocido',
-                ),
-                genre: utfConverter.convertToUtf8(
-                  metadata?.genre ?? 'Genero Desconocido',
-                ),
-                duration: Duration(seconds: metadata?.durationSec ?? 0),
-                artUri: artUri,
-                format: AudioFormat.values.firstWhere(
-                  (e) => e.name.startsWith(ext),
-                ),
-                bitrate: metadata?.bitrate,
+              isIncluded = songs.any((e) => e.id == id);
+            } while (isIncluded);
+
+            final songData = MediaItemData(
+              id: id,
+              audioUrl: file.path,
+              title: utfConverter.convertToUtf8(
+                metadata?.title ?? 'Titulo Desconocido',
               ),
+              artist: utfConverter.convertToUtf8(
+                metadata?.artist ?? 'Artista Desconocido',
+              ),
+              album: utfConverter.convertToUtf8(
+                metadata?.album ?? 'Album Desconocido',
+              ),
+              genre: utfConverter.convertToUtf8(
+                metadata?.genre ?? 'Genero Desconocido',
+              ),
+              duration: Duration(seconds: metadata?.durationSec ?? 0),
+              artUri: artUri,
+              format: AudioFormat.values.firstWhere(
+                (e) => e.name.startsWith(ext),
+              ),
+              bitrate: metadata?.bitrate,
             );
+            // Agregar la cancion a la base de datos
+            songs.add(songData);
           } catch (_) {
-            String id = IDGenerator.generateId(length: 35);
-            bool isIncluded = songs.any((e) => e.id == id);
-            while (isIncluded) {
+            // Generar un id unico para la cancion
+            do {
               id = IDGenerator.generateId(length: 35);
-            }
-            songs.add(
-              MediaItemData(
-                id: id,
-                title: file.path.split('/').last.split('.').first,
-                audioUrl: file.path,
-                artist: 'Artista Desconocido',
-                album: 'Album Desconocido',
-                genre: 'Genero Desconocido',
-                duration: Duration(seconds: metadata?.durationSec ?? 0),
-                artUri: artUri,
-                format: AudioFormat.values.firstWhere(
-                  (e) => e.name.startsWith(ext),
-                ),
-                bitrate: metadata?.bitrate,
+              isIncluded = songs.any((e) => e.id == id);
+            } while (isIncluded);
+
+            final songData = MediaItemData(
+              id: id,
+              title: file.path.split('/').last.split('.').first,
+              audioUrl: file.path,
+              artist: 'Artista Desconocido',
+              album: 'Album Desconocido',
+              genre: 'Genero Desconocido',
+              duration: Duration(seconds: metadata?.durationSec ?? 0),
+              artUri: artUri,
+              format: AudioFormat.values.firstWhere(
+                (e) => e.name.startsWith(ext),
               ),
+              bitrate: metadata?.bitrate,
             );
+            // Agregar la cancion a la base de datos
+            songs.add(songData);
           }
         }
       }

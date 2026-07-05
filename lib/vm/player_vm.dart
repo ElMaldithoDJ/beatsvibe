@@ -46,7 +46,7 @@ class PlayerViewModel extends ChangeNotifier {
     _listenQueue();
     _listenLastPlayedSong();
     _listenCurrentItem();
-    
+
     audioHandler.playbackState.listen((state) {
       _playingState(state.playing);
     });
@@ -77,10 +77,10 @@ class PlayerViewModel extends ChangeNotifier {
     final lastPlayedData = await _hiveService.getLastPlayed();
     if (lastPlayedData != null) {
       _lastPlayed = lastPlayedData.toMediaItem();
-      notifyListeners();
       await audioHandler.jumpToQueueItem(
         _queue.indexWhere((e) => e.id == _lastPlayed?.id),
       );
+      notifyListeners();
     }
   }
 
@@ -89,8 +89,8 @@ class PlayerViewModel extends ChangeNotifier {
     audioHandler.mediaItem.listen((mediaItem) async {
       if (mediaItem != null) {
         _lastPlayed = mediaItem;
-        _isFavorite = await _hiveService.isFavorite(mediaItem.id);
         notifyListeners();
+        _isFavorite = await _hiveService.isFavorite(mediaItem.id);
         final mediaItemData = MediaItemData.fromMediaItem(mediaItem);
         if (mediaItemData != null) {
           await _hiveService.saveLastPlayed(mediaItemData);
@@ -109,7 +109,7 @@ class PlayerViewModel extends ChangeNotifier {
       if (audioHandler.queue.value.length == playlist.length) {
         isSame = true;
         for (int i = 0; i < playlist.length; i++) {
-          if (audioHandler.queue.value[i].id != playlist[i].id.toString()) {
+          if (audioHandler.queue.value[i].id != playlist[i].id) {
             isSame = false;
             break;
           }
@@ -122,17 +122,22 @@ class PlayerViewModel extends ChangeNotifier {
       final songs = await _getSongs();
       if (audioHandler.queue.value.length != songs.length) {
         await audioHandler.initPlayer(songs: songs);
-        await audioHandler.skipToQueueItem(
-          _queue.indexWhere((e) => e.id == song.id),
-        );
-      } else if (lastPlayed != null) {
-      await audioHandler.skipToQueueItem(
-        _queue.indexWhere((e) => e.id == lastPlayed!.id),
-      );
+      } 
     }
+
+    if (song != null) {
+      final index = audioHandler.queue.value.indexWhere((e) => e.id == song.id);
+      if (index != -1) {
+        await audioHandler.skipToQueueItem(index);
+      }
+    } else if (lastPlayed != null) {
+      final index = audioHandler.queue.value.indexWhere((e) => e.id == lastPlayed!.id);
+      if (index != -1) {
+        await audioHandler.skipToQueueItem(index);
+      }
     }
+
     await audioHandler.play();
-    notifyListeners();
   }
 
   //pause

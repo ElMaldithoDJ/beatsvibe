@@ -30,6 +30,7 @@ dependencies:
   json_annotation:
   fluttertoast:
   open_file_manager:
+  string_normalizer:
 
 dev_dependencies:
   flutter_test:

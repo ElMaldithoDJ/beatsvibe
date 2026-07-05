@@ -54,11 +54,12 @@ class PlaylistViewModel extends ChangeNotifier {
   }
 
   Future<void> createPlaylist(PlaylistModelData playlist) async {
-    String id = IDGenerator.generateId(length: 100);
-    bool isIncluded = _playlists.any((e) => e.id == id);
-    while (isIncluded) {
-      id = IDGenerator.generateId(length: 100);
-    }
+    String id;
+    bool isIncluded;
+    do {
+      id = IDGenerator.generateId(length: 50);
+      isIncluded = _playlists.any((e) => e.id == id);
+    } while (isIncluded);
     final newPlaylist = PlaylistModelData(
       id: id,
       title: playlist.title,

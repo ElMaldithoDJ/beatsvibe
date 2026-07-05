@@ -1,9 +1,12 @@
+import 'package:beatsvibe/models/folders_model.dart';
 import 'package:beatsvibe/models/settings_opt.dart';
 import 'package:beatsvibe/routes.dart';
+import 'package:beatsvibe/service/hive_service.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 class SettingsViewModel extends ChangeNotifier {
+  final HiveService _hiveService = HiveService();
   ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
 
@@ -40,7 +43,26 @@ class SettingsViewModel extends ChangeNotifier {
     ),
   ];
 
+  List<FoldersModel> _folderPath = [];
+
   List<SettingsOptionsModel> get settingsOptions => _settingsOptions;
+  List<FoldersModel> get folderPath => _folderPath;
+
+  SettingsViewModel() {
+    _init();
+  }
+
+  void _init() async {
+    await _initFolder();
+  }
+
+  Future<void> _initFolder() async {
+    await _hiveService.getFilesFolder()
+    .then((value) {
+      _folderPath = value;
+      notifyListeners();
+    });
+  }
 
   void setThemeMode(ThemeMode themeMode) {
     _themeMode = themeMode;

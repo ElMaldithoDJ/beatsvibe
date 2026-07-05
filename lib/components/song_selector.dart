@@ -1,4 +1,3 @@
-import 'package:beatsvibe/components/audio_item.dart';
 import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:beatsvibe/vm/playlist_vm.dart';
 import 'package:flutter/cupertino.dart';
@@ -62,9 +61,13 @@ class _SongSelectorState extends State<SongSelector> {
                 child: ListView.builder(
                   physics: const BouncingScrollPhysics(),
                   itemCount: audioVM.songs.length,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   itemBuilder: (context, index) {
                     final song = audioVM.songs[index];
-                    return GestureDetector(
+                    return ListTile(
                       onTap: () {
                         if (playlistVM.selectedSongs.contains(song)) {
                           playlistVM.removeSelectedSong(song);
@@ -72,12 +75,29 @@ class _SongSelectorState extends State<SongSelector> {
                           playlistVM.addSelectedSong(song);
                         }
                       },
-                      child: AudioItem(
-                        song: song,
-                        index: index,
-                        isSelected: playlistVM.selectedSongs.contains(song),
-                        showIsSelected: true,
+                      leading: Icon(CupertinoIcons.music_note),
+                      title: Text(song.title),
+                      subtitle: song.artist != null && song.artist!.isNotEmpty
+                          ? Text(
+                              song.artist!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          : null,
+                      trailing: Checkbox(
+                        value: playlistVM.selectedSongs.contains(song),
+                        onChanged: (value) {
+                          if (value == true) {
+                            playlistVM.addSelectedSong(song);
+                          } else {
+                            playlistVM.removeSelectedSong(song);
+                          }
+                        },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
+                      splashColor: Colors.transparent,
                     );
                   },
                 ),

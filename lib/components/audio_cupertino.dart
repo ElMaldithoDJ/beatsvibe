@@ -343,7 +343,7 @@ class _CupertinoContextMenuRoutePageState
 
         // Menu width and horizontal alignment
         const double menuWidth = 260.0;
-        final double menuX = (screenSize.width - menuWidth) / 2;
+        final double menuX = (screenSize.width - (widget.size.width - 16)) / 2;
 
         return Stack(
           children: [

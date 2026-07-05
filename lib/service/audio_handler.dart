@@ -37,7 +37,6 @@ class AudioHandlerService extends BaseAudioHandler
           MediaControl.skipToPrevious,
           (player.playing) ? MediaControl.pause : MediaControl.play,
           MediaControl.skipToNext,
-          // MediaControl.stop,
         ],
         systemActions: const {
           MediaAction.seek,

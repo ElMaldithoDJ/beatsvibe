@@ -23,6 +23,7 @@ class AppTheme {
       elevation: 0,
       iconTheme: IconThemeData(color: lightTextColor),
       titleTextStyle: TextStyle(color: lightTextColor, fontSize: 20),
+      surfaceTintColor: lightBackgroundColor,
     ),
     textTheme: TextTheme(
       titleMedium: TextStyle(
@@ -82,13 +83,17 @@ class AppTheme {
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: Colors.transparent, width: 0),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.transparent),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: primaryColor),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: primaryColor, width: 1),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.transparent),
       ),
       contentPadding: EdgeInsets.zero,
       filled: true,
@@ -107,6 +112,7 @@ class AppTheme {
       elevation: 0,
       iconTheme: IconThemeData(color: darkTextColor),
       titleTextStyle: TextStyle(color: darkTextColor, fontSize: 20),
+      surfaceTintColor: darkBackgroundColor,
     ),
     textTheme: TextTheme(
       titleMedium: TextStyle(
@@ -166,13 +172,17 @@ class AppTheme {
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: Colors.transparent, width: 0),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.transparent, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: primaryColor),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: primaryColor, width: 1),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.transparent, width: 1),
       ),
       contentPadding: EdgeInsets.zero,
       filled: true,
