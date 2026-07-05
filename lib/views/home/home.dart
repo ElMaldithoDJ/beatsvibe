@@ -56,7 +56,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final audioVM = Provider.of<AudioViewModel>(context, listen: true);
     tabController = TabController(
-      length: audioVM.songs.isEmpty ? 1 : navButtons.length,
+      length: audioVM.songsCopy.isEmpty ? 1 : navButtons.length,
       vsync: this,
       initialIndex: 0,
     );
@@ -80,7 +80,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
           ),
           const SizedBox(width: 10),
         ],
-        bottom: audioVM.isLoading || audioVM.songs.isEmpty
+        bottom: audioVM.isLoading || audioVM.songsCopy.isEmpty
             ? null
             : TabBar(
                 controller: tabController,
@@ -98,7 +98,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
                 dividerHeight: 0,
                 tabAlignment: TabAlignment.fill,
                 tabs: [
-                  if (audioVM.songs.isEmpty) ...[
+                  if (audioVM.songsCopy.isEmpty) ...[
                     Tab(text: '', height: 35, iconMargin: EdgeInsets.zero),
                   ] else ...[
                     ...navButtons.map(
@@ -115,7 +115,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
       body: TabBarView(
         controller: tabController,
         children: [
-          if (audioVM.songs.isEmpty) ...[
+          if (audioVM.songsCopy.isEmpty) ...[
             navButtons[0].page,
           ] else ...[
             ...navButtons.map((btn) => btn.page),

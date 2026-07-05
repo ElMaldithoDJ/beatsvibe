@@ -39,7 +39,7 @@ class _MusicViewState extends State<MusicView> {
     final audioVM = Provider.of<AudioViewModel>(context, listen: true);
     final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
 
-    return audioVM.songs.isEmpty
+    return audioVM.songsCopy.isEmpty
         ? !audioVM.isLoading
               ? const NoSongs()
               : const SizedBox.shrink()

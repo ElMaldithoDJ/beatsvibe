@@ -22,7 +22,7 @@ class ArtworkPlayer extends StatelessWidget {
           child: Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(20),
                 child: Stack(
                   children: [
                     if (playerVM.currentItem?.artUri != null) ...[
@@ -108,32 +108,6 @@ class ArtworkPlayer extends StatelessWidget {
                                           : Colors.white,
                                       size: 25,
                                     ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: Align(
-                        alignment: .topRight,
-                        child: SizedBox(
-                          width: 55,
-                          height: 55,
-                          child: GestureDetector(
-                            onTap: () async {},
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                                child: Container(
-                                  color: Colors.white.withValues(alpha: .15),
-                                  child: Center(
-                                    child: Icon(CupertinoIcons.share, size: 25),
                                   ),
                                 ),
                               ),
