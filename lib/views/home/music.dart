@@ -73,22 +73,27 @@ class _MusicViewState extends State<MusicView> {
                   itemCount: audioVM.songs.length,
                   shrinkWrap: true,
                   controller: _scrollController,
+                  padding: const .only(bottom: 10),
                   physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
                   itemBuilder: (context, index) {
                     final song = audioVM.songs[index];
-                    return SizedBox(
-                      width: .maxFinite,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (playerVM.currentItem?.id != song.id ||
-                              playerVM.lastPlayed?.id != song.id) {
-                            playerVM.play(song, playlist: audioVM.songsCopy);
-                          }
-                          Get.toNamed(AppRoutes.player);
-                        },
+                    return GestureDetector(
+                      onTap: () {
+                        if (playerVM.currentItem?.id != song.id ||
+                            playerVM.lastPlayed?.id != song.id) {
+                          playerVM.play(song, playlist: audioVM.songsCopy);
+                        }
+                        if (_searchController.text.isNotEmpty) {
+                          _searchController.clear();
+                          audioVM.onSearch("");
+                        }
+                        Get.toNamed(AppRoutes.player);
+                      },
 
+                      child: SizedBox(
+                        width: .maxFinite,
                         child: AudioCupertinoContextMenu(
                           actions: [
                             AudioCupertinoMenuItem(
@@ -109,7 +114,9 @@ class _MusicViewState extends State<MusicView> {
                               title: "Eliminar",
                               icon: CupertinoIcons.delete_solid,
                               isDestructive: true,
-                              onTap: () {},
+                              onTap: () async {
+                                await playerVM.deleteSong(song.id);
+                              },
                             ),
                           ],
                           child: AudioItem(

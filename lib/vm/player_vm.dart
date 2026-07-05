@@ -104,40 +104,24 @@ class PlayerViewModel extends ChangeNotifier {
     MediaItemData? song, {
     List<MediaItemData>? playlist,
   }) async {
-    if (playlist != null) {
-      bool isSame = false;
-      if (audioHandler.queue.value.length == playlist.length) {
-        isSame = true;
-        for (int i = 0; i < playlist.length; i++) {
-          if (audioHandler.queue.value[i].id != playlist[i].id) {
-            isSame = false;
-            break;
-          }
-        }
-      }
-      if (!isSame) {
+    try {
+      if (playlist != null) {
         await audioHandler.initPlayer(songs: playlist);
+        if (song != null) {
+          await audioHandler.skipToQueueItem(
+            playlist.indexWhere((e) => e.id == song.id),
+          );
+        }
+      } else if (song != null) {
+        await audioHandler.skipToQueueItem(
+          queue.indexWhere((e) => e.id == song.id),
+        );
+      } else {
+        await audioHandler.play();
       }
-    } else if (song != null) {
-      final songs = await _getSongs();
-      if (audioHandler.queue.value.length != songs.length) {
-        await audioHandler.initPlayer(songs: songs);
-      } 
+    } catch (e) {
+      skipToNext();
     }
-
-    if (song != null) {
-      final index = audioHandler.queue.value.indexWhere((e) => e.id == song.id);
-      if (index != -1) {
-        await audioHandler.skipToQueueItem(index);
-      }
-    } else if (lastPlayed != null) {
-      final index = audioHandler.queue.value.indexWhere((e) => e.id == lastPlayed!.id);
-      if (index != -1) {
-        await audioHandler.skipToQueueItem(index);
-      }
-    }
-
-    await audioHandler.play();
   }
 
   //pause
@@ -182,7 +166,19 @@ class PlayerViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<MediaItemData>> _getSongs() async {
-    return await _hiveService.getAllSongs();
+  // Delete song
+  Future<void> deleteSong(String id) async {
+    await _hiveService.deleteSong(id);
+    if (currentItem?.id == id) {
+      //remove current item from queue
+      _queue.removeWhere((e) => e.id == id);
+      audioHandler.queue.value.removeWhere((e) => e.id == id);
+      skipToNext();
+      notifyListeners();
+    } else {
+      //remove current item from queue
+      _queue.removeWhere((e) => e.id == id);
+      audioHandler.queue.value.removeWhere((e) => e.id == id);
+    }
   }
 }

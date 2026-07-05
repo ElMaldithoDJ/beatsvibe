@@ -13,14 +13,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-const List<String> _validExtensions = [
-  '.mp3',
-  '.wav',
-  '.m4a',
-  '.aac',
-  '.flac',
-  '.alac',
-];
+const List<String> _validExtensions = ['mp3', 'wav', 'm4a', 'flac', 'alac'];
 
 class FetchAudioService {
   static final HiveService _hiveService = HiveService();
@@ -57,7 +50,6 @@ class FetchAudioService {
           path: dir,
         );
         await _hiveService.saveFilesFolder([folder]);
-        
       });
     } catch (_) {
       return [];
@@ -86,7 +78,7 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
       FileSystemEntity file = files[i];
       if (file is File) {
         String ext = file.path.split('.').last.toLowerCase();
-        if (_validExtensions.contains('.$ext')) {
+        if (_validExtensions.contains('$ext')) {
           AudioData? metadata = await AudioInfo.getAudioInfo(file.path);
           Uint8List? artwork = await AudioInfo.getAudioImage(file.path);
 
@@ -117,7 +109,7 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
           try {
             // Generar un id unico para la cancion
             do {
-              id = IDGenerator.generateId(length: 35);
+              id = IDGenerator.generateId(length: 25);
               isIncluded = songs.any((e) => e.id == id);
             } while (isIncluded);
 
@@ -148,7 +140,7 @@ Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
           } catch (_) {
             // Generar un id unico para la cancion
             do {
-              id = IDGenerator.generateId(length: 35);
+              id = IDGenerator.generateId(length: 25);
               isIncluded = songs.any((e) => e.id == id);
             } while (isIncluded);
 

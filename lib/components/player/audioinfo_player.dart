@@ -2,10 +2,15 @@ import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class InfoPlayer extends StatelessWidget {
-  const InfoPlayer({super.key});
+class AudioInfoPlayer extends StatefulWidget {
+  const AudioInfoPlayer({super.key});
 
   @override
+  State<AudioInfoPlayer> createState() => _AudioInfoPlayerState();
+}
+
+class _AudioInfoPlayerState extends State<AudioInfoPlayer> {
+   @override
   Widget build(BuildContext context) {
     return Consumer<PlayerViewModel>(
       builder: (context, playerVM, child) => Padding(

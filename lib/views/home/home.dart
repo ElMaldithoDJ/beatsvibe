@@ -122,7 +122,9 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
           ],
         ],
       ),
-      bottomNavigationBar: const AudioPlayerComponent(margin: EdgeInsets.all(10)),
+      bottomNavigationBar: const AudioPlayerComponent(
+        margin: .only(bottom: 10, left: 10, right: 10),
+      ),
     );
   }
 }

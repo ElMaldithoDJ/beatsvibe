@@ -8,10 +8,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ArtworkPlayer extends StatelessWidget {
+class ArtworkPlayer extends StatefulWidget {
   const ArtworkPlayer({super.key});
 
   @override
+  State<ArtworkPlayer> createState() => _ArtworkPlayerState();
+}
+
+class _ArtworkPlayerState extends State<ArtworkPlayer> {
+   @override
   Widget build(BuildContext context) {
     final favoritesVM = Provider.of<FavoritesViewModel>(context, listen: false);
     return Consumer<PlayerViewModel>(
@@ -50,8 +55,8 @@ class ArtworkPlayer extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(25),
                           color: Theme.brightnessOf(context) == .dark
-                              ? Colors.white.withValues(alpha: .2)
-                              : Colors.grey.withValues(alpha: .2),
+                              ? Colors.white.withValues(alpha: .1)
+                              : Colors.grey.shade200,
                         ),
                         child: Center(
                           child: Icon(
@@ -86,7 +91,11 @@ class ArtworkPlayer extends StatelessWidget {
                               child: BackdropFilter(
                                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                                 child: Container(
-                                  color: Colors.white.withValues(alpha: .15),
+                                  color: playerVM.currentItem?.artUri != null
+                                      ? null
+                                      : Theme.brightnessOf(context) == .dark
+                                      ? Colors.white.withValues(alpha: .1)
+                                      : Colors.black12.withValues(alpha: .05),
                                   child: Center(
                                     child: Icon(
                                       favoritesVM.favorites.any(
@@ -105,7 +114,11 @@ class ArtworkPlayer extends StatelessWidget {
                                                     playerVM.lastPlayed?.id),
                                           )
                                           ? Colors.pinkAccent
-                                          : Colors.white,
+                                          : playerVM.currentItem?.artUri != null
+                                          ? Colors.white
+                                          : Theme.brightnessOf(context) == .dark
+                                          ? Colors.white
+                                          : Colors.redAccent,
                                       size: 25,
                                     ),
                                   ),

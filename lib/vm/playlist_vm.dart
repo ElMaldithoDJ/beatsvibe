@@ -57,7 +57,7 @@ class PlaylistViewModel extends ChangeNotifier {
     String id;
     bool isIncluded;
     do {
-      id = IDGenerator.generateId(length: 50);
+      id = IDGenerator.generateId(length: 25);
       isIncluded = _playlists.any((e) => e.id == id);
     } while (isIncluded);
     final newPlaylist = PlaylistModelData(

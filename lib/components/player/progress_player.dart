@@ -2,10 +2,15 @@ import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ProgressPlayer extends StatelessWidget {
+class ProgressPlayer extends StatefulWidget {
   const ProgressPlayer({super.key});
 
   @override
+  State<ProgressPlayer> createState() => _ProgressPlayerState();
+}
+
+class _ProgressPlayerState extends State<ProgressPlayer> {
+   @override
   Widget build(BuildContext context) {
     return Consumer<PlayerViewModel>(
       builder: (context, playerVM, child) {

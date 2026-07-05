@@ -31,6 +31,12 @@ class HiveService {
     }
   }
 
+  // Delete song from hive
+  Future<void> deleteSong(String id) async {
+    final box = await Hive.openBox(_songsBox);
+    await box.delete(id);
+  }
+
   // Get favorite songs
   Future<List<MediaItemData>> getFavoriteSongs() async {
     final box = await Hive.openBox(_favoriteSongsBox);
