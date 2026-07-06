@@ -127,15 +127,9 @@ class PlayerViewModel extends ChangeNotifier {
             playlist.indexWhere((e) => e.id == song.id),
           );
         }
-      } else if (song != null) {
-        await audioHandler.skipToQueueItem(
-          _queue.indexWhere((e) => e.id == song.id),
-        );
       }
       await audioHandler.play();
-    } catch (e) {
-      skipToNext();
-    }
+    } catch (_) {}
   }
 
   //pause
