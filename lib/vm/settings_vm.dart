@@ -1,6 +1,7 @@
 import 'package:beatsvibe/models/folders_model.dart';
 import 'package:beatsvibe/models/settings_opt.dart';
 import 'package:beatsvibe/routes.dart';
+import 'package:beatsvibe/service/fetch_audio_service.dart';
 import 'package:beatsvibe/service/hive_service.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -53,12 +54,11 @@ class SettingsViewModel extends ChangeNotifier {
   }
 
   void _init() async {
-    await _initFolder();
+    await initFolder();
   }
 
-  Future<void> _initFolder() async {
-    await _hiveService.getFilesFolder()
-    .then((value) {
+  Future<void> initFolder() async {
+    await _hiveService.getFilesFolder().then((value) {
       _folderPath = value;
       notifyListeners();
     });
@@ -69,5 +69,9 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  
+  Future<void> addFolder() async {
+    await FetchAudioService.scanLocalFiles().whenComplete(() async {
+      await initFolder();
+    });
+  }
 }

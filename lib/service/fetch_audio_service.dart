@@ -17,42 +17,47 @@ const List<String> _validExtensions = ['mp3', 'wav', 'm4a', 'flac', 'alac'];
 
 class FetchAudioService {
   static final HiveService _hiveService = HiveService();
-  static Future<List<MediaItemData>> scanLocalFiles() async {
+  static Future<void> scanLocalFiles() async {
     String id;
     bool isIncluded;
 
-    String dir = (await FilePicker.platform.getDirectoryPath(
+    String? dir = (await FilePicker.platform.getDirectoryPath(
       dialogTitle: 'Selecciona una carpeta de música',
-    ))!;
+      initialDirectory: '/storage/emulated/0/',
+    ));
 
-    final RootIsolateToken? token = RootIsolateToken.instance;
-    if (token == null) return [];
+    if (dir != null) {
+      final RootIsolateToken? token = RootIsolateToken.instance;
+      if (token == null) return;
 
-    final Directory appDocDir = await getApplicationDocumentsDirectory();
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
 
-    StorageIsolateModel model = StorageIsolateModel(
-      path: dir,
-      token: token,
-      appDocDir: appDocDir.path,
-    );
+      StorageIsolateModel model = StorageIsolateModel(
+        path: dir,
+        token: token,
+        appDocDir: appDocDir.path,
+      );
 
-    try {
-      return await compute(_scanFiles, model).whenComplete(() async {
-        final existingFolders = await _hiveService.getFilesFolder();
-        do {
-          id = IDGenerator.generateId(length: 25);
-          isIncluded = existingFolders.any((e) => e.id == id);
-        } while (isIncluded);
+      try {
+        return await compute(_scanFiles, model).then((data) async {
+          final existingFolders = await _hiveService.getFilesFolder();
+          do {
+            id = IDGenerator.generateId(length: 25);
+            isIncluded = existingFolders.any((e) => e.id == id);
+          } while (isIncluded);
 
-        final folder = FoldersModel(
-          id: id,
-          name: dir.split('/').last,
-          path: dir,
-        );
-        await _hiveService.saveFilesFolder([folder]);
-      });
-    } catch (_) {
-      return [];
+          final folder = FoldersModel(
+            id: id,
+            name: dir.split('/').last,
+            path: dir,
+            items: data.length,
+          );
+          await _hiveService.saveFilesFolder([folder]);
+          await _hiveService.saveAllSongs(data);
+        });
+      } catch (_) {
+        return;
+      }
     }
   }
 }

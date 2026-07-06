@@ -11,16 +11,26 @@ class PlayerViewModel extends ChangeNotifier {
   bool _isPlaying = false;
   bool _isFavorite = false;
   MediaItem? _lastPlayed;
+  AudioServiceRepeatMode _repeatMode = AudioServiceRepeatMode.none;
   Duration _currentPosition = Duration.zero;
   Duration _duration = Duration.zero;
   List<MediaItemData> _queue = [];
 
   bool get isPlaying => _isPlaying;
   bool get isFavorite => _isFavorite;
-  MediaItem? get currentItem => audioHandler.mediaItem.value;
   MediaItem? get lastPlayed => _lastPlayed;
   Duration get duration => _duration;
   List<MediaItemData> get queue => _queue;
+  AudioServiceRepeatMode get repeatMode => _repeatMode;
+
+  MediaItem? get currentItem {
+    if (_lastPlayed != null) {
+      return _lastPlayed;
+    } else {
+      return audioHandler.mediaItem.value;
+    }
+  }
+
   String get currentPositionString {
     final int minutes = _currentPosition.inMinutes;
     final int seconds = _currentPosition.inSeconds % 60;
@@ -43,8 +53,8 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   void onInit() async {
+    await _listenLastPlayedSong();
     _listenQueue();
-    _listenLastPlayedSong();
     _listenCurrentItem();
 
     audioHandler.playbackState.listen((state) {
@@ -73,15 +83,20 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   // Iniciar stream de ultima cancion reproducida
-  void _listenLastPlayedSong() async {
-    final lastPlayedData = await _hiveService.getLastPlayed();
-    if (lastPlayedData != null) {
-      _lastPlayed = lastPlayedData.toMediaItem();
-      await audioHandler.jumpToQueueItem(
-        _queue.indexWhere((e) => e.id == _lastPlayed?.id),
-      );
-      notifyListeners();
-    }
+  Future<void> _listenLastPlayedSong() async {
+    await _hiveService
+        .getLastPlayed()
+        .then((lastPlayedData) {
+          if (lastPlayedData != null) {
+            _lastPlayed = lastPlayedData.toMediaItem();
+            notifyListeners();
+          }
+        })
+        .whenComplete(() async {
+          await audioHandler.jumpToQueueItem(
+            _queue.indexWhere((e) => e.id == currentItem?.id),
+          );
+        });
   }
 
   // Iniciar Stream de cancion actual
@@ -92,7 +107,7 @@ class PlayerViewModel extends ChangeNotifier {
         notifyListeners();
         _isFavorite = await _hiveService.isFavorite(mediaItem.id);
         final mediaItemData = MediaItemData.fromMediaItem(mediaItem);
-        if (mediaItemData != null) {
+        if (mediaItemData != null && mediaItemData.id != lastPlayed?.id) {
           await _hiveService.saveLastPlayed(mediaItemData);
         }
       }
@@ -100,8 +115,8 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   //Play
-  Future<void> play(
-    MediaItemData? song, {
+  Future<void> play({
+    MediaItemData? song,
     List<MediaItemData>? playlist,
   }) async {
     try {
@@ -114,11 +129,10 @@ class PlayerViewModel extends ChangeNotifier {
         }
       } else if (song != null) {
         await audioHandler.skipToQueueItem(
-          queue.indexWhere((e) => e.id == song.id),
+          _queue.indexWhere((e) => e.id == song.id),
         );
-      } else {
-        await audioHandler.play();
       }
+      await audioHandler.play();
     } catch (e) {
       skipToNext();
     }
@@ -155,9 +169,20 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   //shuffle
-  void setShuffle() {
-    globalAudioHandler.setShuffleMode(AudioServiceShuffleMode.all);
-    notifyListeners();
+  void setRepeatMode() async {
+    if (_repeatMode == AudioServiceRepeatMode.none) {
+      _repeatMode = AudioServiceRepeatMode.all;
+      notifyListeners();
+      await audioHandler.setRepeatMode(AudioServiceRepeatMode.all);
+    } else if (_repeatMode == AudioServiceRepeatMode.all) {
+      _repeatMode = AudioServiceRepeatMode.one;
+      notifyListeners();
+      await audioHandler.setRepeatMode(AudioServiceRepeatMode.one);
+    } else {
+      _repeatMode = AudioServiceRepeatMode.none;
+      notifyListeners();
+      await audioHandler.setRepeatMode(AudioServiceRepeatMode.none);
+    }
   }
 
   // Playing State
@@ -179,6 +204,7 @@ class PlayerViewModel extends ChangeNotifier {
       //remove current item from queue
       _queue.removeWhere((e) => e.id == id);
       audioHandler.queue.value.removeWhere((e) => e.id == id);
+      notifyListeners();
     }
   }
 }

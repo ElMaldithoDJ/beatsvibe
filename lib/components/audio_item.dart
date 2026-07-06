@@ -169,8 +169,8 @@ class _AudioItemState extends State<AudioItem> {
                 child: Center(
                   child: Icon(
                     player.isPlaying
-                        ? CupertinoIcons.pause
-                        : CupertinoIcons.play,
+                        ? CupertinoIcons.play
+                        : CupertinoIcons.pause,
                     color: Theme.of(context).primaryColor,
                     size: 20,
                   ),

@@ -192,7 +192,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                   if (playerVM.isPlaying) {
                     playerVM.pause();
                   } else {
-                    playerVM.play(null);
+                    playerVM.play();
                   }
                 },
               ),
@@ -200,16 +200,14 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
               IconButton(
                 icon: Icon(
                   favoritesVM.favorites.any(
-                        (element) =>
-                            element.id == playerVM.currentItem?.id,
+                        (element) => element.id == playerVM.currentItem?.id,
                       )
                       ? CupertinoIcons.heart_fill
                       : CupertinoIcons.heart,
                   color: Theme.brightnessOf(context) == .dark
                       ? Colors.white
                       : favoritesVM.favorites.any(
-                          (element) =>
-                              element.id == playerVM.currentItem?.id,
+                          (element) => element.id == playerVM.currentItem?.id,
                         )
                       ? Colors.pinkAccent
                       : Colors.black26,

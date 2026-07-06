@@ -152,9 +152,10 @@ class HiveService {
   // Save Files Folder
   Future<void> saveFilesFolder(List<FoldersModel> folderPath) async {
     final box = await Hive.openBox(_filesFolder);
-    await box.clear();
     for (var folder in folderPath) {
-      await box.put(folder.id, folder.toJson());
+      if (!box.containsKey(folder.id)) {
+        await box.put(folder.id, folder.toJson());
+      }
     }
   }
 

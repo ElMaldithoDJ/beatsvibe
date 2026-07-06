@@ -1,4 +1,5 @@
 import 'package:beatsvibe/components/folder_component.dart';
+import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:beatsvibe/vm/settings_vm.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -16,18 +17,32 @@ class _PlayerSettingsViewState extends State<PlayerSettingsView> {
   final ScrollController _controller = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer<SettingsViewModel>(
-      builder: (context, settingsViewModel, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Configuraciones del reproductor'),
-            leading: IconButton(
-              onPressed: () => Get.back(),
-              icon: const Icon(CupertinoIcons.back),
-            ),
-          ),
-          body: SingleChildScrollView(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Configuraciones del reproductor'),
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: const Icon(CupertinoIcons.back),
+        ),
+      ),
+      body: Consumer<SettingsViewModel>(
+        builder: (context, settingsVM, child) {
+          if (settingsVM.folderPath.isEmpty) {
+            settingsVM.initFolder();
+          }
+          return SingleChildScrollView(
             controller: _controller,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -69,15 +84,24 @@ class _PlayerSettingsViewState extends State<PlayerSettingsView> {
                                 ListView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: settingsViewModel.folderPath.length,
+                                  itemCount: settingsVM.folderPath.length,
                                   itemBuilder: (context, index) {
-                                    final folder = settingsViewModel.folderPath[index];
+                                    final folder = settingsVM.folderPath[index];
                                     return FolderComponent(folder: folder);
                                   },
                                 ),
                                 const SizedBox(height: 10),
                                 FilledButton.icon(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    await settingsVM.addFolder().whenComplete(
+                                      () {
+                                        Provider.of<AudioViewModel>(
+                                          context,
+                                          listen: false,
+                                        ).onInit();
+                                      },
+                                    );
+                                  },
                                   icon: const Icon(CupertinoIcons.add),
                                   label: const Text('Agregar carpeta'),
                                   style: FilledButton.styleFrom(
@@ -102,9 +126,9 @@ class _PlayerSettingsViewState extends State<PlayerSettingsView> {
                 ],
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

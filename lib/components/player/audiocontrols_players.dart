@@ -52,7 +52,7 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                   if (playerVM.isPlaying) {
                     playerVM.pause();
                   } else {
-                    playerVM.play(null);
+                    playerVM.play();
                   }
                 },
                 child: DecoratedBox(

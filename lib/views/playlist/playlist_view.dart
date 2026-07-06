@@ -142,7 +142,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                 return GestureDetector(
                   onTap: () {
                     if (song.id != playerVM.currentItem?.id) {
-                      playerVM.play(song, playlist: widget.playlist.songs!);
+                      playerVM.play(song: song, playlist: widget.playlist.songs!);
                     }
                   },
                   child: AudioCupertinoContextMenu(

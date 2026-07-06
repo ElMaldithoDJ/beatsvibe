@@ -83,7 +83,7 @@ class _MusicViewState extends State<MusicView> {
                       onTap: () {
                         if (playerVM.currentItem?.id != song.id ||
                             playerVM.lastPlayed?.id != song.id) {
-                          playerVM.play(song, playlist: audioVM.songsCopy);
+                          playerVM.play(song: song, playlist: audioVM.songsCopy);
                         }
                         if (_searchController.text.isNotEmpty) {
                           _searchController.clear();

@@ -3,9 +3,11 @@ import 'package:beatsvibe/components/player/audiocontrols_players.dart';
 import 'package:beatsvibe/components/player/audioinfo_player.dart';
 import 'package:beatsvibe/components/player/progress_player.dart';
 import 'package:beatsvibe/components/player/queue_player.dart';
+import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class PlayerView extends StatefulWidget {
   const PlayerView({super.key});
@@ -51,22 +53,30 @@ class _PlayerViewState extends State<PlayerView> {
                     SizedBox(
                       width: 45,
                       height: 45,
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Theme.brightnessOf(context) == .dark
-                                ? Colors.white.withValues(alpha: .2)
-                                : Colors.grey.withValues(alpha: .1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Icon(
-                              CupertinoIcons.shuffle,
-                              size: 25,
+                      child: Consumer<PlayerViewModel>(
+                        builder: (context, playerVM, child) => GestureDetector(
+                          onTap: () {
+                            playerVM.setRepeatMode();
+                          },
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
                               color: Theme.brightnessOf(context) == .dark
-                                  ? Colors.white
-                                  : Colors.grey,
+                                  ? Colors.white.withValues(alpha: .2)
+                                  : Colors.grey.withValues(alpha: .1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Icon(
+                                playerVM.repeatMode == .none
+                                    ? CupertinoIcons.repeat
+                                    : playerVM.repeatMode == .one
+                                        ? CupertinoIcons.repeat_1
+                                        : CupertinoIcons.shuffle,
+                                size: 25,
+                                color: Theme.brightnessOf(context) == .dark
+                                    ? Colors.white
+                                    : Colors.grey,
+                              ),
                             ),
                           ),
                         ),
@@ -111,8 +121,6 @@ class _PlayerViewState extends State<PlayerView> {
   }
 
   void openQueue(BuildContext context) {
-    Get.bottomSheet(
-      const QueuePlayer()
-    );
+    Get.bottomSheet(const QueuePlayer());
   }
 }

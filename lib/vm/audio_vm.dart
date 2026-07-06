@@ -6,6 +6,8 @@ import 'package:beatsvibe/service/hive_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:string_normalizer/string_normalizer.dart';
 
+late AudioViewModel globalAudioViewModel;
+
 class AudioViewModel extends ChangeNotifier {
   final HiveService _hiveService = HiveService();
 
@@ -24,9 +26,11 @@ class AudioViewModel extends ChangeNotifier {
   Future<void> onInit() async {
     final songs = _hiveService.getAllSongs();
     if ((await songs).isNotEmpty) {
-          await songs
+      await songs
           .then((data) {
-            data.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+            data.sort(
+              (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+            );
             _songs = data;
             _songsCopy = data;
             notifyListeners();
@@ -37,13 +41,8 @@ class AudioViewModel extends ChangeNotifier {
 
   Future<void> fetchSongs() async {
     _setLoadingState(true);
-    await FetchAudioService.scanLocalFiles()
-    .then((songs) async {
-      await _hiveService.saveAllSongs(songs);
-    })
-    .whenComplete(() async {
+    await FetchAudioService.scanLocalFiles().whenComplete(() async {
       await onInit();
-      _setLoadingState(false);
     });
   }
 
@@ -54,7 +53,10 @@ class AudioViewModel extends ChangeNotifier {
     } else {
       final q = StringNormalizer.normalize(query.toLowerCase());
       _songs = _songsCopy.where((song) {
-        return StringNormalizer.normalize(song.title.toLowerCase()).indexOf(q) >= 0;
+        return StringNormalizer.normalize(
+              song.title.toLowerCase(),
+            ).indexOf(q) >=
+            0;
       }).toList();
     }
     notifyListeners();

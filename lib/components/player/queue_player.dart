@@ -46,7 +46,7 @@ class _QueuePlayerState extends State<QueuePlayer> {
                 return GestureDetector(
                   onTap: () {
                     if (song.id != playerVM.currentItem?.id) {
-                      playerVM.play(song, playlist: playerVM.queue);
+                      playerVM.play(song: song, playlist: playerVM.queue);
                     }
                   },
                   child: AudioItem(
