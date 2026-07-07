@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- primaryColor: Color.fromARGB(255, 30, 101, 255) -> #FF1E65FF -->
+    <color name="primaryColor">#1E65FF</color>
+
+    <!-- secondaryColor: Color.fromARGB(255, 30, 120, 255) -> #FF1E78FF -->
+    <color name="secondaryColor">#1E78FF</color>
+
+    <!-- lightBackgroundColor: Color(0xffFAFAFA) -->
+    <color name="lightBackgroundColor">#FAFAFA</color>
+
+    <!-- darkBackgroundColor: Color.fromARGB(255, 29, 29, 29) -> #FF1D1D1D -->
+    <color name="darkBackgroundColor">#1D1D1D</color>
+
+    <!-- lightTextColor: Color(0xff212121) -->
+    <color name="lightTextColor">#212121</color>
+
+    <!-- darkTextColor: Color(0xffFAFAFA) -->
+    <color name="darkTextColor">#FAFAFA</color>
+
+    <!-- lightBorderInputColor: Color.fromARGB(255, 240, 240, 240) -> #FFF0F0F0 -->
+    <color name="lightBorderInputColor">#F0F0F0</color>
+
+    <!-- darkBorderInputColor: Color.fromARGB(255, 34, 34, 34) -> #FF222222 -->
+    <color name="darkBorderInputColor">#222222</color>
+
+    <!-- playerDarkBgColor: Color.fromARGB(255, 43, 43, 43) -> #FF2B2B2B -->
+    <color name="playerDarkBgColor">#2B2B2B</color>
+
+    <!-- playerLightBgColor: Color.fromARGB(255, 250, 250, 250) -> #FFFAFAFA -->
+    <color name="playerLightBgColor">#FAFAFA</color>
+</resources>
