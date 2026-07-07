@@ -3,6 +3,7 @@ import 'package:beatsvibe/components/audio_item.dart';
 import 'package:beatsvibe/components/no_songs.dart';
 import 'package:beatsvibe/routes.dart';
 import 'package:beatsvibe/vm/audio_vm.dart';
+import 'package:beatsvibe/vm/favorites_vm.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,7 @@ class _MusicViewState extends State<MusicView> {
   Widget build(BuildContext context) {
     final audioVM = Provider.of<AudioViewModel>(context, listen: true);
     final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
+    final favoriteVM = Provider.of<FavoritesViewModel>(context, listen: true);
 
     return audioVM.songsCopy.isEmpty
         ? !audioVM.isLoading
@@ -73,7 +75,9 @@ class _MusicViewState extends State<MusicView> {
                   itemCount: audioVM.songs.length,
                   shrinkWrap: true,
                   controller: _scrollController,
-                  padding: .only(bottom: audioVM.songsCopy.isNotEmpty ? 70 : 10),
+                  padding: .only(
+                    bottom: audioVM.songsCopy.isNotEmpty ? 70 : 10,
+                  ),
                   physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
@@ -83,7 +87,10 @@ class _MusicViewState extends State<MusicView> {
                       onTap: () {
                         if (playerVM.currentItem?.id != song.id ||
                             playerVM.lastPlayed?.id != song.id) {
-                          playerVM.play(song: song, playlist: audioVM.songsCopy);
+                          playerVM.play(
+                            song: song,
+                            playlist: audioVM.songsCopy,
+                          );
                         }
                         if (_searchController.text.isNotEmpty) {
                           _searchController.clear();
@@ -123,6 +130,9 @@ class _MusicViewState extends State<MusicView> {
                             song: song,
                             index: index,
                             showIsPlaying: true,
+                            isFavorite: favoriteVM.favorites.any(
+                              (e) => e.id == song.id,
+                            ),
                           ),
                         ),
                       ),

@@ -73,7 +73,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
             CupertinoActivityIndicator(color: Theme.of(context).primaryColor),
           const SizedBox(width: 20),
           IconButton(
-            icon: const Icon(CupertinoIcons.settings),
+            icon: const Icon(CupertinoIcons.gear_alt),
             onPressed: () {
               Get.toNamed(AppRoutes.settings);
             },
@@ -122,17 +122,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
           ],
         ],
       ),
-      bottomNavigationBar: Material(
-        color: Colors.transparent,
-        child: SafeArea(
-          top: false,
-          bottom: true,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
-            child: const AudioPlayerComponent(),
-          ),
-        ),
-      ),
+      bottomNavigationBar: const AudioPlayerComponent(),
     );
   }
 }

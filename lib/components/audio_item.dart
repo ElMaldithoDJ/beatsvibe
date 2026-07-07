@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 class AudioItem extends StatefulWidget {
   final MediaItemData song;
   final bool isSelected;
+  final bool isFavorite;
   final bool showIsSelected;
   final bool showIsPlaying;
   final int index;
@@ -22,6 +23,7 @@ class AudioItem extends StatefulWidget {
     this.isSelected = false,
     this.playlist,
     this.showIsSelected = true,
+    this.isFavorite = false,
     this.showIsPlaying = false,
   });
 
@@ -89,6 +91,32 @@ class _AudioItemState extends State<AudioItem> {
                             gaplessPlayback: true,
                           ),
                   ),
+                  if (player.currentItem?.id == widget.song.id &&
+                      widget.showIsPlaying) ...[
+                    Center(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: widget.song.artUri != null
+                              ? Colors.black54
+                              : Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: .15),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            player.isPlaying
+                                ? CupertinoIcons.play_fill
+                                : CupertinoIcons.pause,
+                            color: widget.song.artUri != null
+                                ? Colors.white
+                                : Theme.of(context).primaryColor,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ] else ...[
                   DecoratedBox(
                     decoration: BoxDecoration(
@@ -99,7 +127,11 @@ class _AudioItemState extends State<AudioItem> {
                     ),
                     child: Center(
                       child: Icon(
-                        CupertinoIcons.music_note,
+                        player.currentItem?.id == widget.song.id
+                            ? player.isPlaying
+                                  ? CupertinoIcons.play_fill
+                                  : CupertinoIcons.pause
+                            : CupertinoIcons.music_note,
                         color: Theme.of(context).primaryColor,
                         size: 20,
                       ),
@@ -158,11 +190,10 @@ class _AudioItemState extends State<AudioItem> {
               ),
             ),
           ],
-          if (player.currentItem?.id == widget.song.id &&
-              widget.showIsPlaying) ...[
+          if (widget.isFavorite) ...[
             SizedBox(
-              width: 25,
-              height: 25,
+              width: 30,
+              height: 30,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -170,10 +201,8 @@ class _AudioItemState extends State<AudioItem> {
                 ),
                 child: Center(
                   child: Icon(
-                    player.isPlaying
-                        ? CupertinoIcons.play
-                        : CupertinoIcons.pause,
-                    color: Theme.of(context).primaryColor,
+                    CupertinoIcons.heart_fill,
+                    color: Colors.pinkAccent,
                     size: 20,
                   ),
                 ),

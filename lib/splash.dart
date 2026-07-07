@@ -26,14 +26,17 @@ class _SplashScreenState extends State<SplashScreen> {
           context,
           listen: false,
         ).onInit().whenComplete(() {
-          Get.offNamed(AppRoutes.home);
+          Future.delayed(
+            const Duration(milliseconds: 2500),
+            () => Get.offNamed(AppRoutes.home),
+          );
         });
       });
     }
   }
 
   void _cacheImage() {
-    assetCache.load("app_logo.png");
+    assetCache.load("beatsvibes-logo.png");
   }
 
   @override
@@ -51,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     Hero(
                       tag: "logo",
                       child: Image.asset(
-                        "assets/icons/app_logo.png",
+                        AppVariables.appLogo,
                         width: 100,
                         height: 70,
                         fit: .contain,
