@@ -19,7 +19,9 @@ class _ProgressPlayerState extends State<ProgressPlayer> {
             SliderTheme(
               data: SliderThemeData(
                 trackHeight: 3,
-                thumbColor: Theme.brightnessOf(context) == .dark
+                thumbColor: playerVM.currentItem?.artUri != null
+                    ? Colors.white
+                    : Theme.brightnessOf(context) == .dark
                     ? Colors.white
                     : Theme.of(context).primaryColor,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
@@ -28,9 +30,11 @@ class _ProgressPlayerState extends State<ProgressPlayer> {
                     ? Colors.white.withValues(alpha: .2)
                     : Theme.brightnessOf(context) == .dark
                     ? Colors.white.withValues(alpha: .2)
-                    : Colors.black26,
+                    : Colors.black12,
                 overlayColor: Colors.transparent,
-                activeTrackColor: Theme.brightnessOf(context) == .dark
+                activeTrackColor: playerVM.currentItem?.artUri != null
+                    ? Colors.white
+                    : Theme.brightnessOf(context) == .dark
                     ? Colors.white
                     : Theme.of(context).primaryColor,
               ),
@@ -53,9 +57,27 @@ class _ProgressPlayerState extends State<ProgressPlayer> {
               padding: const .symmetric(horizontal: 30),
               child: Row(
                 children: [
-                  Text(playerVM.currentPositionString),
+                  Text(
+                    playerVM.currentPositionString,
+                    style: TextStyle(
+                      color: playerVM.currentItem?.artUri != null
+                          ? Colors.white
+                          : Theme.brightnessOf(context) == .dark
+                          ? Colors.white
+                          : Colors.grey,
+                    ),
+                  ),
                   Spacer(),
-                  Text(playerVM.durationString),
+                  Text(
+                    playerVM.durationString,
+                    style: TextStyle(
+                      color: playerVM.currentItem?.artUri != null
+                          ? Colors.white
+                          : Theme.brightnessOf(context) == .dark
+                          ? Colors.white
+                          : Colors.grey,
+                    ),
+                  ),
                 ],
               ),
             ),

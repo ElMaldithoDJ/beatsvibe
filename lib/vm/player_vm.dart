@@ -62,8 +62,8 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   void onInit() async {
-    _loadLastPlayedPlaylist();
     _listenCurrentItem();
+    await _loadLastPlayedPlaylist();
     _listenQueue();
     _listenPosition();
 
@@ -78,49 +78,42 @@ class PlayerViewModel extends ChangeNotifier {
     });
   }
 
-  void _loadSongs() async {
+  void _loadSongs() {
     try {
-      final songs = await _hiveService.getAllSongs();
-      if (songs.isNotEmpty) {
-        await audioHandler.initPlayer(songs: songs).then((_) async {
-          final lastPlayedData = await _hiveService.getLastPlayed();
-          if (lastPlayedData != null) {
-            await audioHandler
-                .jumpToQueueItem(
-                  queue!.indexWhere((e) => e.id == lastPlayedData.id),
-                )
-                .whenComplete(() {
-                  seek(Duration(seconds: lastPlayedData.position!));
-                });
-          }
-        });
-      }
+      _hiveService.getAllSongs().then((songs) async {
+        if (songs.isNotEmpty) {
+          await audioHandler.initPlayer(songs: songs);
+        }
+      });
     } catch (e) {
       debugPrint("Error al cargar canciones: ${e.toString()}");
     }
   }
 
-  void _loadLastPlayedPlaylist() async {
+  Future<void> _loadLastPlayedPlaylist() async {
     try {
-      final lastPlayedPlaylist = await _hiveService.getLastPlayedPlaylist();
-      if (lastPlayedPlaylist != null) {
-        await audioHandler.initPlayer(songs: lastPlayedPlaylist.songs!).then((
-          _,
-        ) async {
-          final lastPlayedData = await _hiveService.getLastPlayed();
-          if (lastPlayedData != null) {
-            await audioHandler
-                .jumpToQueueItem(
-                  queue!.indexWhere((e) => e.id == lastPlayedData.id),
-                )
-                .whenComplete(() {
-                  seek(Duration(seconds: lastPlayedData.position!));
-                });
-          }
-        });
-      } else {
-        _loadSongs();
-      }
+      _hiveService.getLastPlayedPlaylist().then((
+        lastPlayedPlaylist,
+      ) async {
+        if (lastPlayedPlaylist != null) {
+          await audioHandler
+              .initPlayer(songs: lastPlayedPlaylist.songs!)
+              .whenComplete(() async {
+                final lastPlayedData = await _hiveService.getLastPlayed();
+                if (lastPlayedData != null) {
+                  await audioHandler
+                      .jumpToQueueItem(
+                        queue!.indexWhere((e) => e.id == lastPlayedData.id),
+                      )
+                      .whenComplete(() {
+                        seek(Duration(seconds: lastPlayedData.position!));
+                      });
+                }
+              });
+        } else {
+          _loadSongs();
+        }
+      });
     } catch (e) {
       debugPrint(
         "Error al cargar la ultima lista de reproduccion: ${e.toString()}",
@@ -134,14 +127,8 @@ class PlayerViewModel extends ChangeNotifier {
       audioHandler.mediaItem.listen((mediaItem) async {
         if (mediaItem != null) {
           _lastPlayed = mediaItem;
-          notifyListeners();
           _isFavorite = await _hiveService.isFavorite(mediaItem.id);
-          await _hiveService.saveLastPlayed(
-            LastPlayedModel(
-              id: mediaItem.id,
-              position: _currentPosition.inSeconds,
-            ),
-          );
+          notifyListeners();
         }
       });
     } catch (e) {
@@ -167,15 +154,19 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   void _listenPosition() {
-    audioHandler.positionStream.listen((p) async {
-      _currentPosition = p;
-      notifyListeners();
-      if (isPlaying) {
-        await _hiveService.saveLastPlayed(
-          LastPlayedModel(id: currentItem?.id, position: p.inSeconds),
-        );
-      }
-    });
+    try {
+      audioHandler.positionStream.listen((p) async {
+        _currentPosition = p;
+        notifyListeners();
+        if (isPlaying && p.inSeconds > 0) {
+          await _hiveService.saveLastPlayed(
+            LastPlayedModel(id: currentItem?.id, position: p.inSeconds),
+          );
+        }
+      });
+    } catch (e) {
+      debugPrint("Error al iniciar stream de posicion: ${e.toString()}");
+    }
   }
 
   //Play

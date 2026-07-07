@@ -36,30 +36,50 @@ class _SchemaColorComponentState extends State<SchemaColorComponent> {
               ),
             ),
           ),
-          secondChild: playerVM.currentItem?.artUri != null ? ImageColorSchemeBuilder(
-            provider: Image.file(
-              File.fromUri(playerVM.currentItem!.artUri!),
-            ).image,
-            builder: (context, colorScheme, child) {
-              return AnimatedContainer(
-                width: double.maxFinite,
-                height: double.maxFinite,
-                curve: Curves.easeInOut,
-                duration: const Duration(milliseconds: 500),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      colorScheme.inversePrimary.withValues(alpha: .95),
-                      colorScheme.primaryContainer.withValues(alpha: .8),
-                      colorScheme.inversePrimary.withValues(alpha: .79)
-                    ],
-                  ),
-                ),
-              );
-            },
-          ) : Container(),
+          secondChild: playerVM.currentItem?.artUri != null
+              ? ImageColorSchemeBuilder(
+                  provider: Image.file(
+                    File.fromUri(playerVM.currentItem!.artUri!),
+                  ).image,
+                  builder: (context, colorScheme, child) {
+                    return Scaffold(
+                      appBar: AppBar(
+                        toolbarHeight: 0,
+                        backgroundColor: Theme.brightnessOf(context) == .dark ? colorScheme.primary.withValues(alpha: .9): colorScheme.primary.withValues(alpha: .9),
+                      ),
+                      body: AnimatedContainer(
+                        width: double.maxFinite,
+                        height: double.maxFinite,
+                        curve: Curves.easeInOut,
+                        duration: const Duration(milliseconds: 500),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              if (Theme.brightnessOf(context) == .dark) ...[
+                                colorScheme.inversePrimary.withValues(
+                                  alpha: .95,
+                                ),
+                                colorScheme.primaryContainer.withValues(
+                                  alpha: .8,
+                                ),
+                                colorScheme.inversePrimary.withValues(
+                                  alpha: .79,
+                                ),
+                              ] else ...[
+                                colorScheme.primary.withValues(alpha: .9),
+                                colorScheme.primary.withValues(alpha: .9),
+                                colorScheme.primary.withValues(alpha: .75),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : Container(),
           crossFadeState: playerVM.currentItem?.artUri == null
               ? CrossFadeState.showFirst
               : CrossFadeState.showSecond,

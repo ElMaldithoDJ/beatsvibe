@@ -33,20 +33,40 @@ class _PlayerViewState extends State<PlayerView> {
             child: SafeArea(
               child: Column(
                 children: [
-                  Padding(
-                    padding: const .symmetric(horizontal: 10, vertical: 10),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 45,
-                          height: 45,
-                          child: IconButton(
-                            onPressed: () => Get.back(),
-                            icon: const Icon(CupertinoIcons.chevron_back),
-                          ),
+                  Consumer<PlayerViewModel>(
+                    builder: (context, playerVM, child) {
+                      return Padding(
+                        padding: const .symmetric(horizontal: 10, vertical: 10),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 45,
+                              height: 45,
+                              child: IconButton(
+                                onPressed: () => Get.back(),
+                                icon: Icon(
+                                  CupertinoIcons.chevron_back,
+                                  color: playerVM.currentItem?.artUri != null
+                                      ? Colors.white
+                                      : Theme.brightnessOf(context) == .dark
+                                          ? Colors.white
+                                          : Colors.grey,
+                                ),
+                                style: IconButton.styleFrom(
+                                  backgroundColor:
+                                      playerVM.currentItem?.artUri != null
+                                          ? Colors.white.withValues(alpha: .15)
+                                          : Theme.brightnessOf(context) ==
+                                                .dark
+                                          ? Colors.white.withValues(alpha: .2)
+                                          : Colors.grey.withValues(alpha: .1),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 40),
                   Center(child: ArtworkPlayer()),
@@ -72,7 +92,12 @@ class _PlayerViewState extends State<PlayerView> {
                                     child: DecoratedBox(
                                       decoration: BoxDecoration(
                                         color:
-                                            Theme.brightnessOf(context) == .dark
+                                            playerVM.currentItem?.artUri != null
+                                            ? Colors.white.withValues(
+                                                alpha: .15,
+                                              )
+                                            : Theme.brightnessOf(context) ==
+                                                  .dark
                                             ? Colors.white.withValues(alpha: .2)
                                             : Colors.grey.withValues(alpha: .1),
                                         shape: BoxShape.circle,
@@ -82,12 +107,15 @@ class _PlayerViewState extends State<PlayerView> {
                                           playerVM.repeatMode == .none
                                               ? CupertinoIcons.repeat
                                               : playerVM.repeatMode == .one
-                                              ? CupertinoIcons.repeat_1
-                                              : CupertinoIcons.shuffle,
+                                              ? CupertinoIcons.shuffle
+                                              : CupertinoIcons.repeat_1,
                                           size: 25,
                                           color:
-                                              Theme.brightnessOf(context) ==
-                                                  .dark
+                                              playerVM.currentItem?.artUri !=
+                                                  null
+                                              ? Colors.white
+                                              : Theme.brightnessOf(context) ==
+                                                    .dark
                                               ? Colors.white
                                               : Colors.grey,
                                         ),
@@ -102,25 +130,39 @@ class _PlayerViewState extends State<PlayerView> {
                           SizedBox(
                             width: 45,
                             height: 45,
-                            child: GestureDetector(
-                              onTap: () => openQueue(context),
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: Theme.brightnessOf(context) == .dark
-                                      ? Colors.white.withValues(alpha: .2)
-                                      : Colors.grey.withValues(alpha: .1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    CupertinoIcons.music_albums,
-                                    size: 25,
-                                    color: Theme.brightnessOf(context) == .dark
-                                        ? Colors.white
-                                        : Colors.grey,
+                            child: Consumer<PlayerViewModel>(
+                              builder: (context, playerVM, child) =>
+                                  GestureDetector(
+                                    onTap: () => openQueue(context),
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            playerVM.currentItem?.artUri != null
+                                            ? Colors.white.withValues(
+                                                alpha: .15,
+                                              )
+                                            : Theme.brightnessOf(context) ==
+                                                  .dark
+                                            ? Colors.white.withValues(alpha: .2)
+                                            : Colors.grey.withValues(alpha: .1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Icon(
+                                          CupertinoIcons.music_albums,
+                                          size: 25,
+                                          color:
+                                              playerVM.currentItem?.artUri !=
+                                                  null
+                                              ? Colors.white
+                                              : Theme.brightnessOf(context) ==
+                                                    .dark
+                                              ? Colors.white
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
                             ),
                           ),
                         ],

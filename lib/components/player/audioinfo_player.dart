@@ -19,7 +19,15 @@ class _AudioInfoPlayerState extends State<AudioInfoPlayer> {
           children: [
             Text(
               playerVM.currentItem != null ? playerVM.currentItem!.title : "",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                      color: playerVM.currentItem?.artUri != null
+                          ? Colors.white
+                          : Theme.brightnessOf(context) == .dark
+                          ? Colors.white
+                          : Colors.grey,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -28,7 +36,15 @@ class _AudioInfoPlayerState extends State<AudioInfoPlayer> {
                 playerVM.currentItem!.artist!.isNotEmpty) ...[
               Text(
                 playerVM.currentItem!.artist!,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                      color: playerVM.currentItem?.artUri != null
+                          ? Colors.white
+                          : Theme.brightnessOf(context) == .dark
+                          ? Colors.white
+                          : Colors.grey,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

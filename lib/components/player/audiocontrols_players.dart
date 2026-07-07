@@ -26,7 +26,9 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                 },
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Theme.brightnessOf(context) == .dark
+                    color: playerVM.currentItem?.artUri != null
+                        ? Colors.white.withValues(alpha: .15)
+                        : Theme.brightnessOf(context) == .dark
                         ? Colors.white.withValues(alpha: .2)
                         : Colors.grey.withValues(alpha: .1),
                     shape: BoxShape.circle,
@@ -35,7 +37,9 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                     child: Icon(
                       CupertinoIcons.back,
                       size: 35,
-                      color: Theme.brightnessOf(context) == .dark
+                      color: playerVM.currentItem?.artUri != null
+                          ? Colors.white
+                          : Theme.brightnessOf(context) == .dark
                           ? Colors.white
                           : Colors.grey,
                     ),
@@ -57,7 +61,9 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                 },
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Theme.brightnessOf(context) == .dark
+                    color: playerVM.currentItem?.artUri != null
+                        ? Colors.white.withValues(alpha: .15)
+                        : Theme.brightnessOf(context) == .dark
                         ? Colors.white.withValues(alpha: .2)
                         : Colors.grey.withValues(alpha: .1),
                     shape: BoxShape.circle,
@@ -68,7 +74,9 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                           ? CupertinoIcons.pause
                           : CupertinoIcons.play,
                       size: 50,
-                      color: Theme.brightnessOf(context) == .dark
+                      color: playerVM.currentItem?.artUri != null
+                          ? Colors.white
+                          : Theme.brightnessOf(context) == .dark
                           ? Colors.white
                           : Colors.grey,
                     ),
@@ -86,7 +94,9 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                 },
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Theme.brightnessOf(context) == .dark
+                    color: playerVM.currentItem?.artUri != null
+                        ? Colors.white.withValues(alpha: .15)
+                        : Theme.brightnessOf(context) == .dark
                         ? Colors.white.withValues(alpha: .2)
                         : Colors.grey.withValues(alpha: .1),
                     shape: BoxShape.circle,
@@ -95,7 +105,9 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                     child: Icon(
                       CupertinoIcons.forward,
                       size: 35,
-                      color: Theme.brightnessOf(context) == .dark
+                      color: playerVM.currentItem?.artUri != null
+                          ? Colors.white
+                          : Theme.brightnessOf(context) == .dark
                           ? Colors.white
                           : Colors.grey,
                     ),
