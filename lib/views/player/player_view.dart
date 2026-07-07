@@ -49,17 +49,16 @@ class _PlayerViewState extends State<PlayerView> {
                                   color: playerVM.currentItem?.artUri != null
                                       ? Colors.white
                                       : Theme.brightnessOf(context) == .dark
-                                          ? Colors.white
-                                          : Colors.grey,
+                                      ? Colors.white
+                                      : Colors.grey,
                                 ),
                                 style: IconButton.styleFrom(
                                   backgroundColor:
                                       playerVM.currentItem?.artUri != null
-                                          ? Colors.white.withValues(alpha: .15)
-                                          : Theme.brightnessOf(context) ==
-                                                .dark
-                                          ? Colors.white.withValues(alpha: .2)
-                                          : Colors.grey.withValues(alpha: .1),
+                                      ? Colors.white.withValues(alpha: .15)
+                                      : Theme.brightnessOf(context) == .dark
+                                      ? Colors.white.withValues(alpha: .2)
+                                      : Colors.grey.withValues(alpha: .1),
                                 ),
                               ),
                             ),

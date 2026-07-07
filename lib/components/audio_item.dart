@@ -60,7 +60,8 @@ class _AudioItemState extends State<AudioItem> {
   @override
   Widget build(BuildContext context) {
     final player = Provider.of<PlayerViewModel>(context);
-    return Padding(
+    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: Row(
         children: [
@@ -137,7 +138,7 @@ class _AudioItemState extends State<AudioItem> {
               ],
             ),
           ),
-          SizedBox(width: 10,),
+          SizedBox(width: 10),
           if (widget.isSelected) ...[
             SizedBox(
               width: 25,
@@ -157,7 +158,8 @@ class _AudioItemState extends State<AudioItem> {
               ),
             ),
           ],
-          if (player.currentItem?.id == widget.song.id && widget.showIsPlaying) ...[
+          if (player.currentItem?.id == widget.song.id &&
+              widget.showIsPlaying) ...[
             SizedBox(
               width: 25,
               height: 25,

@@ -45,7 +45,9 @@ class _SchemaColorComponentState extends State<SchemaColorComponent> {
                     return Scaffold(
                       appBar: AppBar(
                         toolbarHeight: 0,
-                        backgroundColor: Theme.brightnessOf(context) == .dark ? colorScheme.primary.withValues(alpha: .9): colorScheme.primary.withValues(alpha: .9),
+                        backgroundColor: Theme.brightnessOf(context) == .dark
+                            ? colorScheme.primary.withValues(alpha: .9)
+                            : colorScheme.primary.withValues(alpha: .9),
                       ),
                       body: AnimatedContainer(
                         width: double.maxFinite,

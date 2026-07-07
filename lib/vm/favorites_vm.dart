@@ -29,16 +29,15 @@ class FavoritesViewModel extends ChangeNotifier {
       if (data != null) {
         await _hiveService.addFavoriteSong(data);
         await _init();
+        Fluttertoast.showToast(
+          msg: "Canción agregada a favoritos",
+          gravity: ToastGravity.BOTTOM,
+          fontSize: 14,
+          backgroundColor: Colors.pinkAccent,
+          textColor: Colors.white,
+          toastLength: Toast.LENGTH_LONG,
+        );
       }
-      Fluttertoast.showToast(
-        msg: "Agregado a favoritos",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.pinkAccent,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
     }
   }
 }

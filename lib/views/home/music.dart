@@ -73,7 +73,7 @@ class _MusicViewState extends State<MusicView> {
                   itemCount: audioVM.songs.length,
                   shrinkWrap: true,
                   controller: _scrollController,
-                  padding: const .only(bottom: 10),
+                  padding: .only(bottom: audioVM.songsCopy.isNotEmpty ? 70 : 10),
                   physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
