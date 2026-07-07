@@ -18,7 +18,7 @@ Future<void> main() async {
   globalAudioHandler = await AudioService.init(
     builder: () => AudioHandlerService(),
     config: const AudioServiceConfig(
-      androidNotificationChannelId: "com.ryanheise.bg_demo.channel.audio",
+      androidNotificationChannelId: "com.beatsvibe.mandril.channel.audio",
       androidNotificationChannelName: 'Audio Playback',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
