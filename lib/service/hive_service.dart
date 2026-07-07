@@ -1,6 +1,8 @@
 import 'package:beatsvibe/models/folders_model.dart';
+import 'package:beatsvibe/models/lastplayed_model.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/models/playlist_data.dart';
+import 'package:beatsvibe/util/id_generator.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -10,6 +12,7 @@ class HiveService {
   static final String _favoriteSongsBox = 'favorite_songs';
   static final String _recentlyPlayedBox = 'recently_played';
   static final String _lastPlayedSongBox = 'last_played';
+  static final String _lastPlayedPlaylistBox = 'last_played_playlist';
   static final String _themeBox = 'theme';
   static final String _filesFolder = 'files_folder';
 
@@ -106,6 +109,44 @@ class HiveService {
     await box.put(playlist.id, playlist.toJson());
   }
 
+  // save last playlist
+  Future<void> saveLastPlayedPlaylist(PlaylistModelData playlist) async {
+    bool exist;
+    String id;
+    final box = await Hive.openBox(_lastPlayedPlaylistBox);
+    await box.clear();
+    if (playlist.id == null) {
+      final pls = PlaylistModelData(
+        id: "root",
+        songs: playlist.songs,
+      );
+      await box.put(pls.id, pls.toJson());
+    } else {
+      do {
+        id = IDGenerator.generateId();
+        exist = box.containsKey(id);
+      } while (exist);
+      final pls = PlaylistModelData(
+        id: id,
+        title: playlist.title,
+        artwork: playlist.artwork,
+        description: playlist.description,
+        songs: playlist.songs,
+      );
+      await box.put(pls.id, pls.toJson());
+    }
+  }
+
+  // Get last playlist
+  Future<PlaylistModelData?> getLastPlayedPlaylist() async {
+    final box = await Hive.openBox(_lastPlayedPlaylistBox);
+    if (box.isNotEmpty) {
+      final value = box.values.first;
+      return PlaylistModelData.fromJson(value as Map<dynamic, dynamic>);
+    }
+    return null;
+  }
+
   // Check if song is favorite
   Future<bool> isFavorite(String title) async {
     final box = await Hive.openBox(_favoriteSongsBox);
@@ -113,18 +154,18 @@ class HiveService {
   }
 
   // save last played song
-  Future<void> saveLastPlayed(MediaItemData song) async {
+  Future<void> saveLastPlayed(LastPlayedModel item) async {
     final box = await Hive.openBox(_lastPlayedSongBox);
     await box.clear();
-    await box.put(song.id, song.toJson());
+    await box.put(item.id, item.toJson());
   }
 
   // Get last played song
-  Future<MediaItemData?> getLastPlayed() async {
+  Future<LastPlayedModel?> getLastPlayed() async {
     final box = await Hive.openBox(_lastPlayedSongBox);
     if (box.isNotEmpty) {
       final value = box.values.first;
-      return MediaItemData.fromJson(value as Map<dynamic, dynamic>);
+      return LastPlayedModel.fromJson(value as Map<dynamic, dynamic>);
     }
     return null;
   }

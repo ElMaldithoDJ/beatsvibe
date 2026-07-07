@@ -115,7 +115,7 @@ class _PlaylistsViewState extends State<PlaylistsView> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                playlist.title,
+                                "${playlist.title}",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Theme.brightnessOf(context) == .dark

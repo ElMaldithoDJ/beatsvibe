@@ -22,7 +22,6 @@ Future<void> main() async {
       androidNotificationChannelId: "com.ryanheise.bg_demo.channel.audio",
       androidNotificationChannelName: 'Audio Playback',
       androidNotificationOngoing: true,
-      androidStopForegroundOnPause: true,
     ),
   );
   await Hive.initFlutter();

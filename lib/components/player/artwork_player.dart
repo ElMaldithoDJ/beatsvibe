@@ -16,7 +16,7 @@ class ArtworkPlayer extends StatefulWidget {
 }
 
 class _ArtworkPlayerState extends State<ArtworkPlayer> {
-   @override
+  @override
   Widget build(BuildContext context) {
     final favoritesVM = Provider.of<FavoritesViewModel>(context, listen: false);
     return Consumer<PlayerViewModel>(

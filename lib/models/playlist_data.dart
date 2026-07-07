@@ -2,13 +2,13 @@ import 'package:beatsvibe/models/mediaitem_data.dart';
 
 class PlaylistModelData {
   final String? id;
-  final String title;
+  final String? title;
   final String? description;
   final String? artwork;
   final List<MediaItemData>? songs;
 
   PlaylistModelData({
-    required this.title,
+    this.title,
     this.id,
     this.description,
     this.artwork,

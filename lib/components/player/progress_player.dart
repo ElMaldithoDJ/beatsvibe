@@ -10,7 +10,7 @@ class ProgressPlayer extends StatefulWidget {
 }
 
 class _ProgressPlayerState extends State<ProgressPlayer> {
-   @override
+  @override
   Widget build(BuildContext context) {
     return Consumer<PlayerViewModel>(
       builder: (context, playerVM, child) {
@@ -24,7 +24,11 @@ class _ProgressPlayerState extends State<ProgressPlayer> {
                     : Theme.of(context).primaryColor,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
                 trackShape: const RoundedRectSliderTrackShape(),
-
+                inactiveTrackColor: playerVM.currentItem?.artUri != null
+                    ? Colors.white.withValues(alpha: .2)
+                    : Theme.brightnessOf(context) == .dark
+                    ? Colors.white.withValues(alpha: .2)
+                    : Colors.black26,
                 overlayColor: Colors.transparent,
                 activeTrackColor: Theme.brightnessOf(context) == .dark
                     ? Colors.white

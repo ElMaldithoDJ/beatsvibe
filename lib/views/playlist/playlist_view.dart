@@ -61,7 +61,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                           crossAxisAlignment: .start,
                           children: [
                             Text(
-                              widget.playlist.title,
+                              "${widget.playlist.title}",
                               style: TextStyle(fontSize: 20, fontWeight: .bold),
                             ),
                             Text(

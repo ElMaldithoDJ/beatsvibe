@@ -37,12 +37,12 @@ class _QueuePlayerState extends State<QueuePlayer> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: playerVM.queue.length,
+              itemCount: playerVM.queue?.length,
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               itemBuilder: (context, index) {
-                final song = playerVM.queue[index];
+                final song = playerVM.queue![index];
                 return GestureDetector(
                   onTap: () {
                     if (song.id != playerVM.currentItem?.id) {

@@ -1,5 +1,7 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:beatsvibe/models/lastplayed_model.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
+import 'package:beatsvibe/models/playlist_data.dart';
 import 'package:beatsvibe/service/audio_handler.dart';
 import 'package:beatsvibe/service/hive_service.dart';
 import 'package:flutter/material.dart';
@@ -14,13 +16,20 @@ class PlayerViewModel extends ChangeNotifier {
   AudioServiceRepeatMode _repeatMode = AudioServiceRepeatMode.none;
   Duration _currentPosition = Duration.zero;
   Duration _duration = Duration.zero;
-  List<MediaItemData> _queue = [];
 
   bool get isPlaying => _isPlaying;
   bool get isFavorite => _isFavorite;
   MediaItem? get lastPlayed => _lastPlayed;
   Duration get duration => _duration;
-  List<MediaItemData> get queue => _queue;
+  List<MediaItemData>? get queue {
+    if (audioHandler.queue.value.isNotEmpty) {
+      return audioHandler.queue.value
+          .map((e) => MediaItemData.fromMediaItem(e)!)
+          .toList();
+    }
+    return null;
+  }
+
   AudioServiceRepeatMode get repeatMode => _repeatMode;
 
   MediaItem? get currentItem {
@@ -53,16 +62,13 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   void onInit() async {
-    await _listenLastPlayedSong();
-    _listenQueue();
+    _loadLastPlayedPlaylist();
     _listenCurrentItem();
+    _listenQueue();
+    _listenPosition();
 
     audioHandler.playbackState.listen((state) {
       _playingState(state.playing);
-    });
-    audioHandler.positionStream.listen((position) {
-      _currentPosition = position;
-      notifyListeners();
     });
     audioHandler.durationStream.listen((duration) {
       if (duration != null) {
@@ -72,44 +78,102 @@ class PlayerViewModel extends ChangeNotifier {
     });
   }
 
-  // Iniciar Streams de cola
-  void _listenQueue() {
-    audioHandler.queue.listen((dataQueue) {
-      if (dataQueue.isNotEmpty) {
-        _queue = dataQueue.map((e) => MediaItemData.fromMediaItem(e)!).toList();
-        notifyListeners();
+  void _loadSongs() async {
+    try {
+      final songs = await _hiveService.getAllSongs();
+      if (songs.isNotEmpty) {
+        await audioHandler.initPlayer(songs: songs).then((_) async {
+          final lastPlayedData = await _hiveService.getLastPlayed();
+          if (lastPlayedData != null) {
+            await audioHandler
+                .jumpToQueueItem(
+                  queue!.indexWhere((e) => e.id == lastPlayedData.id),
+                )
+                .whenComplete(() {
+                  seek(Duration(seconds: lastPlayedData.position!));
+                });
+          }
+        });
       }
-    });
+    } catch (e) {
+      debugPrint("Error al cargar canciones: ${e.toString()}");
+    }
   }
 
-  // Iniciar stream de ultima cancion reproducida
-  Future<void> _listenLastPlayedSong() async {
-    await _hiveService
-        .getLastPlayed()
-        .then((lastPlayedData) {
+  void _loadLastPlayedPlaylist() async {
+    try {
+      final lastPlayedPlaylist = await _hiveService.getLastPlayedPlaylist();
+      if (lastPlayedPlaylist != null) {
+        await audioHandler.initPlayer(songs: lastPlayedPlaylist.songs!).then((
+          _,
+        ) async {
+          final lastPlayedData = await _hiveService.getLastPlayed();
           if (lastPlayedData != null) {
-            _lastPlayed = lastPlayedData.toMediaItem();
-            notifyListeners();
+            await audioHandler
+                .jumpToQueueItem(
+                  queue!.indexWhere((e) => e.id == lastPlayedData.id),
+                )
+                .whenComplete(() {
+                  seek(Duration(seconds: lastPlayedData.position!));
+                });
           }
-        })
-        .whenComplete(() async {
-          await audioHandler.jumpToQueueItem(
-            _queue.indexWhere((e) => e.id == currentItem?.id),
-          );
         });
+      } else {
+        _loadSongs();
+      }
+    } catch (e) {
+      debugPrint(
+        "Error al cargar la ultima lista de reproduccion: ${e.toString()}",
+      );
+    }
   }
 
   // Iniciar Stream de cancion actual
   void _listenCurrentItem() async {
-    audioHandler.mediaItem.listen((mediaItem) async {
-      if (mediaItem != null) {
-        _lastPlayed = mediaItem;
-        notifyListeners();
-        _isFavorite = await _hiveService.isFavorite(mediaItem.id);
-        final mediaItemData = MediaItemData.fromMediaItem(mediaItem);
-        if (mediaItemData != null && mediaItemData.id != lastPlayed?.id) {
-          await _hiveService.saveLastPlayed(mediaItemData);
+    try {
+      audioHandler.mediaItem.listen((mediaItem) async {
+        if (mediaItem != null) {
+          _lastPlayed = mediaItem;
+          notifyListeners();
+          _isFavorite = await _hiveService.isFavorite(mediaItem.id);
+          await _hiveService.saveLastPlayed(
+            LastPlayedModel(
+              id: mediaItem.id,
+              position: _currentPosition.inSeconds,
+            ),
+          );
         }
+      });
+    } catch (e) {
+      debugPrint("Error al iniciar stream de cancion actual: ${e.toString()}");
+    }
+  }
+
+  // Iniciar stream de la cola actual
+  void _listenQueue() async {
+    try {
+      audioHandler.queue.listen((queue) async {
+        if (queue.isNotEmpty) {
+          await _hiveService.saveLastPlayedPlaylist(
+            PlaylistModelData(
+              songs: queue.map((e) => MediaItemData.fromMediaItem(e)!).toList(),
+            ),
+          );
+        }
+      });
+    } catch (e) {
+      debugPrint("Error al iniciar stream de cola actual: ${e.toString()}");
+    }
+  }
+
+  void _listenPosition() {
+    audioHandler.positionStream.listen((p) async {
+      _currentPosition = p;
+      notifyListeners();
+      if (isPlaying) {
+        await _hiveService.saveLastPlayed(
+          LastPlayedModel(id: currentItem?.id, position: p.inSeconds),
+        );
       }
     });
   }
@@ -190,15 +254,20 @@ class PlayerViewModel extends ChangeNotifier {
     await _hiveService.deleteSong(id);
     if (currentItem?.id == id) {
       //remove current item from queue
-      _queue.removeWhere((e) => e.id == id);
+      queue?.removeWhere((e) => e.id == id);
       audioHandler.queue.value.removeWhere((e) => e.id == id);
       skipToNext();
       notifyListeners();
     } else {
       //remove current item from queue
-      _queue.removeWhere((e) => e.id == id);
+      queue?.removeWhere((e) => e.id == id);
       audioHandler.queue.value.removeWhere((e) => e.id == id);
       notifyListeners();
     }
+  }
+
+  // save last playlist
+  Future<void> saveLastPlaylist(PlaylistModelData playlist) async {
+    await _hiveService.saveLastPlayedPlaylist(playlist);
   }
 }
