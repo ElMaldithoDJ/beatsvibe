@@ -31,7 +31,7 @@ class AppRoutes {
       name: AppRoutes.splash,
       page: () => const SplashScreen(),
       transition: Transition.fadeIn,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 500),
     ),
     GetPage(
       name: AppRoutes.home,
