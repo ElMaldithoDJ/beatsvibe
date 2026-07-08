@@ -33,15 +33,25 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                     File.fromUri(playerVM.currentItem!.artUri!),
                   ).image,
                   builder: (context, colorScheme, child) => Container(
-                    margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10, top: 10),
+                    margin: const EdgeInsets.only(
+                      bottom: 10,
+                      left: 10,
+                      right: 10,
+                      top: 10,
+                    ),
                     padding:
                         widget.padding ??
                         const EdgeInsets.symmetric(horizontal: 8),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          colorScheme.primary,
-                          colorScheme.primaryFixed,
+                          if (Theme.brightnessOf(context) == .dark) ...[
+                            colorScheme.inversePrimary,
+                            colorScheme.inversePrimary,
+                          ] else ...[
+                            colorScheme.primary,
+                            colorScheme.primaryFixed,
+                          ],
                         ],
                         begin: .topLeft,
                         end: .bottomRight,
@@ -51,7 +61,9 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                       borderRadius: BorderRadius.circular(360),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: .1),
+                          color: Theme.of(context).brightness == .dark
+                              ? const Color.fromARGB(255, 68, 68, 68).withValues(alpha: .1)
+                              : Colors.black.withValues(alpha: .1),
                           blurRadius: 10,
                           spreadRadius: 3,
                           offset: const Offset(0, 2),
@@ -286,7 +298,12 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                   ),
                 )
               : Container(
-                margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10, top: 10),
+                  margin: const EdgeInsets.only(
+                    bottom: 10,
+                    left: 10,
+                    right: 10,
+                    top: 10,
+                  ),
                   padding:
                       widget.padding ??
                       const EdgeInsets.symmetric(horizontal: 8),
@@ -511,7 +528,12 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                   ),
                 ),
           secondChild: Container(
-            margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10, top: 10),
+            margin: const EdgeInsets.only(
+              bottom: 10,
+              left: 10,
+              right: 10,
+              top: 10,
+            ),
             padding:
                 widget.padding ?? const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(

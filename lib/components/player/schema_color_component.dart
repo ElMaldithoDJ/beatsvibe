@@ -46,7 +46,7 @@ class _SchemaColorComponentState extends State<SchemaColorComponent> {
                       appBar: AppBar(
                         toolbarHeight: 0,
                         backgroundColor: Theme.brightnessOf(context) == .dark
-                            ? colorScheme.primary.withValues(alpha: .9)
+                            ? colorScheme.inversePrimary.withValues(alpha: .95)
                             : colorScheme.primary.withValues(alpha: .9),
                       ),
                       body: AnimatedContainer(
@@ -63,8 +63,8 @@ class _SchemaColorComponentState extends State<SchemaColorComponent> {
                                 colorScheme.inversePrimary.withValues(
                                   alpha: .95,
                                 ),
-                                colorScheme.primaryContainer.withValues(
-                                  alpha: .8,
+                                colorScheme.primaryFixedDim.withValues(
+                                  alpha: .9,
                                 ),
                                 colorScheme.inversePrimary.withValues(
                                   alpha: .79,

@@ -19,7 +19,7 @@ Future<void> main() async {
     builder: () => AudioHandlerService(),
     config: const AudioServiceConfig(
       androidNotificationChannelId: "com.beatsvibe.mandril.channel.audio",
-      androidNotificationChannelName: 'Audio Playback',
+      androidNotificationChannelName: 'Music Playback',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
     ),
