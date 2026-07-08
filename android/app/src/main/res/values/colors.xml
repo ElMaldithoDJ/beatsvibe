@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primaryColor">#1E65FF</color>
-    <color name="secondaryColor">#1E78FF</color>
     <color name="lightBackgroundColor">#FAFAFA</color>
     <color name="darkBackgroundColor">#1D1D1D</color>
-    <color name="lightTextColor">#212121</color>
-    <color name="darkTextColor">#FAFAFA</color>
-    <color name="lightBorderInputColor">#F0F0F0</color>
-    <color name="darkBorderInputColor">#222222</color>
-    <color name="playerDarkBgColor">#2B2B2B</color>
-    <color name="playerLightBgColor">#FAFAFA</color>
 </resources>
