@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
@@ -14,6 +15,12 @@ class AppTheme {
 
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: <TargetPlatform, PageTransitionsBuilder>{
+        TargetPlatform.android: PredictiveBackFullscreenPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
     useMaterial3: true,
     shadowColor: darkBackgroundColor.withValues(alpha: .3),
     scaffoldBackgroundColor: lightBackgroundColor,
@@ -103,6 +110,12 @@ class AppTheme {
 
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: <TargetPlatform, PageTransitionsBuilder>{
+        TargetPlatform.android: PredictiveBackFullscreenPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
     useMaterial3: true,
     shadowColor: Colors.grey.withValues(alpha: .3),
     scaffoldBackgroundColor: darkBackgroundColor,
