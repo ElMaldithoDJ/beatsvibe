@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:beatsvibe/models/mediaitem_data.dart';
+import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -104,15 +105,7 @@ class _AudioItemState extends State<AudioItem> {
                                 ).primaryColor.withValues(alpha: .15),
                         ),
                         child: Center(
-                          child: Icon(
-                            player.isPlaying
-                                ? CupertinoIcons.play_fill
-                                : CupertinoIcons.pause,
-                            color: widget.song.artUri != null
-                                ? Colors.white
-                                : Theme.of(context).primaryColor,
-                            size: 20,
-                          ),
+                          child: Image.asset(AppVariables.appLogo)
                         ),
                       ),
                     ),
@@ -123,18 +116,10 @@ class _AudioItemState extends State<AudioItem> {
                       shape: BoxShape.circle,
                       color: Theme.of(
                         context,
-                      ).primaryColor.withValues(alpha: .15),
+                      ).primaryColor.withValues(alpha: .1),
                     ),
                     child: Center(
-                      child: Icon(
-                        player.currentItem?.id == widget.song.id
-                            ? player.isPlaying
-                                  ? CupertinoIcons.play_fill
-                                  : CupertinoIcons.pause
-                            : CupertinoIcons.music_note,
-                        color: Theme.of(context).primaryColor,
-                        size: 20,
-                      ),
+                      child: Image.asset(AppVariables.appLogo)
                     ),
                   ),
                 ],

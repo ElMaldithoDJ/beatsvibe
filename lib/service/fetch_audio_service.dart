@@ -1,69 +1,17 @@
 import 'dart:io';
 
-import 'package:beatsvibe/models/folders_model.dart';
-import 'package:beatsvibe/service/hive_service.dart';
 import 'package:beatsvibe/util/id_generator.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:audio_info/audio_info.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/models/storage_isolate_model.dart';
 import 'package:beatsvibe/service/utfconverter_service.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 const List<String> _validExtensions = ['mp3', 'wav', 'm4a', 'flac', 'alac'];
 
-class FetchAudioService {
-  static final HiveService _hiveService = HiveService();
-  static Future<void> scanLocalFiles() async {
-    String id;
-    bool isIncluded;
-
-    String? dir = (await FilePicker.platform.getDirectoryPath(
-      dialogTitle: 'Selecciona una carpeta de música',
-      initialDirectory: '/storage/emulated/0/',
-    ));
-
-    if (dir != null) {
-      final RootIsolateToken? token = RootIsolateToken.instance;
-      if (token == null) return;
-
-      final Directory appDocDir = await getApplicationDocumentsDirectory();
-
-      StorageIsolateModel model = StorageIsolateModel(
-        path: dir,
-        token: token,
-        appDocDir: appDocDir.path,
-      );
-
-      try {
-        return await compute(_scanFiles, model).then((data) async {
-          final existingFolders = await _hiveService.getFilesFolder();
-          do {
-            id = IDGenerator.generateId(length: 25);
-            isIncluded = existingFolders.any((e) => e.id == id);
-          } while (isIncluded);
-
-          final folder = FoldersModel(
-            id: id,
-            name: dir.split('/').last,
-            path: dir,
-            items: data.length,
-          );
-          await _hiveService.saveFilesFolder([folder]);
-          await _hiveService.saveAllSongs(data);
-        });
-      } catch (_) {
-        return;
-      }
-    }
-  }
-}
-
 @pragma('vm:entry-point')
-Future<List<MediaItemData>> _scanFiles(StorageIsolateModel model) async {
+Future<List<MediaItemData>> scanFiles(StorageIsolateModel model) async {
   final UtfConverterService utfConverter = UtfConverterService();
   String id;
   bool isIncluded;

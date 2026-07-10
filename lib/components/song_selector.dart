@@ -1,3 +1,4 @@
+import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:beatsvibe/vm/playlist_vm.dart';
 import 'package:flutter/cupertino.dart';
@@ -75,7 +76,9 @@ class _SongSelectorState extends State<SongSelector> {
                           playlistVM.addSelectedSong(song);
                         }
                       },
-                      leading: Icon(CupertinoIcons.music_note),
+                      leading: Image.asset(AppVariables.appLogo,
+                      width: 35,
+                      height: 35,),
                       title: Text(song.title),
                       subtitle: song.artist != null && song.artist!.isNotEmpty
                           ? Text(

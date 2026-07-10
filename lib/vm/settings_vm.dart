@@ -1,15 +1,26 @@
+import 'dart:io';
+import 'dart:ui' show RootIsolateToken;
+
 import 'package:beatsvibe/models/folders_model.dart';
 import 'package:beatsvibe/models/settings_opt.dart';
+import 'package:beatsvibe/models/storage_isolate_model.dart';
 import 'package:beatsvibe/routes.dart';
 import 'package:beatsvibe/service/fetch_audio_service.dart';
 import 'package:beatsvibe/service/hive_service.dart';
+import 'package:beatsvibe/util/id_generator.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 class SettingsViewModel extends ChangeNotifier {
   final HiveService _hiveService = HiveService();
   ThemeMode _themeMode = ThemeMode.system;
+  bool _isLoading = false;
+  
   ThemeMode get themeMode => _themeMode;
+  bool get isLoading => _isLoading;
 
   final List<SettingsOptionsModel> _settingsOptions = [
     SettingsOptionsModel(
@@ -70,8 +81,61 @@ class SettingsViewModel extends ChangeNotifier {
   }
 
   Future<void> addFolder() async {
-    await FetchAudioService.scanLocalFiles().whenComplete(() async {
-      await initFolder();
-    });
+    String id;
+    bool isIncluded;
+
+    FilePicker.platform
+        .getDirectoryPath(
+          dialogTitle: 'Selecciona una carpeta de música',
+          initialDirectory: '/storage/emulated/0/',
+        )
+        .then((dir) async {
+          if (dir != null) {
+            _setLoadingState(true);
+            final RootIsolateToken? token = RootIsolateToken.instance;
+            if (token == null) return;
+
+            final Directory appDocDir =
+                await getApplicationDocumentsDirectory();
+
+            StorageIsolateModel model = StorageIsolateModel(
+              path: dir,
+              token: token,
+              appDocDir: appDocDir.path,
+            );
+
+            try {
+              await compute(scanFiles, model)
+                  .then((data) async {
+                    final existingFolders = await _hiveService.getFilesFolder();
+                    do {
+                      id = IDGenerator.generateId(length: 25);
+                      isIncluded = existingFolders.any((e) => e.id == id);
+                    } while (isIncluded);
+
+                    final folder = FoldersModel(
+                      id: id,
+                      name: dir.split('/').last,
+                      path: dir,
+                      items: data.length,
+                    );
+                    await _hiveService.saveFilesFolder([folder]);
+                    await _hiveService.saveAllSongs(data);
+                  })
+                  .whenComplete(() {
+                    _setLoadingState(false);
+                    initFolder();
+                  });
+            } catch (_) {
+              _setLoadingState(false);
+              return;
+            }
+          }
+        });
+  }
+
+  void _setLoadingState(bool state) {
+    _isLoading = state;
+    notifyListeners();
   }
 }

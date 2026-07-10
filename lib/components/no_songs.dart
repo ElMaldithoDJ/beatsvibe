@@ -1,7 +1,7 @@
 import 'package:beatsvibe/service/hive_service.dart';
 import 'package:beatsvibe/service/permision_service.dart';
+import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/audio_vm.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -33,12 +33,7 @@ class _NoSongsState extends State<NoSongs> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            CupertinoIcons.music_note,
-            size: 50,
-            color: Theme.of(context).primaryColor,
-          ),
-          const SizedBox(height: 10),
+          Image.asset(AppVariables.appLogo, width: 100, height: 100),
           Text(
             "No se encontraron canciones",
             style: Theme.of(

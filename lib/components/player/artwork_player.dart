@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/favorites_vm.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,11 +66,7 @@ class _ArtworkPlayerState extends State<ArtworkPlayer> {
                               : Colors.grey.shade200,
                         ),
                         child: Center(
-                          child: Icon(
-                            CupertinoIcons.music_note,
-                            color: Theme.of(context).primaryColor,
-                            size: 80,
-                          ),
+                          child: Image.asset(AppVariables.appLogo, width: 180, height: 180),
                         ),
                       ),
                     ],

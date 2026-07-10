@@ -4,6 +4,7 @@ import 'dart:math' as math;
 
 import 'package:beatsvibe/routes.dart';
 import 'package:beatsvibe/theme.dart';
+import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/favorites_vm.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
@@ -129,13 +130,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                             ),
                                                       ),
                                                       child: Center(
-                                                        child: Icon(
-                                                          CupertinoIcons
-                                                              .music_note,
-                                                          color: Theme.of(
-                                                            context,
-                                                          ).primaryColor,
-                                                          size: 20,
+                                                        child: Image.asset(
+                                                          AppVariables.appLogo,
+                                                          width: 35,
+                                                          height: 35,
                                                         ),
                                                       ),
                                                     );
@@ -162,13 +160,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                             ),
                                                       ),
                                                       child: Center(
-                                                        child: Icon(
-                                                          CupertinoIcons
-                                                              .music_note,
-                                                          color: Theme.of(
-                                                            context,
-                                                          ).primaryColor,
-                                                          size: 20,
+                                                        child: Image.asset(
+                                                          AppVariables.appLogo,
+                                                          width: 35,
+                                                          height: 35,
                                                         ),
                                                       ),
                                                     );
@@ -189,12 +184,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                           ),
                                         ),
                                         child: Center(
-                                          child: Icon(
-                                            CupertinoIcons.music_note,
-                                            color: Theme.of(
-                                              context,
-                                            ).primaryColor,
-                                            size: 20,
+                                          child: Image.asset(
+                                            AppVariables.appLogo,
+                                            width: 35,
+                                            height: 35,
                                           ),
                                         ),
                                       ),
@@ -373,13 +366,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                           ),
                                                     ),
                                                     child: Center(
-                                                      child: Icon(
-                                                        CupertinoIcons
-                                                            .music_note,
-                                                        color: Theme.of(
-                                                          context,
-                                                        ).primaryColor,
-                                                        size: 20,
+                                                      child: Image.asset(
+                                                        AppVariables.appLogo,
+                                                        width: 35,
+                                                        height: 35,
                                                       ),
                                                     ),
                                                   );
@@ -406,13 +396,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                           ),
                                                     ),
                                                     child: Center(
-                                                      child: Icon(
-                                                        CupertinoIcons
-                                                            .music_note,
-                                                        color: Theme.of(
-                                                          context,
-                                                        ).primaryColor,
-                                                        size: 20,
+                                                      child: Image.asset(
+                                                        AppVariables.appLogo,
+                                                        width: 35,
+                                                        height: 35,
                                                       ),
                                                     ),
                                                   );
@@ -433,10 +420,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                         ),
                                       ),
                                       child: Center(
-                                        child: Icon(
-                                          CupertinoIcons.music_note,
-                                          color: Theme.of(context).primaryColor,
-                                          size: 20,
+                                        child: Image.asset(
+                                          AppVariables.appLogo,
+                                          width: 35,
+                                          height: 35,
                                         ),
                                       ),
                                     ),
@@ -599,12 +586,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                     BorderRadius.circular(360),
                                               ),
                                               child: Center(
-                                                child: Icon(
-                                                  CupertinoIcons.music_note,
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).primaryColor,
-                                                  size: 20,
+                                                child: Image.asset(
+                                                  AppVariables.appLogo,
+                                                  width: 35,
+                                                  height: 35,
                                                 ),
                                               ),
                                             );
@@ -626,12 +611,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                     BorderRadius.circular(360),
                                               ),
                                               child: Center(
-                                                child: Icon(
-                                                  CupertinoIcons.music_note,
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).primaryColor,
-                                                  size: 20,
+                                                child: Image.asset(
+                                                  AppVariables.appLogo,
+                                                  width: 35,
+                                                  height: 35,
                                                 ),
                                               ),
                                             );
@@ -650,10 +633,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                   borderRadius: BorderRadius.circular(360),
                                 ),
                                 child: Center(
-                                  child: Icon(
-                                    CupertinoIcons.music_note,
-                                    color: Theme.of(context).primaryColor,
-                                    size: 20,
+                                  child: Image.asset(
+                                    AppVariables.appLogo,
+                                    width: 35,
+                                    height: 35,
                                   ),
                                 ),
                               ),

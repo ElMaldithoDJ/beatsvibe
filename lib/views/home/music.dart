@@ -76,7 +76,11 @@ class _MusicViewState extends State<MusicView> {
                   shrinkWrap: true,
                   controller: _scrollController,
                   padding: .only(
-                    bottom: audioVM.songsCopy.isNotEmpty ? 70 : 10,
+                    bottom:
+                        audioVM.songsCopy.isNotEmpty ||
+                            playerVM.currentItem != null
+                        ? 70
+                        : 10,
                   ),
                   physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
@@ -104,8 +108,21 @@ class _MusicViewState extends State<MusicView> {
                         child: AudioCupertinoContextMenu(
                           actions: [
                             AudioCupertinoMenuItem(
-                              title: "Seleccionar",
-                              onTap: () {},
+                              title:
+                                  audioVM.songsSelected.any(
+                                    (e) => e.id == song.id,
+                                  )
+                                  ? "Deseleccionar"
+                                  : "Seleccionar",
+                              icon:
+                                  audioVM.songsSelected.any(
+                                    (e) => e.id == song.id,
+                                  )
+                                  ? CupertinoIcons.check_mark
+                                  : CupertinoIcons.add,
+                              onTap: () {
+                                audioVM.selectSong(song.id);
+                              },
                             ),
                             AudioCupertinoMenuItem(
                               title: "Agregar a playlist",
@@ -142,5 +159,29 @@ class _MusicViewState extends State<MusicView> {
               ),
             ],
           );
+  }
+
+  void showPlaylistDialog() {
+    Get.dialog(
+      CupertinoActionSheet(
+        title: Text("Agregar a playlist"),
+        message: Text("Selecciona una playlist"),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text("Cancelar"),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text("Agregar"),
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    );
   }
 }

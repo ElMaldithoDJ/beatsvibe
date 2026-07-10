@@ -1,6 +1,7 @@
 import 'package:beatsvibe/models/playlist_data.dart';
 import 'package:beatsvibe/routes.dart';
 import 'package:beatsvibe/theme.dart';
+import 'package:beatsvibe/variables.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -108,6 +109,11 @@ class _PlayListFormViewState extends State<PlayListFormView> {
                 itemBuilder: (context, index) {
                   final song = playlistVM.selectedSongs[index];
                   return ListTile(
+                    leading: Image.asset(
+                      AppVariables.appLogo,
+                      width: 35,
+                      height: 35,
+                    ),
                     title: Text(song.title),
                     subtitle: song.artist != null && song.artist!.isNotEmpty
                         ? Text(
@@ -168,7 +174,9 @@ class _PlayListFormViewState extends State<PlayListFormView> {
                         );
                       }
                     : null,
-                style: TextButton.styleFrom(foregroundColor: AppTheme.primaryColor),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primaryColor,
+                ),
                 child: Text("Crear"),
               ),
             ],
