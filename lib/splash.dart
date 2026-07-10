@@ -3,6 +3,7 @@ import 'package:beatsvibe/routes.dart';
 import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -51,14 +52,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Hero(
-                      tag: "logo",
-                      child: Image.asset(
-                        AppVariables.appLogo,
-                        width: 100,
-                        height: 70,
-                        fit: .contain,
-                      ),
+                    SvgPicture.asset(
+                      AppVariables.appLogo,
+                      width: 100,
+                      height: 70,
                     ),
                     Text(
                       AppVariables.appName,

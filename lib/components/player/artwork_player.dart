@@ -7,6 +7,7 @@ import 'package:beatsvibe/vm/favorites_vm.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:image_color_scheme/image_color_scheme.dart';
 import 'package:provider/provider.dart';
 
@@ -66,7 +67,7 @@ class _ArtworkPlayerState extends State<ArtworkPlayer> {
                               : Colors.grey.shade200,
                         ),
                         child: Center(
-                          child: Image.asset(AppVariables.appLogo, width: 180, height: 180),
+                          child: SvgPicture.asset(AppVariables.appLogo, width: 180, height: 180),
                         ),
                       ),
                     ],

@@ -9,6 +9,7 @@ import 'package:beatsvibe/vm/favorites_vm.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:image_color_scheme/image_color_scheme.dart';
 import 'package:provider/provider.dart';
@@ -130,7 +131,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                             ),
                                                       ),
                                                       child: Center(
-                                                        child: Image.asset(
+                                                        child: SvgPicture.asset(
                                                           AppVariables.appLogo,
                                                           width: 35,
                                                           height: 35,
@@ -160,7 +161,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                             ),
                                                       ),
                                                       child: Center(
-                                                        child: Image.asset(
+                                                        child: SvgPicture.asset(
                                                           AppVariables.appLogo,
                                                           width: 35,
                                                           height: 35,
@@ -184,7 +185,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                           ),
                                         ),
                                         child: Center(
-                                          child: Image.asset(
+                                          child: SvgPicture.asset(
                                             AppVariables.appLogo,
                                             width: 35,
                                             height: 35,
@@ -366,7 +367,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                           ),
                                                     ),
                                                     child: Center(
-                                                      child: Image.asset(
+                                                      child: SvgPicture.asset(
                                                         AppVariables.appLogo,
                                                         width: 35,
                                                         height: 35,
@@ -396,7 +397,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                           ),
                                                     ),
                                                     child: Center(
-                                                      child: Image.asset(
+                                                      child: SvgPicture.asset(
                                                         AppVariables.appLogo,
                                                         width: 35,
                                                         height: 35,
@@ -420,7 +421,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                         ),
                                       ),
                                       child: Center(
-                                        child: Image.asset(
+                                        child: SvgPicture.asset(
                                           AppVariables.appLogo,
                                           width: 35,
                                           height: 35,
@@ -586,7 +587,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                     BorderRadius.circular(360),
                                               ),
                                               child: Center(
-                                                child: Image.asset(
+                                                child: SvgPicture.asset(
                                                   AppVariables.appLogo,
                                                   width: 35,
                                                   height: 35,
@@ -611,7 +612,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                                     BorderRadius.circular(360),
                                               ),
                                               child: Center(
-                                                child: Image.asset(
+                                                child: SvgPicture.asset(
                                                   AppVariables.appLogo,
                                                   width: 35,
                                                   height: 35,
@@ -633,7 +634,7 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                                   borderRadius: BorderRadius.circular(360),
                                 ),
                                 child: Center(
-                                  child: Image.asset(
+                                  child: SvgPicture.asset(
                                     AppVariables.appLogo,
                                     width: 35,
                                     height: 35,

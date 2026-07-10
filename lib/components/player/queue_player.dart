@@ -52,7 +52,6 @@ class _QueuePlayerState extends State<QueuePlayer> {
                   child: AudioItem(
                     song: song,
                     index: index,
-                    showIsPlaying: true,
                   ),
                 );
               },

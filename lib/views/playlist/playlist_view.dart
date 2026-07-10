@@ -168,7 +168,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                         onTap: () {},
                       ),
                     ],
-                    child: AudioItem(song: song, index: index, showIsPlaying: true,),
+                    child: AudioItem(song: song, index: index,),
                   ),
                 );
               },

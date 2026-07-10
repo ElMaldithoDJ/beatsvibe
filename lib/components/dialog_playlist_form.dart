@@ -4,6 +4,7 @@ import 'package:beatsvibe/theme.dart';
 import 'package:beatsvibe/variables.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -109,7 +110,7 @@ class _PlayListFormViewState extends State<PlayListFormView> {
                 itemBuilder: (context, index) {
                   final song = playlistVM.selectedSongs[index];
                   return ListTile(
-                    leading: Image.asset(
+                    leading: SvgPicture.asset(
                       AppVariables.appLogo,
                       width: 35,
                       height: 35,

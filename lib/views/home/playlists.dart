@@ -1,9 +1,11 @@
 import 'package:beatsvibe/components/playlist_cupertino.dart';
 import 'package:beatsvibe/routes.dart';
 import 'package:beatsvibe/theme.dart';
+import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/playlist_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -96,12 +98,16 @@ class _PlaylistsViewState extends State<PlaylistsView> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                CupertinoIcons.music_albums,
-                                size: 50,
-                                color: Theme.brightnessOf(context) == .dark
-                                    ? Colors.white
-                                    : Colors.black,
+                              SvgPicture.asset(
+                                AppVariables.playlistIcon,
+                                width: 50,
+                                height: 50,
+                                colorFilter: ColorFilter.mode(
+                                  Theme.brightnessOf(context) == .dark
+                                      ? Colors.white
+                                      : Colors.black,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               SizedBox(height: 5),
                               Text(

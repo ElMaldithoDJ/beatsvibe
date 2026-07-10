@@ -31,6 +31,7 @@ dependencies:
   fluttertoast:
   open_file_manager:
   string_normalizer:
+  flutter_svg:
 
 dev_dependencies:
   flutter_test:

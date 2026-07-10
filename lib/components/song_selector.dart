@@ -3,6 +3,7 @@ import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:beatsvibe/vm/playlist_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -76,9 +77,11 @@ class _SongSelectorState extends State<SongSelector> {
                           playlistVM.addSelectedSong(song);
                         }
                       },
-                      leading: Image.asset(AppVariables.appLogo,
-                      width: 35,
-                      height: 35,),
+                      leading: SvgPicture.asset(
+                        AppVariables.appLogo,
+                        width: 35,
+                        height: 35,
+                      ),
                       title: Text(song.title),
                       subtitle: song.artist != null && song.artist!.isNotEmpty
                           ? Text(

@@ -6,6 +6,7 @@ import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class AudioItem extends StatefulWidget {
@@ -13,7 +14,6 @@ class AudioItem extends StatefulWidget {
   final bool isSelected;
   final bool isFavorite;
   final bool showIsSelected;
-  final bool showIsPlaying;
   final int index;
   final List<MediaItemData>? playlist;
 
@@ -25,7 +25,6 @@ class AudioItem extends StatefulWidget {
     this.playlist,
     this.showIsSelected = true,
     this.isFavorite = false,
-    this.showIsPlaying = false,
   });
 
   @override
@@ -92,21 +91,28 @@ class _AudioItemState extends State<AudioItem> {
                             gaplessPlayback: true,
                           ),
                   ),
-                  if (player.currentItem?.id == widget.song.id &&
-                      widget.showIsPlaying) ...[
-                    Center(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: widget.song.artUri != null
-                              ? Colors.black54
-                              : Theme.of(
-                                  context,
-                                ).primaryColor.withValues(alpha: .15),
-                        ),
-                        child: Center(
-                          child: Image.asset(AppVariables.appLogo)
-                        ),
+                  if ((player.currentItem?.id == widget.song.id)) ...[
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: widget.song.artUri != null
+                            ? Colors.black54
+                            : Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: .15),
+                      ),
+                      child: Center(
+                        child: player.isPlaying
+                            ? Icon(
+                                CupertinoIcons.play_arrow_solid,
+                                size: 20,
+                                color: Colors.white,
+                              )
+                            : Icon(
+                                CupertinoIcons.pause_solid,
+                                size: 20,
+                                color: Colors.white,
+                              ),
                       ),
                     ),
                   ],
@@ -119,9 +125,34 @@ class _AudioItemState extends State<AudioItem> {
                       ).primaryColor.withValues(alpha: .1),
                     ),
                     child: Center(
-                      child: Image.asset(AppVariables.appLogo)
+                      child: SvgPicture.asset(
+                        AppVariables.appLogo,
+                        width: 35,
+                        height: 35,
+                      ),
                     ),
                   ),
+                  if ((player.currentItem?.id == widget.song.id)) ...[
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black45,
+                      ),
+                      child: Center(
+                        child: player.isPlaying
+                            ? Icon(
+                                CupertinoIcons.play_arrow_solid,
+                                size: 20,
+                                color: Colors.white,
+                              )
+                            : Icon(
+                                CupertinoIcons.pause_solid,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                      ),
+                    ),
+                  ],
                 ],
               ],
             ),

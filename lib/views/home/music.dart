@@ -95,6 +95,10 @@ class _MusicViewState extends State<MusicView> {
                             song: song,
                             playlist: audioVM.songsCopy,
                           );
+                        } else if (!playerVM.isPlaying &&
+                            (playerVM.currentItem?.id == song.id ||
+                                playerVM.lastPlayed?.id == song.id)) {
+                          playerVM.play();
                         }
                         if (_searchController.text.isNotEmpty) {
                           _searchController.clear();
@@ -146,7 +150,6 @@ class _MusicViewState extends State<MusicView> {
                           child: AudioItem(
                             song: song,
                             index: index,
-                            showIsPlaying: true,
                             isFavorite: favoriteVM.favorites.any(
                               (e) => e.id == song.id,
                             ),

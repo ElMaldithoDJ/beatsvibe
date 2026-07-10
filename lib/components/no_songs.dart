@@ -3,6 +3,7 @@ import 'package:beatsvibe/service/permision_service.dart';
 import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class NoSongs extends StatefulWidget {
@@ -33,7 +34,7 @@ class _NoSongsState extends State<NoSongs> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(AppVariables.appLogo, width: 100, height: 100),
+          SvgPicture.asset(AppVariables.appLogo, width: 100, height: 100),
           Text(
             "No se encontraron canciones",
             style: Theme.of(
