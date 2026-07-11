@@ -14,6 +14,7 @@ class AudioItem extends StatefulWidget {
   final bool isSelected;
   final bool isFavorite;
   final bool showIsSelected;
+  final bool? showIsPlaying;
   final int index;
   final List<MediaItemData>? playlist;
 
@@ -25,16 +26,57 @@ class AudioItem extends StatefulWidget {
     this.playlist,
     this.showIsSelected = true,
     this.isFavorite = false,
+    this.showIsPlaying = false,
   });
 
   @override
   State<AudioItem> createState() => _AudioItemState();
 }
 
-class _AudioItemState extends State<AudioItem> {
+class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+
   @override
   void initState() {
     super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.bounceOut,
+      ),
+    );
+
+    if (widget.isFavorite) {
+      _animationController.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant AudioItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.isFavorite != oldWidget.isFavorite) {
+      if (widget.isFavorite) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    }
   }
 
   @override
@@ -97,12 +139,11 @@ class _AudioItemState extends State<AudioItem> {
                         shape: BoxShape.circle,
                         color: widget.song.artUri != null
                             ? Colors.black54
-                            : Theme.of(
-                                context,
-                              ).primaryColor.withValues(alpha: .15),
+                            : Theme.of(context).primaryColor
+                                  .withValues(alpha: .15),
                       ),
                       child: Center(
-                        child: player.isPlaying
+                        child: player.isPlaying && widget.showIsPlaying!
                             ? Icon(
                                 CupertinoIcons.play_arrow_solid,
                                 size: 20,
@@ -120,9 +161,8 @@ class _AudioItemState extends State<AudioItem> {
                   DecoratedBox(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Theme.of(
-                        context,
-                      ).primaryColor.withValues(alpha: .1),
+                      color: Theme.of(context).primaryColor
+                          .withValues(alpha: .1),
                     ),
                     child: Center(
                       child: SvgPicture.asset(
@@ -139,7 +179,7 @@ class _AudioItemState extends State<AudioItem> {
                         color: Colors.black45,
                       ),
                       child: Center(
-                        child: player.isPlaying
+                        child: player.isPlaying && widget.showIsPlaying!
                             ? Icon(
                                 CupertinoIcons.play_arrow_solid,
                                 size: 20,
@@ -206,25 +246,27 @@ class _AudioItemState extends State<AudioItem> {
               ),
             ),
           ],
-          if (widget.isFavorite) ...[
-            SizedBox(
-              width: 30,
-              height: 30,
+          SizedBox(
+            width: 25,
+            height: 25,
+            child: ScaleTransition(
+              alignment: .center,
+              scale: _scaleAnimation,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Theme.of(context).primaryColor.withValues(alpha: .15),
+                  color: Colors.pinkAccent.withValues(alpha: .15),
                 ),
                 child: Center(
                   child: Icon(
                     CupertinoIcons.heart_fill,
                     color: Colors.pinkAccent,
-                    size: 20,
+                    size: 15,
                   ),
                 ),
               ),
             ),
-          ],
+          ),
         ],
       ),
     );

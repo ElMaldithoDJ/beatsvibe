@@ -279,6 +279,8 @@ class _CupertinoContextMenuRoutePageState
         final bool isMenuBelow =
             widget.position.dy < (safeArea.top + availableHeight / 2);
 
+        final bool isItemInRightSide = widget.position.dx >= (safeArea.left + widget.size.width / 2);
+
         double childTargetY;
         double menuTargetY;
 
@@ -343,7 +345,7 @@ class _CupertinoContextMenuRoutePageState
 
         // Menu width and horizontal alignment
         const double menuWidth = 260.0;
-        final double menuX = (screenSize.width - ((widget.size.width - 60) + menuWidth)) / 2;
+        final double menuX = isItemInRightSide ? (screenSize.width - (menuWidth +10)) : 10;
 
         return Stack(
           children: [
@@ -379,7 +381,7 @@ class _CupertinoContextMenuRoutePageState
                 opacity: menuOpacity.clamp(0.0, 1.0),
                 child: Transform.scale(
                   scale: menuScale,
-                  alignment: Alignment.center,
+                  alignment: isMenuBelow ? Alignment.topCenter : Alignment.bottomCenter,
                   child: _buildMenuCard(context, isDarkMode),
                 ),
               ),

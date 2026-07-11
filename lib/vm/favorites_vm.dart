@@ -40,4 +40,8 @@ class FavoritesViewModel extends ChangeNotifier {
       }
     }
   }
+
+  bool isFavorite(String id) {
+    return _favorites.any((e) => e.id == id);
+  }
 }

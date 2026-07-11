@@ -19,7 +19,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-    _cacheImage();
     super.initState();
     if (mounted) {
       Future.microtask(() {
@@ -34,10 +33,6 @@ class _SplashScreenState extends State<SplashScreen> {
         });
       });
     }
-  }
-
-  void _cacheImage() {
-    assetCache.load("beatsvibes-logo.png");
   }
 
   @override

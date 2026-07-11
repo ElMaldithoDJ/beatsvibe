@@ -15,6 +15,7 @@ class HiveService {
   static final String _lastPlayedPlaylistBox = 'last_played_playlist';
   static final String _themeBox = 'theme';
   static final String _filesFolder = 'files_folder';
+  static final String _activeTabBox = 'active_tab';
 
   // Get all songs
   Future<List<MediaItemData>> getAllSongs() async {
@@ -204,5 +205,21 @@ class HiveService {
   Future<void> removeFilesFolder(String id) async {
     final box = await Hive.openBox(_filesFolder);
     await box.delete(id);
+  }
+
+  // Get Active Tab Index
+  Future<int> getActiveTabIndex() async {
+    final box = await Hive.openBox(_activeTabBox);
+    if (box.isNotEmpty) {
+      return box.get("active_tab");
+    }
+    return 0;
+  }
+
+  // Save Active Tab Index
+  Future<void> saveActiveTabIndex(int index) async {
+    final box = await Hive.openBox(_activeTabBox);
+    await box.clear();
+    await box.put("active_tab", index);
   }
 }

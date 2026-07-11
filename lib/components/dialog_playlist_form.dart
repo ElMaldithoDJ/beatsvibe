@@ -36,27 +36,27 @@ class _PlayListFormViewState extends State<PlayListFormView> {
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
-          padding: const .symmetric(vertical: 8, horizontal: 16),
+          padding: const .symmetric(vertical: 16, horizontal: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Center(
                 child: SizedBox(
-                  width: 150,
-                  height: 150,
+                  width: 240,
+                  height: 200,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: Theme.brightnessOf(context) == .dark
                           ? Colors.white.withValues(alpha: .1)
-                          : Colors.black.withValues(alpha: .05),
+                          : Colors.transparent,
+                      
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(
-                      CupertinoIcons.music_albums,
-                      size: 50,
-                      color: Theme.brightnessOf(context) == .dark
-                          ? Colors.white
-                          : Colors.grey,
+                    child: Image.asset(
+                      AppVariables.playlistIconPng,
+                      fit: .cover,
+                      width: 50,
+                      height: 50,
                     ),
                   ),
                 ),

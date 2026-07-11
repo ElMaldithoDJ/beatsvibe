@@ -10,7 +10,9 @@ class PlaylistViewModel extends ChangeNotifier {
   final audioHandler = globalAudioHandler;
 
   List<PlaylistModelData> _playlists = [];
+  List<PlaylistModelData> _playlistsCopy = [];
   List<PlaylistModelData> get playlists => _playlists;
+  List<PlaylistModelData> get playlistsCopy => _playlistsCopy;
 
   final List<MediaItemData> _selectedSongs = [];
   List<MediaItemData> get selectedSongs => _selectedSongs;
@@ -35,9 +37,11 @@ class PlaylistViewModel extends ChangeNotifier {
     final lists = await _hiveService.getPlaylists();
     if (lists.isNotEmpty) {
       _playlists = lists;
+      _playlistsCopy = lists;
       notifyListeners();
     } else {
       _playlists = [];
+      _playlistsCopy = [];
       notifyListeners();
     }
   }
@@ -46,9 +50,11 @@ class PlaylistViewModel extends ChangeNotifier {
     final lists = await _hiveService.getPlaylists();
     if (lists.isNotEmpty) {
       _playlists = lists;
+      _playlistsCopy = lists;
       notifyListeners();
     } else {
       _playlists = [];
+      _playlistsCopy = [];
       notifyListeners();
     }
   }
@@ -99,6 +105,19 @@ class PlaylistViewModel extends ChangeNotifier {
 
   void clearSelectedSongs() {
     _selectedSongs.clear();
+    notifyListeners();
+  }
+
+  void searchPlaylist(String title) {
+    if (title.isEmpty) {
+      _playlists = _playlistsCopy;
+    } else {
+      _playlists = _playlistsCopy
+          .where(
+            (e) => e.title!.toLowerCase().indexOf(title.toLowerCase()) >= 0,
+          )
+          .toList();
+    }
     notifyListeners();
   }
 }

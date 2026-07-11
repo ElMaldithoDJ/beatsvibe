@@ -17,6 +17,7 @@ late AudioViewModel globalAudioViewModel;
 
 class AudioViewModel extends ChangeNotifier {
   final HiveService _hiveService = HiveService();
+  int _tabIndex = 0;
 
   bool _isLoading = false;
   List<MediaItemData> _songs = [];
@@ -27,6 +28,7 @@ class AudioViewModel extends ChangeNotifier {
   List<MediaItemData> get songs => _songs;
   List<MediaItemData> get songsCopy => _songsCopy;
   List<MediaItemData> get songsSelected => _songsSelected;
+  int get tabIndex => _tabIndex;
 
   AudioViewModel() {
     onInit();
@@ -44,7 +46,9 @@ class AudioViewModel extends ChangeNotifier {
             _songsCopy = data;
             notifyListeners();
           })
-          .whenComplete(() => _setLoadingState(false));
+          .whenComplete(() {
+            _setLoadingState(false);
+          });
     }
   }
 
@@ -109,9 +113,8 @@ class AudioViewModel extends ChangeNotifier {
     } else {
       final q = StringNormalizer.normalize(query.toLowerCase());
       _songs = _songsCopy.where((song) {
-        return StringNormalizer.normalize(
-              song.title.toLowerCase(),
-            ).indexOf(q) >=
+        return StringNormalizer.normalize(song.title.toLowerCase())
+                .indexOf(q) >=
             0;
       }).toList();
     }
@@ -130,5 +133,9 @@ class AudioViewModel extends ChangeNotifier {
       _songsSelected.add(_songsCopy.firstWhere((e) => e.id == id));
     }
     notifyListeners();
+  }
+
+  bool isSongSelected(String id) {
+    return _songsSelected.any((e) => e.id == id);
   }
 }

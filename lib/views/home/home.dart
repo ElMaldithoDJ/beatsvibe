@@ -19,7 +19,9 @@ class HomeRoute extends StatefulWidget {
 }
 
 class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
-  late TabController tabController;
+
+  int currentIndex = 0;
+  late PageController pageController = PageController(initialPage: currentIndex);
 
   final List<BottomNavButton> navButtons = [
     BottomNavButton(
@@ -47,19 +49,8 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
   }
 
   @override
-  void dispose() {
-    tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final audioVM = Provider.of<AudioViewModel>(context, listen: true);
-    tabController = TabController(
-      length: audioVM.songsCopy.isEmpty ? 1 : navButtons.length,
-      vsync: this,
-      initialIndex: 0,
-    );
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
@@ -82,38 +73,42 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
         ],
         bottom: audioVM.isLoading || audioVM.songsCopy.isEmpty
             ? null
-            : TabBar(
-                controller: tabController,
-                indicatorColor: Theme.of(context).primaryColor,
-                labelColor: Theme.of(context).primaryColor,
-                indicatorSize: TabBarIndicatorSize.label,
-                labelPadding: EdgeInsets.zero,
-                padding: EdgeInsets.zero,
-                indicatorPadding: EdgeInsets.zero,
-                indicatorWeight: 1,
-                indicatorAnimation: .elastic,
-                unselectedLabelColor: Theme.of(
-                  context,
-                ).textTheme.bodySmall!.color,
-                dividerHeight: 0,
-                tabAlignment: TabAlignment.fill,
-                tabs: [
-                  if (audioVM.songsCopy.isEmpty) ...[
-                    Tab(text: '', height: 35, iconMargin: EdgeInsets.zero),
-                  ] else ...[
+            : PreferredSize(
+                preferredSize: Size(.maxFinite, 25),
+                child: Row(
+                  children: [
                     ...navButtons.map(
-                      (btn) => Tab(
-                        icon: Icon(btn.icon, size: 18),
-                        height: 35,
-                        iconMargin: EdgeInsets.zero,
+                      (btn) => Expanded(
+                        child: BottomNavButton(
+                          icon: btn.icon,
+                          activeIcon: btn.activeIcon,
+                          page: btn.page,
+                          activeColor: btn.activeColor,
+                          isActive: currentIndex == navButtons.indexOf(btn),
+                          onTap: () {
+                            setState(() {
+                              currentIndex = navButtons.indexOf(btn);
+                              pageController.animateToPage(
+                                currentIndex,
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.ease,
+                              );
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ],
-                ],
+                ),
               ),
       ),
-      body: TabBarView(
-        controller: tabController,
+      body: PageView(
+        controller: pageController,
+        onPageChanged: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
         children: [
           if (audioVM.songsCopy.isEmpty) ...[
             navButtons[0].page,

@@ -5,7 +5,6 @@ import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/playlist_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -17,13 +16,23 @@ class PlaylistsView extends StatefulWidget {
 }
 
 class _PlaylistsViewState extends State<PlaylistsView> {
+  final _searchController = TextEditingController();
+  final _searchNode = FocusNode();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchNode.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<PlaylistViewModel>(
       builder: (context, playlistVM, _) {
         return Stack(
           children: [
-            if (playlistVM.playlists.isEmpty) ...[
+            if (playlistVM.playlistsCopy.isEmpty) ...[
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -50,105 +59,142 @@ class _PlaylistsViewState extends State<PlaylistsView> {
               ),
             ] else ...[
               Positioned.fill(
-                child: GridView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
-                  ),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 1,
-                    mainAxisSpacing: 5,
-                    crossAxisSpacing: 5,
-                  ),
-                  itemCount: playlistVM.playlists.length,
-                  itemBuilder: (context, index) {
-                    final playlist = playlistVM.playlists[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Get.toNamed(
-                          AppRoutes.playlistView,
-                          arguments: playlist,
-                        );
-                      },
-                      child: PlaylistContextMenu(
-                        actions: [
-                          PlaylistMenuItem(
-                            title: "Editar",
-                            icon: CupertinoIcons.pencil,
-                            onTap: () {},
-                          ),
-                          PlaylistMenuItem(
-                            title: "Eliminar",
-                            icon: CupertinoIcons.trash,
-                            isDestructive: true,
-                            onTap: () async {
-                              await playlistVM.removePlaylist(playlist.id!);
+                child: Column(
+                  children: [
+                    if (playlistVM.playlistsCopy.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 5,
+                          horizontal: 16,
+                        ),
+                        child: SizedBox(
+                          height: 45,
+                          child: TextField(
+                            controller: _searchController,
+                            focusNode: _searchNode,
+                            decoration: InputDecoration(
+                              hintText: 'Titulo de la playlist...',
+                              prefixIcon: Icon(Icons.search),
+                            ),
+                            onChanged: (value) {
+                              playlistVM.searchPlaylist(value);
                             },
-                          ),
-                        ],
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.brightnessOf(context) == .dark
-                                ? AppTheme.playerDarkBgColor
-                                : Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                AppVariables.playlistIcon,
-                                width: 50,
-                                height: 50,
-                                colorFilter: ColorFilter.mode(
-                                  Theme.brightnessOf(context) == .dark
-                                      ? Colors.white
-                                      : Colors.black,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                "${playlist.songs!.length} canciones",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Theme.brightnessOf(context) == .dark
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                "${playlist.title}",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.brightnessOf(context) == .dark
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                            onTapOutside: (event) {
+                              _searchNode.unfocus();
+                            },
                           ),
                         ),
                       ),
-                    );
-                  },
+                    ],
+                    GridView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1,
+                            mainAxisSpacing: 5,
+                            crossAxisSpacing: 5,
+                          ),
+                      itemCount: playlistVM.playlists.length,
+                      physics: const BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final playlist = playlistVM.playlists[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Get.toNamed(
+                              AppRoutes.playlistView,
+                              arguments: playlist,
+                            );
+                          },
+                          child: PlaylistContextMenu(
+                            actions: [
+                              PlaylistMenuItem(
+                                title: "Editar",
+                                icon: CupertinoIcons.pencil,
+                                onTap: () {},
+                              ),
+                              PlaylistMenuItem(
+                                title: "Eliminar",
+                                icon: CupertinoIcons.trash,
+                                isDestructive: true,
+                                onTap: () async {
+                                  await playlistVM.removePlaylist(playlist.id!);
+                                },
+                              ),
+                            ],
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.brightnessOf(context) == .dark
+                                    ? AppTheme.playerDarkBgColor
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: Theme.brightnessOf(context) == .dark
+                                      ? Colors.white.withValues(alpha: .1)
+                                      : Colors.grey.shade100,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    AppVariables.playlistIconPng,
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "${playlist.songs!.length} canciones",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color:
+                                          Theme.brightnessOf(context) == .dark
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "${playlist.title}",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color:
+                                          Theme.brightnessOf(context) == .dark
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
             Positioned(
-              bottom: (playlistVM.audioHandler.mediaItem.value != null) ? 80 : 20,
+              bottom: (playlistVM.audioHandler.mediaItem.value != null)
+                  ? 80
+                  : 20,
               right: 20,
               child: FloatingActionButton(
                 onPressed: () {
                   Get.toNamed(AppRoutes.createPlaylist);
                 },
                 backgroundColor: AppTheme.primaryColor,
-                child: Icon(CupertinoIcons.add, color: Colors.white,),
+                child: Icon(CupertinoIcons.add, color: Colors.white),
               ),
             ),
           ],

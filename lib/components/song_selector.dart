@@ -112,8 +112,13 @@ class _SongSelectorState extends State<SongSelector> {
           ),
           bottomNavigationBar: SafeArea(
             child: Container(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 30),
               child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 onPressed: () {
                   _searchController.clear();
                   audioVM.onSearch("");

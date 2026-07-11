@@ -1,4 +1,5 @@
 import 'dart:ui' show lerpDouble, ImageFilter;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +12,12 @@ class AudioCupertinoMenuItem {
   final IconData? icon;
   final VoidCallback onTap;
   final bool isDestructive;
+  final Color? iconColor;
 
   const AudioCupertinoMenuItem({
     required this.title,
     this.icon,
+    this.iconColor,
     required this.onTap,
     this.isDestructive = false,
   });
@@ -483,7 +486,7 @@ class _CupertinoContextMenuRoutePageState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             if (action.icon != null) ...[
-              Icon(action.icon, size: 20, color: iconColor),
+              Icon(action.icon, size: 20, color: action.iconColor ?? iconColor),
               const SizedBox(width: 10),
             ],
             Expanded(

@@ -89,40 +89,43 @@ class _MusicViewState extends State<MusicView> {
                     final song = audioVM.songs[index];
                     return GestureDetector(
                       onTap: () {
-                        if (playerVM.currentItem?.id != song.id ||
-                            playerVM.lastPlayed?.id != song.id) {
-                          playerVM.play(
-                            song: song,
-                            playlist: audioVM.songsCopy,
-                          );
-                        } else if (!playerVM.isPlaying &&
-                            (playerVM.currentItem?.id == song.id ||
-                                playerVM.lastPlayed?.id == song.id)) {
-                          playerVM.play();
+                        if (audioVM.songsSelected.isNotEmpty) {
+                          bool isSelected = audioVM.isSongSelected(song.id);
+                          if (!isSelected) {
+                            audioVM.selectSong(song.id);
+                          } else {
+                            audioVM.selectSong(song.id);
+                          }
+                        } else {
+                          if (playerVM.currentItem?.id != song.id ||
+                              playerVM.lastPlayed?.id != song.id) {
+                            playerVM.play(
+                              song: song,
+                              playlist: audioVM.songsCopy,
+                            );
+                          } else if (!playerVM.isPlaying &&
+                              (playerVM.currentItem?.id == song.id ||
+                                  playerVM.lastPlayed?.id == song.id)) {
+                            playerVM.play();
+                          }
+                          Get.toNamed(AppRoutes.player);
                         }
                         if (_searchController.text.isNotEmpty) {
                           _searchController.clear();
                           audioVM.onSearch("");
                         }
-                        Get.toNamed(AppRoutes.player);
                       },
 
                       child: SizedBox(
-                        width: .maxFinite,
+                        width: .infinity,
                         child: AudioCupertinoContextMenu(
                           actions: [
                             AudioCupertinoMenuItem(
-                              title:
-                                  audioVM.songsSelected.any(
-                                    (e) => e.id == song.id,
-                                  )
-                                  ? "Deseleccionar"
+                              title: audioVM.isSongSelected(song.id)
+                                  ? "Quitar"
                                   : "Seleccionar",
-                              icon:
-                                  audioVM.songsSelected.any(
-                                    (e) => e.id == song.id,
-                                  )
-                                  ? CupertinoIcons.check_mark
+                              icon: audioVM.isSongSelected(song.id)
+                                  ? CupertinoIcons.minus
                                   : CupertinoIcons.add,
                               onTap: () {
                                 audioVM.selectSong(song.id);
@@ -132,6 +135,20 @@ class _MusicViewState extends State<MusicView> {
                               title: "Agregar a playlist",
                               icon: CupertinoIcons.add_circled,
                               onTap: () {},
+                            ),
+                            AudioCupertinoMenuItem(
+                              title: favoriteVM.isFavorite(song.id)
+                                  ? "Ya no me gusta"
+                                  : "Me gusta",
+                              icon: !favoriteVM.isFavorite(song.id)
+                                  ? CupertinoIcons.heart
+                                  : CupertinoIcons.heart_fill,
+                              iconColor: Colors.pinkAccent,
+                              onTap: () async {
+                                await favoriteVM.toggleFavorite(
+                                  song: song.toMediaItem(),
+                                );
+                              },
                             ),
                             AudioCupertinoMenuItem(
                               title: "Info",
@@ -153,6 +170,8 @@ class _MusicViewState extends State<MusicView> {
                             isFavorite: favoriteVM.favorites.any(
                               (e) => e.id == song.id,
                             ),
+                            isSelected: audioVM.isSongSelected(song.id),
+                            showIsPlaying: true,
                           ),
                         ),
                       ),
