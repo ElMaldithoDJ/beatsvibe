@@ -161,8 +161,12 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
                   DecoratedBox(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Theme.of(context).primaryColor
-                          .withValues(alpha: .1),
+                      border: Border.all(
+                        color: Theme.brightnessOf(context) == .dark
+                            ? Colors.white.withValues(alpha: .1)
+                            : Colors.black.withValues(alpha: .1),
+                        width: 1,
+                      ),
                     ),
                     child: Center(
                       child: SvgPicture.asset(

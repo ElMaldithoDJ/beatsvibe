@@ -15,9 +15,15 @@ class AboutComponent extends StatelessWidget {
           icon: const Icon(CupertinoIcons.back),
         ),
       ),
-      body: Center(
-        child: Text('Acerca de'),
-      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(""),
+          ],
+        ),
+      )
     );
   }
 }

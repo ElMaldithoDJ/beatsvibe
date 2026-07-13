@@ -42,8 +42,8 @@ class _PlayListFormViewState extends State<PlayListFormView> {
             children: [
               Center(
                 child: SizedBox(
-                  width: 240,
-                  height: 200,
+                  width: 150,
+                  height: 150,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: Theme.brightnessOf(context) == .dark

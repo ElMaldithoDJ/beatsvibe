@@ -19,8 +19,6 @@ class MusicView extends StatefulWidget {
 
 class _MusicViewState extends State<MusicView> {
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchNode = FocusNode();
 
   @override
   void initState() {
@@ -30,8 +28,6 @@ class _MusicViewState extends State<MusicView> {
   @override
   void dispose() {
     _scrollController.dispose();
-    _searchController.dispose();
-    _searchNode.dispose();
     super.dispose();
   }
 
@@ -47,29 +43,6 @@ class _MusicViewState extends State<MusicView> {
               : const SizedBox.shrink()
         : Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5,
-                  horizontal: 16,
-                ),
-                child: SizedBox(
-                  height: 45,
-                  child: TextField(
-                    controller: _searchController,
-                    focusNode: _searchNode,
-                    decoration: InputDecoration(
-                      hintText: 'Titulo o Artista de la cancion...',
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                    onChanged: (value) {
-                      audioVM.onSearch(value);
-                    },
-                    onTapOutside: (event) {
-                      _searchNode.unfocus();
-                    },
-                  ),
-                ),
-              ),
               Expanded(
                 child: ListView.builder(
                   itemCount: audioVM.songs.length,
@@ -109,10 +82,6 @@ class _MusicViewState extends State<MusicView> {
                             playerVM.play();
                           }
                           Get.toNamed(AppRoutes.player);
-                        }
-                        if (_searchController.text.isNotEmpty) {
-                          _searchController.clear();
-                          audioVM.onSearch("");
                         }
                       },
 

@@ -22,7 +22,7 @@ class SettingsViewModel extends ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
   bool get isLoading => _isLoading;
 
-  final List<SettingsOptionsModel> _settingsOptions = [
+  List<SettingsOptionsModel> _settingsOptions = [
     SettingsOptionsModel(
       title: 'Apariencia',
       subtitle: 'Cambiar el tema',

@@ -32,6 +32,7 @@ dependencies:
   open_file_manager:
   string_normalizer:
   flutter_svg:
+  flutter_widget_from_html:
 
 dev_dependencies:
   flutter_test:

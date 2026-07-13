@@ -16,13 +16,8 @@ class PlaylistsView extends StatefulWidget {
 }
 
 class _PlaylistsViewState extends State<PlaylistsView> {
-  final _searchController = TextEditingController();
-  final _searchNode = FocusNode();
-
   @override
   void dispose() {
-    _searchController.dispose();
-    _searchNode.dispose();
     super.dispose();
   }
 
@@ -61,31 +56,6 @@ class _PlaylistsViewState extends State<PlaylistsView> {
               Positioned.fill(
                 child: Column(
                   children: [
-                    if (playlistVM.playlistsCopy.isNotEmpty) ...[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 5,
-                          horizontal: 16,
-                        ),
-                        child: SizedBox(
-                          height: 45,
-                          child: TextField(
-                            controller: _searchController,
-                            focusNode: _searchNode,
-                            decoration: InputDecoration(
-                              hintText: 'Titulo de la playlist...',
-                              prefixIcon: Icon(Icons.search),
-                            ),
-                            onChanged: (value) {
-                              playlistVM.searchPlaylist(value);
-                            },
-                            onTapOutside: (event) {
-                              _searchNode.unfocus();
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
                     GridView.builder(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -184,19 +154,6 @@ class _PlaylistsViewState extends State<PlaylistsView> {
                 ),
               ),
             ],
-            Positioned(
-              bottom: (playlistVM.audioHandler.mediaItem.value != null)
-                  ? 80
-                  : 20,
-              right: 20,
-              child: FloatingActionButton(
-                onPressed: () {
-                  Get.toNamed(AppRoutes.createPlaylist);
-                },
-                backgroundColor: AppTheme.primaryColor,
-                child: Icon(CupertinoIcons.add, color: Colors.white),
-              ),
-            ),
           ],
         );
       },
