@@ -29,12 +29,12 @@ class _PlayerViewState extends State<PlayerView>
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
-      reverseDuration: const Duration(milliseconds: 250),
+      reverseDuration: const Duration(milliseconds: 150),
     );
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
+    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeInCubic));
     _fadeController.forward();
   }
 

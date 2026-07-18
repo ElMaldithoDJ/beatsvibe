@@ -409,7 +409,8 @@ class _CupertinoContextMenuRoutePageState
                     type: MaterialType.canvas,
                     elevation: 12.0 * widget.animation.value,
                     shadowColor: Colors.black.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
+                    // BorderRadius is set to 0 because the child is a Hero widget that already has a border radius.
+                    borderRadius: BorderRadius.circular(0),
                     color:
                         Theme.of(context).cardTheme.color ??
                         Theme.of(context).scaffoldBackgroundColor,
@@ -429,12 +430,13 @@ class _CupertinoContextMenuRoutePageState
       color: isDarkMode
           ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
           : Colors.white.withValues(alpha: 0.85),
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(25),
       elevation: 6.0,
       shadowColor: Colors.black.withValues(alpha: 0.18),
-      clipBehavior: Clip.antiAlias,
       child: Container(
-        decoration: BoxDecoration(),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: List.generate(widget.actions.length, (index) {

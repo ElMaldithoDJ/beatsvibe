@@ -8,7 +8,7 @@ class FavoritesViewModel extends ChangeNotifier {
   final HiveService _hiveService = HiveService();
   List<MediaItemData> _favorites = [];
 
-  List<MediaItemData> get favorites => _favorites;
+  List<MediaItemData> get favorites => _favorites.reversed.toList();
 
   FavoritesViewModel() {
     _init();
@@ -16,6 +16,7 @@ class FavoritesViewModel extends ChangeNotifier {
 
   Future<void> _init() async {
     _favorites = await _hiveService.getFavoriteSongs();
+    _favorites = _favorites.reversed.toList();
     notifyListeners();
   }
 

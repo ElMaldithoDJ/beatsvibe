@@ -46,7 +46,7 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 450),
     );
     _scaleAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.bounceOut),
+      CurvedAnimation(parent: _animationController, curve: Curves.fastOutSlowIn),
     );
 
     if (widget.isFavorite) {
@@ -204,7 +204,7 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
                   widget.song.title,
                   style: TextStyle(
                     color: Theme.brightnessOf(context) == .dark
-                        ? Colors.white.withValues(alpha: .1)
+                        ? Colors.white
                         : Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -221,7 +221,7 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
                         widget.song.artist!,
                         style: TextStyle(
                           color: Theme.brightnessOf(context) == .dark
-                              ? Colors.white
+                              ? Colors.grey
                               : Colors.black,
                           fontSize: 10,
                         ),

@@ -72,7 +72,7 @@ class _FavoritesViewState extends State<FavoritesView> with AutomaticKeepAliveCl
           physics: const BouncingScrollPhysics(),
           itemCount: favoritesVM.favorites.length,
           itemBuilder: (context, index) {
-            final song = favoritesVM.favorites.reversed.toList()[index];
+            final song = favoritesVM.favorites[index];
             return GestureDetector(
               onTap: () {
                 if (playerVM.currentItem?.id != song.id) {
@@ -105,7 +105,7 @@ class _FavoritesViewState extends State<FavoritesView> with AutomaticKeepAliveCl
                     },
                   ),
                 ],
-                child: AudioItem(song: song, index: index),
+                child: AudioItem(song: song, index: index, showIsPlaying: true,),
               ),
             );
           },
