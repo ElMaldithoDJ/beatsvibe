@@ -10,10 +10,31 @@ class ProgressPlayer extends StatefulWidget {
 }
 
 class _ProgressPlayerState extends State<ProgressPlayer> {
+  bool _isDragging = false;
+  double _dragValue = 0.0;
+
+  String _formatDuration(Duration duration) {
+    final int minutes = duration.inMinutes;
+    final int seconds = duration.inSeconds % 60;
+    return "$minutes:${seconds.toString().padLeft(2, '0')}";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<PlayerViewModel>(
       builder: (context, playerVM, child) {
+        final double maxDuration = playerVM.duration.inSeconds.toDouble();
+        // Ensure max is always at least 0.1 to avoid errors when duration is zero
+        final double sliderMax = maxDuration > 0 ? maxDuration : 0.1;
+        
+        // Ensure the value is within the min and max bounds
+        double sliderValue = _isDragging
+            ? _dragValue
+            : (playerVM.progress * maxDuration);
+            
+        if (sliderValue < 0) sliderValue = 0;
+        if (sliderValue > sliderMax) sliderValue = sliderMax;
+
         return Column(
           children: [
             SliderTheme(
@@ -28,16 +49,24 @@ class _ProgressPlayerState extends State<ProgressPlayer> {
               ),
               child: Slider(
                 min: 0,
-                max: 100,
-                value: playerVM.progress * 100,
+                max: sliderMax,
+                value: sliderValue,
+                onChangeStart: (value) {
+                  setState(() {
+                    _isDragging = true;
+                    _dragValue = value;
+                  });
+                },
                 onChanged: (value) {
-                  playerVM.seek(
-                    Duration(
-                      milliseconds:
-                          (playerVM.duration.inMilliseconds * value / 100)
-                              .round(),
-                    ),
-                  );
+                  setState(() {
+                    _dragValue = value;
+                  });
+                },
+                onChangeEnd: (value) {
+                  playerVM.seek(Duration(seconds: value.toInt()));
+                  setState(() {
+                    _isDragging = false;
+                  });
                 },
               ),
             ),
@@ -46,25 +75,15 @@ class _ProgressPlayerState extends State<ProgressPlayer> {
               child: Row(
                 children: [
                   Text(
-                    playerVM.currentPositionString,
-                    style: TextStyle(
-                      color: playerVM.currentItem?.artUri != null
-                          ? Colors.white
-                          : Theme.brightnessOf(context) == .dark
-                          ? Colors.white
-                          : Colors.grey,
-                    ),
+                    _isDragging
+                        ? _formatDuration(Duration(seconds: _dragValue.toInt()))
+                        : playerVM.currentPositionString,
+                    style: TextStyle(color: Colors.white),
                   ),
                   Spacer(),
                   Text(
                     playerVM.durationString,
-                    style: TextStyle(
-                      color: playerVM.currentItem?.artUri != null
-                          ? Colors.white
-                          : Theme.brightnessOf(context) == .dark
-                          ? Colors.white
-                          : Colors.grey,
-                    ),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ],
               ),

@@ -6,7 +6,11 @@ class FoldersModel {
 
   FoldersModel({required this.id, this.name, this.path, this.items});
 
-  factory FoldersModel.fromJson(Map<dynamic, dynamic> json) {
+  static FoldersModel? fromJson(Map<dynamic, dynamic> json) {
+    if (json.isEmpty) {
+      return null;
+    }
+
     return FoldersModel(
       id: json['id'],
       name: json['name'],

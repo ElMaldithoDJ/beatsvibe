@@ -35,21 +35,19 @@ class AudioViewModel extends ChangeNotifier {
   }
 
   Future<void> onInit() async {
-    final songs = _hiveService.getAllSongs();
-    if ((await songs).isNotEmpty) {
-      await songs
-          .then((data) {
-            data.sort(
-              (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
-            );
-            _songs = data;
-            _songsCopy = data;
-            notifyListeners();
-          })
-          .whenComplete(() {
-            _setLoadingState(false);
-          });
+    final data = await _hiveService.getAllSongs();
+    if (data.isNotEmpty) {
+      data.sort(
+        (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+      );
+      _songs = data;
+      _songsCopy = data;
+    } else {
+      _songs = [];
+      _songsCopy = [];
     }
+    notifyListeners();
+    _setLoadingState(false);
   }
 
   Future<void> fetchSongs() async {
@@ -137,5 +135,9 @@ class AudioViewModel extends ChangeNotifier {
 
   bool isSongSelected(String id) {
     return _songsSelected.any((e) => e.id == id);
+  }
+
+  Future<void> updateSongs() async {
+    
   }
 }

@@ -138,4 +138,10 @@ class SettingsViewModel extends ChangeNotifier {
     _isLoading = state;
     notifyListeners();
   }
+
+  // Delete folder
+  Future<void> deleteFolder(String id) async {
+    await _hiveService.removeFilesFolder(id);
+    await initFolder();
+  }
 }

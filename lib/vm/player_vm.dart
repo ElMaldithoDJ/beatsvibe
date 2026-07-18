@@ -57,6 +57,8 @@ class PlayerViewModel extends ChangeNotifier {
     return _currentPosition.inMilliseconds / _duration.inMilliseconds;
   }
 
+  bool _shouldPlay = false;
+
   PlayerViewModel() {
     onInit();
   }
@@ -66,12 +68,27 @@ class PlayerViewModel extends ChangeNotifier {
     await _loadLastPlayedPlaylist();
     _listenQueue();
     _listenPosition();
+    _listenPlaybackState();
     audioHandler.durationStream.listen((duration) {
       if (duration != null) {
         _duration = duration;
         notifyListeners();
       }
     });
+  }
+
+  void _listenPlaybackState() {
+    try {
+      audioHandler.playbackState.listen((playbackState) {
+        final playing = playbackState.playing;
+        if (_isPlaying != playing) {
+          _isPlaying = playing;
+          notifyListeners();
+        }
+      });
+    } catch (e) {
+      debugPrint("Error al iniciar stream de playbackState: ${e.toString()}");
+    }
   }
 
   void _loadSongs() {
@@ -168,24 +185,27 @@ class PlayerViewModel extends ChangeNotifier {
     MediaItemData? song,
     List<MediaItemData>? playlist,
   }) async {
+    _shouldPlay = true;
     try {
       if (playlist != null) {
         await audioHandler.initPlayer(songs: playlist);
+        if (!_shouldPlay) return;
         if (song != null) {
           await audioHandler.skipToQueueItem(
             playlist.indexWhere((e) => e.id == song.id),
           );
+          if (!_shouldPlay) return;
         }
-        _playingState(true);
       }
-      _playingState(true);
-      await audioHandler.play();
+      if (_shouldPlay) {
+        await audioHandler.play();
+      }
     } catch (_) {}
   }
 
   //pause
   void pause() {
-    _playingState(false);
+    _shouldPlay = false;
     audioHandler.pause();
   }
 
@@ -231,12 +251,6 @@ class PlayerViewModel extends ChangeNotifier {
     }
   }
 
-  // Playing State
-  void _playingState(bool state) {
-    _isPlaying = state;
-    notifyListeners();
-  }
-
   // Delete song
   Future<void> deleteSong(String id) async {
     await _hiveService.deleteSong(id);
@@ -257,5 +271,13 @@ class PlayerViewModel extends ChangeNotifier {
   // save last playlist
   Future<void> saveLastPlaylist(PlaylistModelData playlist) async {
     await _hiveService.saveLastPlayedPlaylist(playlist);
+  }
+
+  @override
+  void dispose() {
+    audioHandler.mediaItem.close();
+    audioHandler.queue.close();
+    audioHandler.playbackState.close();
+    super.dispose();
   }
 }

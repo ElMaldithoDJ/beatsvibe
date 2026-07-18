@@ -61,9 +61,7 @@ class _ArtworkPlayerState extends State<ArtworkPlayer> {
                       DecoratedBox(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(25),
-                          color: Theme.brightnessOf(context) == .dark
-                              ? Colors.white.withValues(alpha: .1)
-                              : Colors.grey.shade200,
+                          color: Colors.white.withValues(alpha: .1),
                         ),
                         child: Center(
                           child: SvgPicture.asset(

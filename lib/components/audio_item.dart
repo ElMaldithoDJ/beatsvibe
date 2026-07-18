@@ -45,14 +45,8 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _scaleAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.bounceOut,
-      ),
+    _scaleAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.bounceOut),
     );
 
     if (widget.isFavorite) {
@@ -231,25 +225,6 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
             ),
           ),
           SizedBox(width: 10),
-          if (widget.isSelected) ...[
-            SizedBox(
-              width: 25,
-              height: 25,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).primaryColor.withValues(alpha: .15),
-                ),
-                child: Center(
-                  child: Icon(
-                    CupertinoIcons.check_mark,
-                    color: Theme.of(context).primaryColor,
-                    size: 20,
-                  ),
-                ),
-              ),
-            ),
-          ],
           SizedBox(
             width: 25,
             height: 25,
@@ -271,6 +246,25 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
               ),
             ),
           ),
+          if (widget.isSelected) ...[
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).primaryColor.withValues(alpha: .15),
+                ),
+                child: Center(
+                  child: Icon(
+                    CupertinoIcons.check_mark,
+                    color: Theme.of(context).primaryColor,
+                    size: 10,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

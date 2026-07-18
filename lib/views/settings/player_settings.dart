@@ -29,6 +29,7 @@ class _PlayerSettingsViewState extends State<PlayerSettingsView> {
 
   @override
   Widget build(BuildContext context) {
+    final audioVM = Provider.of<AudioViewModel>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configuraciones del reproductor'),
@@ -94,11 +95,8 @@ class _PlayerSettingsViewState extends State<PlayerSettingsView> {
                                 FilledButton.icon(
                                   onPressed: () async {
                                     await settingsVM.addFolder().whenComplete(
-                                      () {
-                                        Provider.of<AudioViewModel>(
-                                          context,
-                                          listen: false,
-                                        ).onInit();
+                                      () async {
+                                        await audioVM.onInit();
                                       },
                                     );
                                   },

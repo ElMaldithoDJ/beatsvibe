@@ -1,6 +1,9 @@
 import 'package:beatsvibe/models/folders_model.dart';
+import 'package:beatsvibe/vm/audio_vm.dart';
+import 'package:beatsvibe/vm/settings_vm.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class FolderComponent extends StatefulWidget {
   final FoldersModel? folder;
@@ -13,6 +16,8 @@ class FolderComponent extends StatefulWidget {
 class _FolderComponentState extends State<FolderComponent> {
   @override
   Widget build(BuildContext context) {
+    final settingsVM = Provider.of<SettingsViewModel>(context, listen: false);
+    final audioVM = Provider.of<AudioViewModel>(context, listen: false);
     return DecoratedBox(
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
       child: Padding(
@@ -28,13 +33,22 @@ class _FolderComponentState extends State<FolderComponent> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(widget.folder!.name ?? ''),
-                  Text("${widget.folder?.items} canciones", style: const TextStyle(fontSize: 12)),
+                  Text(
+                    "${widget.folder?.items} canciones",
+                    style: const TextStyle(fontSize: 12),
+                  ),
                 ],
               ),
             ),
             IconButton(
               icon: const Icon(CupertinoIcons.delete, size: 18),
-              onPressed: () {},
+              onPressed: () async {
+                await settingsVM.deleteFolder(widget.folder!.id).whenComplete(
+                  () async {
+                    await audioVM.onInit();
+                  },
+                );
+              },
             ),
           ],
         ),

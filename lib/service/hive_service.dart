@@ -185,7 +185,7 @@ class HiveService {
     final box = await Hive.openBox(_filesFolder);
     if (box.isNotEmpty) {
       return box.values
-          .map((e) => FoldersModel.fromJson(e as Map<dynamic, dynamic>))
+          .map((e) => FoldersModel.fromJson(e as Map<dynamic, dynamic>)!)
           .toList();
     }
     return [];
@@ -204,6 +204,20 @@ class HiveService {
   // Remove Files Folder
   Future<void> removeFilesFolder(String id) async {
     final box = await Hive.openBox(_filesFolder);
+    final folderData = box.get(id);
+    if (folderData != null) {
+      FoldersModel? folder = FoldersModel.fromJson(folderData as Map<dynamic, dynamic>);
+      final boxSongs = await Hive.openBox(_songsBox);
+      if (folder != null) {
+        final songs = boxSongs.values
+            .map((e) => MediaItemData.fromJson(e as Map<dynamic, dynamic>))
+            .toList();
+        final folderSongs = songs.where((e) => e.audioUrl.contains(folder.path!)).toList();
+        for (var song in folderSongs) {
+          await boxSongs.delete(song.id);
+        }
+      }
+    }
     await box.delete(id);
   }
 
