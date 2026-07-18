@@ -54,7 +54,7 @@ class _PlayerViewState extends State<PlayerView> {
                                 ),
                                 style: IconButton.styleFrom(
                                   backgroundColor: Colors.white.withValues(
-                                    alpha: .2,
+                                    alpha: 0,
                                   ),
                                 ),
                               ),

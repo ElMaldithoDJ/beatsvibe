@@ -31,8 +31,8 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                   ),
                   child: Center(
                     child: Icon(
-                      CupertinoIcons.back,
-                      size: 35,
+                      CupertinoIcons.backward_end,
+                      size: 30,
                       color: Colors.white,
                     ),
                   ),
@@ -83,8 +83,8 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                   ),
                   child: Center(
                     child: Icon(
-                      CupertinoIcons.forward,
-                      size: 35,
+                      CupertinoIcons.forward_end,
+                      size: 30,
                       color: Colors.white,
                     ),
                   ),

@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
           listen: false,
         ).onInit().whenComplete(() {
           Future.delayed(
-            const Duration(milliseconds: 2500),
+            const Duration(milliseconds: 1500),
             () => Get.offNamed(AppRoutes.home),
           );
         });

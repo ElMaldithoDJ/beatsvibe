@@ -5,7 +5,7 @@ class PlaylistModelData {
   final String? title;
   final String? description;
   final String? artwork;
-  final List<MediaItemData>? songs;
+  List<MediaItemData>? songs;
 
   PlaylistModelData({
     this.title,
