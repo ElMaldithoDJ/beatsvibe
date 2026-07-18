@@ -11,6 +11,38 @@ class QueuePlayer extends StatefulWidget {
 }
 
 class _QueuePlayerState extends State<QueuePlayer> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentPlaying();
+    });
+  }
+
+  void _scrollToCurrentPlaying() {
+    if (!mounted) return;
+    final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
+
+    if (playerVM.currentItem != null && playerVM.queue != null && playerVM.queue!.isNotEmpty) {
+      final index = playerVM.queue!.indexWhere((s) => s.id == playerVM.currentItem!.id);
+      if (index != -1 && _scrollController.hasClients) {
+        // Altura aproximada de un AudioItem
+        final offset = index * 55.0;
+        _scrollController.jumpTo(
+          offset,
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
@@ -37,6 +69,7 @@ class _QueuePlayerState extends State<QueuePlayer> {
           ),
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: playerVM.queue?.length,
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),

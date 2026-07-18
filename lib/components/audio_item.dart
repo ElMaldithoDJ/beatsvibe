@@ -202,7 +202,13 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
               children: [
                 Text(
                   widget.song.title,
-                  style: Theme.of(context).textTheme.titleSmall,
+                  style: TextStyle(
+                    color: Theme.brightnessOf(context) == .dark
+                        ? Colors.white.withValues(alpha: .1)
+                        : Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -213,7 +219,12 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
                         widget.song.artist!.isNotEmpty) ...[
                       Text(
                         widget.song.artist!,
-                        style: Theme.of(context).textTheme.titleSmall,
+                        style: TextStyle(
+                          color: Theme.brightnessOf(context) == .dark
+                              ? Colors.white
+                              : Colors.black,
+                          fontSize: 10,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

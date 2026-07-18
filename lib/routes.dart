@@ -10,6 +10,7 @@ import 'package:beatsvibe/views/settings/languague_settings.dart';
 import 'package:beatsvibe/views/settings/player_settings.dart';
 import 'package:beatsvibe/views/settings/privacy_settings.dart';
 import 'package:beatsvibe/views/settings/settings_view.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -37,67 +38,70 @@ class AppRoutes {
       name: AppRoutes.home,
       page: () => const HomeRoute(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.player,
       page: () => const PlayerView(),
-      transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transition: Transition.downToUp,
+      curve: Curves.easeOutCubic,
+      transitionDuration: const Duration(milliseconds: 350),
+      opaque: true,
+      fullscreenDialog: true,
     ),
     GetPage(
       name: AppRoutes.settings,
       page: () => const SettingsView(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.createPlaylist,
       page: () => const PlayListFormView(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.songSelector,
       page: () => const SongSelector(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.playlistView,
       page: () => PlaylistView(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.appearanceSettings,
       page: () => const AppearanceSettingsView(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.privacySettings,
       page: () => const PrivacySettingsView(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.aboutSettings,
       page: () => const AboutComponent(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.playerSettings,
       page: () => const PlayerSettingsView(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.languageSettings,
       page: () => const LanguageSettingsView(),
       transition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 250),
     ),
   ];
 }

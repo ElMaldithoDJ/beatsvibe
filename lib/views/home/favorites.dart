@@ -12,9 +12,44 @@ class FavoritesView extends StatefulWidget {
   State<FavoritesView> createState() => _FavoritesViewState();
 }
 
-class _FavoritesViewState extends State<FavoritesView> {
+class _FavoritesViewState extends State<FavoritesView> with AutomaticKeepAliveClientMixin {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentPlaying();
+    });
+  }
+
+  void _scrollToCurrentPlaying() {
+    if (!mounted) return;
+    final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
+    final favoritesVM = Provider.of<FavoritesViewModel>(context, listen: false);
+
+    if (playerVM.currentItem != null && favoritesVM.favorites.isNotEmpty) {
+      final reversedFavorites = favoritesVM.favorites.reversed.toList();
+      final index = reversedFavorites.indexWhere((s) => s.id == playerVM.currentItem!.id);
+      if (index != -1 && _scrollController.hasClients) {
+        final offset = index * 55.0;
+        _scrollController.jumpTo(offset);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
     return Consumer<FavoritesViewModel>(
       builder: (context, favoritesVM, child) {
@@ -33,10 +68,11 @@ class _FavoritesViewState extends State<FavoritesView> {
           );
         }
         return ListView.builder(
+          controller: _scrollController,
           physics: const BouncingScrollPhysics(),
           itemCount: favoritesVM.favorites.length,
           itemBuilder: (context, index) {
-            final song = favoritesVM.favorites[index];
+            final song = favoritesVM.favorites.reversed.toList()[index];
             return GestureDetector(
               onTap: () {
                 if (playerVM.currentItem?.id != song.id) {

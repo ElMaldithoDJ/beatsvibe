@@ -57,6 +57,7 @@ class _BeatsVibeState extends State<BeatsVibe> {
             themeMode: settingsViewModel.themeMode,
             initialRoute: AppRoutes.splash,
             getPages: AppRoutes.pages,
+            
           );
         },
       ),

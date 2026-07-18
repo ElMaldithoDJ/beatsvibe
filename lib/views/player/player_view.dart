@@ -17,160 +17,223 @@ class PlayerView extends StatefulWidget {
   State<PlayerView> createState() => _PlayerViewState();
 }
 
-class _PlayerViewState extends State<PlayerView> {
+class _PlayerViewState extends State<PlayerView>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+  bool _canPop = false;
+
   @override
   void initState() {
     super.initState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+      reverseDuration: const Duration(milliseconds: 250),
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
+    _fadeController.forward();
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  void _onBackPressed() async {
+    if (_canPop) return;
+    await _fadeController.reverse();
+    if (mounted) {
+      setState(() {
+        _canPop = true;
+      });
+      Get.back();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0,
+    return PopScope(
+      canPop: _canPop,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        _onBackPressed();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 0,
+          backgroundColor: AppTheme.darkBackgroundColor,
+        ),
         backgroundColor: AppTheme.darkBackgroundColor,
-      ),
-      backgroundColor: AppTheme.darkBackgroundColor,
-      body: Stack(
-        children: [
-          Positioned(
-            child: SafeArea(
-              child: Column(
-                children: [
-                  Consumer<PlayerViewModel>(
-                    builder: (context, playerVM, child) {
-                      return Padding(
-                        padding: const .symmetric(horizontal: 10, vertical: 10),
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 45,
-                              height: 45,
-                              child: IconButton(
-                                onPressed: () => Get.back(),
-                                icon: Icon(
-                                  CupertinoIcons.chevron_back,
-                                  color: Colors.white,
-                                ),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0,
+        body: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Stack(
+            children: [
+              Positioned(
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      Consumer<PlayerViewModel>(
+                        builder: (context, playerVM, child) {
+                          return Padding(
+                            padding: const .symmetric(
+                              horizontal: 10,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 45,
+                                  height: 45,
+                                  child: IconButton(
+                                    onPressed: _onBackPressed,
+                                    icon: Icon(
+                                      CupertinoIcons.chevron_back,
+                                      color: Colors.white,
+                                    ),
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.white.withValues(
+                                        alpha: 0,
+                                      ),
+                                    ),
                                   ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 40),
+                      Center(child: ArtworkPlayer()),
+                      const SizedBox(height: 20),
+                      const AudioInfoPlayer(),
+                      const ProgressPlayer(),
+                      const Spacer(),
+                      Padding(
+                        padding: const .symmetric(horizontal: 15),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: .center,
+                            children: [
+                              SizedBox(
+                                width: 45,
+                                height: 45,
+                                child: Consumer<PlayerViewModel>(
+                                  builder: (context, playerVM, child) =>
+                                      GestureDetector(
+                                        onTap: () {
+                                          playerVM.setRepeatMode();
+                                        },
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            color:
+                                                playerVM.currentItem?.artUri !=
+                                                    null
+                                                ? Colors.white.withValues(
+                                                    alpha: .15,
+                                                  )
+                                                : Theme.brightnessOf(context) ==
+                                                      .dark
+                                                ? Colors.white.withValues(
+                                                    alpha: .2,
+                                                  )
+                                                : Colors.grey.withValues(
+                                                    alpha: .1,
+                                                  ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Center(
+                                            child: Icon(
+                                              playerVM.repeatMode == .none
+                                                  ? CupertinoIcons.repeat
+                                                  : playerVM.repeatMode == .one
+                                                  ? CupertinoIcons.shuffle
+                                                  : CupertinoIcons.repeat_1,
+                                              size: 25,
+                                              color:
+                                                  playerVM
+                                                          .currentItem
+                                                          ?.artUri !=
+                                                      null
+                                                  ? Colors.white
+                                                  : Theme.brightnessOf(
+                                                          context,
+                                                        ) ==
+                                                        .dark
+                                                  ? Colors.white
+                                                  : Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                 ),
                               ),
-                            ),
-                          ],
+                              Spacer(),
+                              const AudioControlsPlayer(),
+                              Spacer(),
+                              SizedBox(
+                                width: 45,
+                                height: 45,
+                                child: Consumer<PlayerViewModel>(
+                                  builder: (context, playerVM, child) =>
+                                      GestureDetector(
+                                        onTap: () => openQueue(context),
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            color:
+                                                playerVM.currentItem?.artUri !=
+                                                    null
+                                                ? Colors.white.withValues(
+                                                    alpha: .15,
+                                                  )
+                                                : Theme.brightnessOf(context) ==
+                                                      .dark
+                                                ? Colors.white.withValues(
+                                                    alpha: .2,
+                                                  )
+                                                : Colors.grey.withValues(
+                                                    alpha: .1,
+                                                  ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Center(
+                                            child: Icon(
+                                              CupertinoIcons.music_albums,
+                                              size: 25,
+                                              color:
+                                                  playerVM
+                                                          .currentItem
+                                                          ?.artUri !=
+                                                      null
+                                                  ? Colors.white
+                                                  : Theme.brightnessOf(
+                                                          context,
+                                                        ) ==
+                                                        .dark
+                                                  ? Colors.white
+                                                  : Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 40),
-                  Center(child: ArtworkPlayer()),
-                  const SizedBox(height: 20),
-                  const AudioInfoPlayer(),
-                  const ProgressPlayer(),
-                  const Spacer(),
-                  Padding(
-                    padding: const .symmetric(horizontal: 15),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: .center,
-                        children: [
-                          SizedBox(
-                            width: 45,
-                            height: 45,
-                            child: Consumer<PlayerViewModel>(
-                              builder: (context, playerVM, child) =>
-                                  GestureDetector(
-                                    onTap: () {
-                                      playerVM.setRepeatMode();
-                                    },
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        color:
-                                            playerVM.currentItem?.artUri != null
-                                            ? Colors.white.withValues(
-                                                alpha: .15,
-                                              )
-                                            : Theme.brightnessOf(context) ==
-                                                  .dark
-                                            ? Colors.white.withValues(alpha: .2)
-                                            : Colors.grey.withValues(alpha: .1),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          playerVM.repeatMode == .none
-                                              ? CupertinoIcons.repeat
-                                              : playerVM.repeatMode == .one
-                                              ? CupertinoIcons.shuffle
-                                              : CupertinoIcons.repeat_1,
-                                          size: 25,
-                                          color:
-                                              playerVM.currentItem?.artUri !=
-                                                  null
-                                              ? Colors.white
-                                              : Theme.brightnessOf(context) ==
-                                                    .dark
-                                              ? Colors.white
-                                              : Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                            ),
-                          ),
-                          Spacer(),
-                          const AudioControlsPlayer(),
-                          Spacer(),
-                          SizedBox(
-                            width: 45,
-                            height: 45,
-                            child: Consumer<PlayerViewModel>(
-                              builder: (context, playerVM, child) =>
-                                  GestureDetector(
-                                    onTap: () => openQueue(context),
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        color:
-                                            playerVM.currentItem?.artUri != null
-                                            ? Colors.white.withValues(
-                                                alpha: .15,
-                                              )
-                                            : Theme.brightnessOf(context) ==
-                                                  .dark
-                                            ? Colors.white.withValues(alpha: .2)
-                                            : Colors.grey.withValues(alpha: .1),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          CupertinoIcons.music_albums,
-                                          size: 25,
-                                          color:
-                                              playerVM.currentItem?.artUri !=
-                                                  null
-                                              ? Colors.white
-                                              : Theme.brightnessOf(context) ==
-                                                    .dark
-                                              ? Colors.white
-                                              : Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                            ),
-                          ),
-                        ],
                       ),
-                    ),
+                      const SizedBox(height: 50),
+                    ],
                   ),
-                  const SizedBox(height: 50),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -110,7 +110,7 @@ class BottomNavButton extends StatelessWidget {
                     size: 20,
                     color: isActive == true
                         ? activeColor ?? Theme.of(context).primaryColor
-                        : Theme.of(context).textTheme.titleSmall!.color,
+                        : Colors.grey.shade600,
                   ),
                 ),
               ),

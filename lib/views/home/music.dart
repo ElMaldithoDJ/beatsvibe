@@ -19,13 +19,38 @@ class MusicView extends StatefulWidget {
   State<MusicView> createState() => _MusicViewState();
 }
 
-class _MusicViewState extends State<MusicView> {
+class _MusicViewState extends State<MusicView> with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   final PageStorageBucket _bucket = PageStorageBucket();
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentPlaying();
+    });
+  }
+
+  void _scrollToCurrentPlaying() {
+    if (!mounted) return;
+    final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
+    final audioVM = Provider.of<AudioViewModel>(context, listen: false);
+
+    if (playerVM.currentItem != null && audioVM.songs.isNotEmpty) {
+      final index = audioVM.songs.indexWhere((s) => s.id == playerVM.currentItem!.id);
+      if (index != -1 && _scrollController.hasClients) {
+        // Altura aproximada de un AudioItem
+        final offset = index * 60.0;
+        _scrollController.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    }
   }
 
   @override
@@ -36,6 +61,7 @@ class _MusicViewState extends State<MusicView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final audioVM = Provider.of<AudioViewModel>(context, listen: true);
     final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
     final favoriteVM = Provider.of<FavoritesViewModel>(context, listen: true);
