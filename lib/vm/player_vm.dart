@@ -66,10 +66,6 @@ class PlayerViewModel extends ChangeNotifier {
     await _loadLastPlayedPlaylist();
     _listenQueue();
     _listenPosition();
-
-    audioHandler.playbackState.listen((state) {
-      _playingState(state.playing);
-    });
     audioHandler.durationStream.listen((duration) {
       if (duration != null) {
         _duration = duration;
@@ -92,9 +88,7 @@ class PlayerViewModel extends ChangeNotifier {
 
   Future<void> _loadLastPlayedPlaylist() async {
     try {
-      _hiveService.getLastPlayedPlaylist().then((
-        lastPlayedPlaylist,
-      ) async {
+      _hiveService.getLastPlayedPlaylist().then((lastPlayedPlaylist) async {
         if (lastPlayedPlaylist != null) {
           await audioHandler
               .initPlayer(songs: lastPlayedPlaylist.songs!)
@@ -182,13 +176,16 @@ class PlayerViewModel extends ChangeNotifier {
             playlist.indexWhere((e) => e.id == song.id),
           );
         }
+        _playingState(true);
       }
+      _playingState(true);
       await audioHandler.play();
     } catch (_) {}
   }
 
   //pause
   void pause() {
+    _playingState(false);
     audioHandler.pause();
   }
 

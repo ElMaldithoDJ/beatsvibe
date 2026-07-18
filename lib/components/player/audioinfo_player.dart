@@ -20,11 +20,7 @@ class _AudioInfoPlayerState extends State<AudioInfoPlayer> {
             Text(
               playerVM.currentItem != null ? playerVM.currentItem!.title : "",
               style: TextStyle(
-                      color: playerVM.currentItem?.artUri != null
-                          ? Colors.white
-                          : Theme.brightnessOf(context) == .dark
-                          ? Colors.white
-                          : Colors.grey,
+                      color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -37,11 +33,7 @@ class _AudioInfoPlayerState extends State<AudioInfoPlayer> {
               Text(
                 playerVM.currentItem!.artist!,
                 style: TextStyle(
-                      color: playerVM.currentItem?.artUri != null
-                          ? Colors.white
-                          : Theme.brightnessOf(context) == .dark
-                          ? Colors.white
-                          : Colors.grey,
+                      color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),

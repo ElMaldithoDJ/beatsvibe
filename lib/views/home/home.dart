@@ -139,7 +139,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
             child: SizedBox(
               height: 45,
-              child: TextField(
+              child: audioVM.songsCopy.isNotEmpty ? TextField(
                 controller: _searchController,
                 focusNode: _searchNode,
                 decoration: InputDecoration(
@@ -160,7 +160,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
                 onTapOutside: (event) {
                   _searchNode.unfocus();
                 },
-              ),
+              ) : null,
             ),
           ),
           Expanded(

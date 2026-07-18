@@ -26,22 +26,14 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                 },
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: playerVM.currentItem?.artUri != null
-                        ? Colors.white.withValues(alpha: .15)
-                        : Theme.brightnessOf(context) == .dark
-                        ? Colors.white.withValues(alpha: .2)
-                        : Colors.grey.withValues(alpha: .1),
+                    color: Colors.white.withValues(alpha: .15),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Icon(
                       CupertinoIcons.back,
                       size: 35,
-                      color: playerVM.currentItem?.artUri != null
-                          ? Colors.white
-                          : Theme.brightnessOf(context) == .dark
-                          ? Colors.white
-                          : Colors.grey,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -61,11 +53,7 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                 },
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: playerVM.currentItem?.artUri != null
-                        ? Colors.white.withValues(alpha: .15)
-                        : Theme.brightnessOf(context) == .dark
-                        ? Colors.white.withValues(alpha: .2)
-                        : Colors.grey.withValues(alpha: .1),
+                    color: Colors.white.withValues(alpha: .15),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -74,11 +62,7 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                           ? CupertinoIcons.pause
                           : CupertinoIcons.play,
                       size: 50,
-                      color: playerVM.currentItem?.artUri != null
-                          ? Colors.white
-                          : Theme.brightnessOf(context) == .dark
-                          ? Colors.white
-                          : Colors.grey,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -94,22 +78,14 @@ class _AudioControlsPlayerState extends State<AudioControlsPlayer> {
                 },
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: playerVM.currentItem?.artUri != null
-                        ? Colors.white.withValues(alpha: .15)
-                        : Theme.brightnessOf(context) == .dark
-                        ? Colors.white.withValues(alpha: .2)
-                        : Colors.grey.withValues(alpha: .1),
+                    color: Colors.white.withValues(alpha: .15),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Icon(
                       CupertinoIcons.forward,
                       size: 35,
-                      color: playerVM.currentItem?.artUri != null
-                          ? Colors.white
-                          : Theme.brightnessOf(context) == .dark
-                          ? Colors.white
-                          : Colors.grey,
+                      color: Colors.white,
                     ),
                   ),
                 ),

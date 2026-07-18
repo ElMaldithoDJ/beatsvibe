@@ -3,7 +3,7 @@ import 'package:beatsvibe/components/player/audiocontrols_players.dart';
 import 'package:beatsvibe/components/player/audioinfo_player.dart';
 import 'package:beatsvibe/components/player/progress_player.dart';
 import 'package:beatsvibe/components/player/queue_player.dart';
-import 'package:beatsvibe/components/player/schema_color_component.dart';
+import 'package:beatsvibe/theme.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,9 +26,13 @@ class _PlayerViewState extends State<PlayerView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 0,
+        backgroundColor: AppTheme.darkBackgroundColor,
+      ),
+      backgroundColor: AppTheme.darkBackgroundColor,
       body: Stack(
         children: [
-          Positioned.fill(child: const SchemaColorComponent()),
           Positioned(
             child: SafeArea(
               child: Column(
@@ -46,19 +50,12 @@ class _PlayerViewState extends State<PlayerView> {
                                 onPressed: () => Get.back(),
                                 icon: Icon(
                                   CupertinoIcons.chevron_back,
-                                  color: playerVM.currentItem?.artUri != null
-                                      ? Colors.white
-                                      : Theme.brightnessOf(context) == .dark
-                                      ? Colors.white
-                                      : Colors.grey,
+                                  color: Colors.white,
                                 ),
                                 style: IconButton.styleFrom(
-                                  backgroundColor:
-                                      playerVM.currentItem?.artUri != null
-                                      ? Colors.white.withValues(alpha: .15)
-                                      : Theme.brightnessOf(context) == .dark
-                                      ? Colors.white.withValues(alpha: .2)
-                                      : Colors.grey.withValues(alpha: .1),
+                                  backgroundColor: Colors.white.withValues(
+                                    alpha: .2,
+                                  ),
                                 ),
                               ),
                             ),

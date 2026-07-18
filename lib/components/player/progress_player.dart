@@ -19,24 +19,12 @@ class _ProgressPlayerState extends State<ProgressPlayer> {
             SliderTheme(
               data: SliderThemeData(
                 trackHeight: 3,
-                thumbColor: playerVM.currentItem?.artUri != null
-                    ? Colors.white
-                    : Theme.brightnessOf(context) == .dark
-                    ? Colors.white
-                    : Theme.of(context).primaryColor,
+                thumbColor: Colors.white,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
                 trackShape: const RoundedRectSliderTrackShape(),
-                inactiveTrackColor: playerVM.currentItem?.artUri != null
-                    ? Colors.white.withValues(alpha: .2)
-                    : Theme.brightnessOf(context) == .dark
-                    ? Colors.white.withValues(alpha: .2)
-                    : Colors.black12,
+                inactiveTrackColor: Colors.white.withValues(alpha: .2),
                 overlayColor: Colors.transparent,
-                activeTrackColor: playerVM.currentItem?.artUri != null
-                    ? Colors.white
-                    : Theme.brightnessOf(context) == .dark
-                    ? Colors.white
-                    : Theme.of(context).primaryColor,
+                activeTrackColor: Colors.white,
               ),
               child: Slider(
                 min: 0,

@@ -4,6 +4,7 @@ import 'package:beatsvibe/variables.dart';
 import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class NoSongs extends StatefulWidget {
@@ -37,9 +38,8 @@ class _NoSongsState extends State<NoSongs> {
           SvgPicture.asset(AppVariables.appLogo, width: 100, height: 100),
           Text(
             "No se encontraron canciones",
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(color: Colors.grey),
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(color: Colors.grey),
           ),
           const SizedBox(height: 10),
           FilledButton(
@@ -49,9 +49,16 @@ class _NoSongsState extends State<NoSongs> {
               ) async {
                 if (!isGranted) {
                   await permisions
-                      .requestPermission([.audio, .notification])
-                      .then((_) async {
-                        await audioVM.fetchSongs();
+                      .requestPermission([
+                        Permission.audio,
+                        Permission.notification,
+                        Permission.photos,
+                        Permission.videos,
+                      ])
+                      .then((e) async {
+                        if (await Permission.audio.status.isGranted == e) {
+                          await audioVM.fetchSongs();
+                        }
                       });
                 }
               });
@@ -60,7 +67,10 @@ class _NoSongsState extends State<NoSongs> {
               backgroundColor: Theme.of(context).primaryColor,
               foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
             ),
-            child: const Text("Escanear", style: TextStyle(color: Colors.white),),
+            child: const Text(
+              "Escanear",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

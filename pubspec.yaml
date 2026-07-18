@@ -21,9 +21,9 @@ dependencies:
   audio_service:
   provider:
   file_picker: ^10.3.8
+  # on_audio_query:
   rxdart:
   permission_handler:
-  image_color_scheme:
   audio_info:
   path_provider:
   asset_cache:

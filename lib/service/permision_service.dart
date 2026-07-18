@@ -17,9 +17,21 @@ class PermisionService {
     return true;
   }
 
-  Future<void> requestPermission(List<Permission> permissions) async {
+  Future<bool> requestPermission(List<Permission> permissions) async {
     for (Permission permission in permissions) {
-      await permission.request();
+      PermissionStatus status = await permission.request();
+      if (!status.isGranted) {
+        return false;
+      }
+      if (status.isDenied) {
+        return false;
+      }
+      if (status.isPermanentlyDenied ||
+          status.isRestricted ||
+          status.isLimited) {
+        return await openAppSettings();
+      }
     }
+    return true;
   }
 }
