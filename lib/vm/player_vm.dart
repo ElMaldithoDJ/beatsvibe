@@ -269,10 +269,30 @@ class PlayerViewModel extends ChangeNotifier {
       notifyListeners();
     } else {
       //remove current item from queue
-      queue?.removeWhere((e) => e.id == id);
       audioHandler.queue.value.removeWhere((e) => e.id == id);
       notifyListeners();
     }
+  }
+
+  // Remove deleted songs from queue
+  Future<void> removeDeletedSongsFromQueue() async {
+    final songs = await _hiveService.getAllSongs();
+    final songIds = songs.map((e) => e.id).toSet();
+    
+    final currentQueue = audioHandler.queue.value.toList();
+    currentQueue.removeWhere((item) => !songIds.contains(item.id));
+    
+    audioHandler.queue.value.clear();
+    audioHandler.queue.value.addAll(currentQueue);
+    
+    if (currentItem != null && !songIds.contains(currentItem!.id)) {
+      if (currentQueue.isNotEmpty) {
+        skipToNext();
+      } else {
+        _resetPlayer();
+      }
+    }
+    notifyListeners();
   }
 
   // save last playlist

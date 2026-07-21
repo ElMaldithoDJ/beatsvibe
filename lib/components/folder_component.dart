@@ -1,6 +1,7 @@
 import 'package:beatsvibe/models/folders_model.dart';
 import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:beatsvibe/vm/settings_vm.dart';
+import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ class _FolderComponentState extends State<FolderComponent> {
   Widget build(BuildContext context) {
     final settingsVM = Provider.of<SettingsViewModel>(context, listen: false);
     final audioVM = Provider.of<AudioViewModel>(context, listen: false);
+    final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
     return DecoratedBox(
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
       child: Padding(
@@ -46,6 +48,7 @@ class _FolderComponentState extends State<FolderComponent> {
                 await settingsVM.deleteFolder(widget.folder!.id).whenComplete(
                   () async {
                     await audioVM.onInit();
+                    await playerVM.removeDeletedSongsFromQueue();
                   },
                 );
               },
