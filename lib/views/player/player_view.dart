@@ -148,11 +148,11 @@ class _PlayerViewState extends State<PlayerView>
                                           ),
                                           child: Center(
                                             child: Icon(
-                                              playerVM.repeatMode == .none
+                                              playerVM.repeatMode == .all
                                                   ? CupertinoIcons.repeat
                                                   : playerVM.repeatMode == .one
-                                                  ? CupertinoIcons.shuffle
-                                                  : CupertinoIcons.repeat_1,
+                                                  ? CupertinoIcons.repeat_1
+                                                  : CupertinoIcons.shuffle,
                                               size: 25,
                                               color:
                                                   playerVM

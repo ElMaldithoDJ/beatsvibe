@@ -13,7 +13,7 @@ class PlayerViewModel extends ChangeNotifier {
   bool _isPlaying = false;
   bool _isFavorite = false;
   MediaItem? _lastPlayed;
-  AudioServiceRepeatMode _repeatMode = AudioServiceRepeatMode.none;
+  AudioServiceRepeatMode _repeatMode = AudioServiceRepeatMode.all;
   Duration _currentPosition = Duration.zero;
   Duration _duration = Duration.zero;
 
@@ -69,6 +69,7 @@ class PlayerViewModel extends ChangeNotifier {
     _listenQueue();
     _listenPosition();
     _listenPlaybackState();
+    _listenCompleted();
     audioHandler.durationStream.listen((duration) {
       if (duration != null) {
         _duration = duration;
@@ -88,6 +89,22 @@ class PlayerViewModel extends ChangeNotifier {
       });
     } catch (e) {
       debugPrint("Error al iniciar stream de playbackState: ${e.toString()}");
+    }
+  }
+
+  void _listenCompleted() {
+    try {
+      audioHandler.playbackState.listen((playbackState) {
+        if (playbackState.processingState ==
+            AudioProcessingState.completed) {
+          skipToNext();
+        }
+        if (playbackState.processingState == AudioProcessingState.idle) {
+          _resetPlayer();
+        }
+      });
+    } catch (e) {
+      debugPrint("Error al iniciar stream de completed: ${e.toString()}");
     }
   }
 
@@ -216,38 +233,28 @@ class PlayerViewModel extends ChangeNotifier {
 
   //skip
   void skipToNext() async {
-    final index = audioHandler.queue.value.length - 1;
-    if (audioHandler.player.currentIndex! < index) {
-      await audioHandler.skipToNext();
-    } else if (audioHandler.player.currentIndex == index) {
-      await audioHandler.skipToQueueItem(0);
-    }
+    await audioHandler.skipToNext();
   }
 
   //back
   void skipToPrevious() async {
-    final index = audioHandler.queue.value.length - 1;
-    if (audioHandler.player.currentIndex! > 0) {
-      await audioHandler.skipToPrevious();
-    } else if (audioHandler.player.currentIndex == 0) {
-      await audioHandler.skipToQueueItem(index);
-    }
+    await audioHandler.skipToPrevious();
   }
 
-  //shuffle
-  void setRepeatMode() async {
-    if (_repeatMode == AudioServiceRepeatMode.none) {
-      _repeatMode = AudioServiceRepeatMode.all;
-      notifyListeners();
-      await audioHandler.setRepeatMode(AudioServiceRepeatMode.all);
-    } else if (_repeatMode == AudioServiceRepeatMode.all) {
+  // repeat mode
+  void setRepeatMode() {
+    if (_repeatMode == AudioServiceRepeatMode.all) {
       _repeatMode = AudioServiceRepeatMode.one;
       notifyListeners();
-      await audioHandler.setRepeatMode(AudioServiceRepeatMode.one);
+      audioHandler.setPlayerRepeatMode(AudioServiceRepeatMode.one);
+    } else if (_repeatMode == AudioServiceRepeatMode.one) {
+      _repeatMode = AudioServiceRepeatMode.all;
+      notifyListeners();
+      audioHandler.setPlayerRepeatMode(AudioServiceRepeatMode.all);
     } else {
       _repeatMode = AudioServiceRepeatMode.none;
       notifyListeners();
-      await audioHandler.setRepeatMode(AudioServiceRepeatMode.none);
+      audioHandler.setPlayerRepeatMode(AudioServiceRepeatMode.group);
     }
   }
 
@@ -271,6 +278,14 @@ class PlayerViewModel extends ChangeNotifier {
   // save last playlist
   Future<void> saveLastPlaylist(PlaylistModelData playlist) async {
     await _hiveService.saveLastPlayedPlaylist(playlist);
+  }
+
+  void _resetPlayer() {
+    _currentPosition = Duration.zero;
+    _duration = Duration.zero;
+    _isPlaying = false;
+    _shouldPlay = false;
+    notifyListeners();
   }
 
   @override

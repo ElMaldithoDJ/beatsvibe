@@ -12,6 +12,25 @@ class AudioHandlerService extends BaseAudioHandler
   Stream<Duration> get bufferedPositionStream => player.bufferedPositionStream;
   Stream<Duration?> get durationStream => player.durationStream;
 
+  AudioServiceRepeatMode repeatMode = AudioServiceRepeatMode.none;
+
+  void setPlayerRepeatMode(AudioServiceRepeatMode mode) async {
+    repeatMode = mode;
+    await setRepeatMode(mode);
+    switch (mode) {
+      case AudioServiceRepeatMode.none:
+        await player.setLoopMode(LoopMode.off);
+        break;
+      case AudioServiceRepeatMode.one:
+        await player.setLoopMode(LoopMode.one);
+        break;
+      case AudioServiceRepeatMode.all:
+      case AudioServiceRepeatMode.group:
+        await player.setLoopMode(LoopMode.all);
+        break;
+    }
+  }
+
   // Create audio source from a media item
   UriAudioSource _createAudioSource(MediaItemData item) {
     return ProgressiveAudioSource(
@@ -71,13 +90,6 @@ class AudioHandlerService extends BaseAudioHandler
     final newQueue = queue.value..addAll(songs.map((e) => e.toMediaItem()));
     queue.add(newQueue);
     _listenForCurrenSongIndexChange();
-
-    // Auto skip song when the current song ends (loop all songs)
-    player.processingStateStream.listen((state) {
-      if (state == ProcessingState.completed) {
-        skipToNext();
-      }
-    });
   }
 
   @override
@@ -102,19 +114,32 @@ class AudioHandlerService extends BaseAudioHandler
   // Skip song (next or previous)
   @override
   Future<void> skipToNext() async {
-    if (player.currentIndex == queue.value.length - 1) {
-      await player.seek(Duration.zero, index: 0);
-    } else if (player.currentIndex! < queue.value.length - 1) {
-      await player.seekToNext();
+    if (queue.value.isEmpty || player.currentIndex == null) return;
+    if (repeatMode == AudioServiceRepeatMode.all) {
+      final nextIndex = player.currentIndex! + 1;
+      if (nextIndex < queue.value.length) {
+        await player.seek(Duration.zero, index: nextIndex);
+      } else {
+        await player.stop();
+        await player.seek(Duration.zero, index: player.currentIndex);
+      }
+    } else if (repeatMode == AudioServiceRepeatMode.one) {
+      await player.seek(Duration.zero, index: player.currentIndex);
     }
   }
 
   @override
   Future<void> skipToPrevious() async {
-    if (player.currentIndex == 0) {
-      await player.seek(Duration.zero, index: queue.value.length - 1);
-    } else if (player.currentIndex! > 0) {
-      await player.seekToPrevious();
+    if (queue.value.isEmpty || player.currentIndex == null) return;
+    if (repeatMode == AudioServiceRepeatMode.all) {
+      final prevIndex = player.currentIndex! - 1;
+      if (prevIndex >= 0) {
+        await player.seek(Duration.zero, index: prevIndex);
+      } else {
+        await player.seek(Duration.zero, index: queue.value.length - 1);
+      }
+    } else if (repeatMode == AudioServiceRepeatMode.one) {
+      await player.seek(Duration.zero, index: player.currentIndex);
     }
   }
 }
