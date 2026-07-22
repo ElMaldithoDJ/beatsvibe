@@ -2,6 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:beatsvibe/models/lastplayed_model.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/models/playlist_data.dart';
+import 'package:beatsvibe/models/repeatmode_model.dart';
 import 'package:beatsvibe/service/audio_handler.dart';
 import 'package:beatsvibe/service/hive_service.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class PlayerViewModel extends ChangeNotifier {
   bool _isPlaying = false;
   bool _isFavorite = false;
   MediaItem? _lastPlayed;
-  AudioServiceRepeatMode _repeatMode = AudioServiceRepeatMode.all;
+  RepeatPlayerMode _repeatMode = RepeatPlayerMode.repeatAll;
   Duration _currentPosition = Duration.zero;
   Duration _duration = Duration.zero;
 
@@ -30,7 +31,7 @@ class PlayerViewModel extends ChangeNotifier {
     return null;
   }
 
-  AudioServiceRepeatMode get repeatMode => _repeatMode;
+  RepeatPlayerMode get repeatMode => _repeatMode;
 
   MediaItem? get currentItem {
     if (_lastPlayed != null) {
@@ -95,8 +96,7 @@ class PlayerViewModel extends ChangeNotifier {
   void _listenCompleted() {
     try {
       audioHandler.playbackState.listen((playbackState) {
-        if (playbackState.processingState ==
-            AudioProcessingState.completed) {
+        if (playbackState.processingState == AudioProcessingState.completed) {
           skipToNext();
         }
         if (playbackState.processingState == AudioProcessingState.idle) {
@@ -243,18 +243,20 @@ class PlayerViewModel extends ChangeNotifier {
 
   // repeat mode
   void setRepeatMode() {
-    if (_repeatMode == AudioServiceRepeatMode.all) {
-      _repeatMode = AudioServiceRepeatMode.one;
+    if (_repeatMode == RepeatPlayerMode.repeatAll) {
+      _repeatMode = RepeatPlayerMode.repeatOne;
       notifyListeners();
-      audioHandler.setPlayerRepeatMode(AudioServiceRepeatMode.one);
-    } else if (_repeatMode == AudioServiceRepeatMode.one) {
-      _repeatMode = AudioServiceRepeatMode.all;
+      audioHandler.setPlayerRepeatMode(RepeatPlayerMode.repeatOne);
+    } else if (_repeatMode == RepeatPlayerMode.repeatOne) {
+      _repeatMode = RepeatPlayerMode.shuffle;
       notifyListeners();
-      audioHandler.setPlayerRepeatMode(AudioServiceRepeatMode.all);
+      audioHandler.setPlayerRepeatMode(RepeatPlayerMode.shuffle);
+      shuffleQueue();
     } else {
-      _repeatMode = AudioServiceRepeatMode.none;
+      _repeatMode = RepeatPlayerMode.repeatAll;
       notifyListeners();
-      audioHandler.setPlayerRepeatMode(AudioServiceRepeatMode.group);
+      audioHandler.setPlayerRepeatMode(RepeatPlayerMode.repeatAll);
+      shuffleQueue();
     }
   }
 
@@ -278,13 +280,13 @@ class PlayerViewModel extends ChangeNotifier {
   Future<void> removeDeletedSongsFromQueue() async {
     final songs = await _hiveService.getAllSongs();
     final songIds = songs.map((e) => e.id).toSet();
-    
+
     final currentQueue = audioHandler.queue.value.toList();
     currentQueue.removeWhere((item) => !songIds.contains(item.id));
-    
+
     audioHandler.queue.value.clear();
     audioHandler.queue.value.addAll(currentQueue);
-    
+
     if (currentItem != null && !songIds.contains(currentItem!.id)) {
       if (currentQueue.isNotEmpty) {
         skipToNext();
@@ -305,6 +307,16 @@ class PlayerViewModel extends ChangeNotifier {
     _duration = Duration.zero;
     _isPlaying = false;
     _shouldPlay = false;
+    notifyListeners();
+  }
+
+  // shuffle queue
+  void shuffleQueue() {
+    audioHandler.shuffleQueue();
+    final currentQueue = queue?.toList();
+    currentQueue?.shuffle();
+    queue?.clear();
+    queue?.addAll(currentQueue!);
     notifyListeners();
   }
 

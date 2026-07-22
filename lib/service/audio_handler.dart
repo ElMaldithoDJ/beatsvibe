@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
+import 'package:beatsvibe/models/repeatmode_model.dart';
 import 'package:just_audio/just_audio.dart';
 
 late AudioHandlerService globalAudioHandler;
@@ -12,22 +13,21 @@ class AudioHandlerService extends BaseAudioHandler
   Stream<Duration> get bufferedPositionStream => player.bufferedPositionStream;
   Stream<Duration?> get durationStream => player.durationStream;
 
-  AudioServiceRepeatMode repeatMode = AudioServiceRepeatMode.none;
+  RepeatPlayerMode repeatMode = RepeatPlayerMode.noRepeat;
 
-  void setPlayerRepeatMode(AudioServiceRepeatMode mode) async {
+  void setPlayerRepeatMode(RepeatPlayerMode mode) async {
     repeatMode = mode;
-    await setRepeatMode(mode);
-    switch (mode) {
-      case AudioServiceRepeatMode.none:
-        await player.setLoopMode(LoopMode.off);
-        break;
-      case AudioServiceRepeatMode.one:
-        await player.setLoopMode(LoopMode.one);
-        break;
-      case AudioServiceRepeatMode.all:
-      case AudioServiceRepeatMode.group:
-        await player.setLoopMode(LoopMode.all);
-        break;
+    if (mode == RepeatPlayerMode.noRepeat) {
+      await setRepeatMode(AudioServiceRepeatMode.none);
+      await player.setLoopMode(LoopMode.off);
+    } else if (mode == RepeatPlayerMode.repeatOne) {
+      await setRepeatMode(AudioServiceRepeatMode.one);
+      await player.setLoopMode(LoopMode.one);
+    } else if (mode == RepeatPlayerMode.repeatAll) {
+      await setRepeatMode(AudioServiceRepeatMode.all);
+      await player.setLoopMode(LoopMode.all);
+    } else if (mode == RepeatPlayerMode.shuffle) {
+      await setShuffleMode(AudioServiceShuffleMode.all);
     }
   }
 
@@ -115,7 +115,7 @@ class AudioHandlerService extends BaseAudioHandler
   @override
   Future<void> skipToNext() async {
     if (queue.value.isEmpty || player.currentIndex == null) return;
-    if (repeatMode == AudioServiceRepeatMode.all) {
+    if (repeatMode == RepeatPlayerMode.repeatAll) {
       final nextIndex = player.currentIndex! + 1;
       if (nextIndex < queue.value.length) {
         await player.seek(Duration.zero, index: nextIndex);
@@ -123,7 +123,7 @@ class AudioHandlerService extends BaseAudioHandler
         await player.stop();
         await player.seek(Duration.zero, index: player.currentIndex);
       }
-    } else if (repeatMode == AudioServiceRepeatMode.one) {
+    } else if (repeatMode == RepeatPlayerMode.repeatOne) {
       await player.seek(Duration.zero, index: player.currentIndex);
     }
   }
@@ -131,15 +131,20 @@ class AudioHandlerService extends BaseAudioHandler
   @override
   Future<void> skipToPrevious() async {
     if (queue.value.isEmpty || player.currentIndex == null) return;
-    if (repeatMode == AudioServiceRepeatMode.all) {
+    if (repeatMode == RepeatPlayerMode.repeatAll) {
       final prevIndex = player.currentIndex! - 1;
       if (prevIndex >= 0) {
         await player.seek(Duration.zero, index: prevIndex);
       } else {
         await player.seek(Duration.zero, index: queue.value.length - 1);
       }
-    } else if (repeatMode == AudioServiceRepeatMode.one) {
+    } else if (repeatMode == RepeatPlayerMode.repeatOne) {
       await player.seek(Duration.zero, index: player.currentIndex);
     }
+  }
+
+  void shuffleQueue() {
+    player.seek(Duration.zero);
+    queue.value.shuffle();
   }
 }

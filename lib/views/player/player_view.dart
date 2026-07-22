@@ -3,6 +3,7 @@ import 'package:beatsvibe/components/player/audiocontrols_players.dart';
 import 'package:beatsvibe/components/player/audioinfo_player.dart';
 import 'package:beatsvibe/components/player/progress_player.dart';
 import 'package:beatsvibe/components/player/queue_player.dart';
+import 'package:beatsvibe/models/repeatmode_model.dart';
 import 'package:beatsvibe/theme.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,10 +32,9 @@ class _PlayerViewState extends State<PlayerView>
       duration: const Duration(milliseconds: 600),
       reverseDuration: const Duration(milliseconds: 150),
     );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeInCubic));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInCubic),
+    );
     _fadeController.forward();
   }
 
@@ -148,9 +148,12 @@ class _PlayerViewState extends State<PlayerView>
                                           ),
                                           child: Center(
                                             child: Icon(
-                                              playerVM.repeatMode == .all
+                                              playerVM.repeatMode ==
+                                                      RepeatPlayerMode.repeatAll
                                                   ? CupertinoIcons.repeat
-                                                  : playerVM.repeatMode == .one
+                                                  : playerVM.repeatMode ==
+                                                        RepeatPlayerMode
+                                                            .repeatOne
                                                   ? CupertinoIcons.repeat_1
                                                   : CupertinoIcons.shuffle,
                                               size: 25,
