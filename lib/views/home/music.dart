@@ -19,7 +19,8 @@ class MusicView extends StatefulWidget {
   State<MusicView> createState() => _MusicViewState();
 }
 
-class _MusicViewState extends State<MusicView> with AutomaticKeepAliveClientMixin {
+class _MusicViewState extends State<MusicView>
+    with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   final PageStorageBucket _bucket = PageStorageBucket();
 
@@ -40,15 +41,13 @@ class _MusicViewState extends State<MusicView> with AutomaticKeepAliveClientMixi
     final audioVM = Provider.of<AudioViewModel>(context, listen: false);
 
     if (playerVM.currentItem != null && audioVM.songs.isNotEmpty) {
-      final index = audioVM.songs.indexWhere((s) => s.id == playerVM.currentItem!.id);
+      final index = audioVM.songs.indexWhere(
+        (s) => s.id == playerVM.currentItem!.id,
+      );
       if (index != -1 && _scrollController.hasClients) {
         // Altura aproximada de un AudioItem
         final offset = index * 60.0;
-        _scrollController.animateTo(
-          offset,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
+        _scrollController.jumpTo(offset);
       }
     }
   }

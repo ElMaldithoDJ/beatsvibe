@@ -148,6 +148,11 @@ class HiveService {
     return null;
   }
 
+  Future<void> clearLastPlayedPlaylist() async {
+    final box = await Hive.openBox(_lastPlayedPlaylistBox);
+    await box.clear();
+  }
+
   // Check if song is favorite
   Future<bool> isFavorite(String title) async {
     final box = await Hive.openBox(_favoriteSongsBox);
@@ -159,6 +164,12 @@ class HiveService {
     final box = await Hive.openBox(_lastPlayedSongBox);
     await box.clear();
     await box.put(item.id, item.toJson());
+  }
+
+  // Clear last played song
+  Future<void> clearLastPlayedSong() async {
+    final box = await Hive.openBox(_lastPlayedSongBox);
+    await box.clear();
   }
 
   // Get last played song
@@ -209,12 +220,8 @@ class HiveService {
       FoldersModel? folder = FoldersModel.fromJson(folderData as Map<dynamic, dynamic>);
       final boxSongs = await Hive.openBox(_songsBox);
       if (folder != null) {
-        final songs = boxSongs.values
-            .map((e) => MediaItemData.fromJson(e as Map<dynamic, dynamic>))
-            .toList();
-        final folderSongs = songs.where((e) => e.audioUrl.contains(folder.path!)).toList();
-        for (var song in folderSongs) {
-          await boxSongs.delete(song.id);
+        for (String songId in folder.items!) {
+          await boxSongs.delete(songId);
         }
       }
     }

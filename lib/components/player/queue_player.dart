@@ -12,6 +12,7 @@ class QueuePlayer extends StatefulWidget {
 
 class _QueuePlayerState extends State<QueuePlayer> {
   final ScrollController _scrollController = ScrollController();
+  final Map<String, GlobalKey> _itemKeys = {};
 
   @override
   void initState() {
@@ -24,15 +25,25 @@ class _QueuePlayerState extends State<QueuePlayer> {
   void _scrollToCurrentPlaying() {
     if (!mounted) return;
     final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
-
-    if (playerVM.currentItem != null && playerVM.queue != null && playerVM.queue!.isNotEmpty) {
-      final index = playerVM.queue!.indexWhere((s) => s.id == playerVM.currentItem!.id);
-      if (index != -1 && _scrollController.hasClients) {
-        // Altura aproximada de un AudioItem
-        final offset = index * 55.0;
-        _scrollController.jumpTo(
-          offset,
+    if (playerVM.currentItem != null && playerVM.queue.isNotEmpty) {
+      final key = _itemKeys[playerVM.currentItem!.id];
+      if (key != null && key.currentContext != null) {
+        Scrollable.ensureVisible(
+          key.currentContext!,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
         );
+      } else {
+        final index = playerVM.queue.indexWhere((s) => s.id == playerVM.currentItem!.id);
+        if (index != -1 && _scrollController.hasClients) {
+          // Altura aproximada de un AudioItem (40 imagen + 12 padding) = 52.0
+          final offset = index * 52.0;
+          _scrollController.animateTo(
+            offset,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        }
       }
     }
   }
@@ -70,12 +81,13 @@ class _QueuePlayerState extends State<QueuePlayer> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              itemCount: playerVM.queue?.length,
+              itemCount: playerVM.queue.length,
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               itemBuilder: (context, index) {
-                final song = playerVM.queue![index];
+                final song = playerVM.queue[index];
+                final key = _itemKeys.putIfAbsent(song.id, () => GlobalKey());
                 return GestureDetector(
                   onTap: () {
                     if (song.id != playerVM.currentItem?.id) {
@@ -83,6 +95,7 @@ class _QueuePlayerState extends State<QueuePlayer> {
                     }
                   },
                   child: AudioItem(
+                    key: key,
                     song: song,
                     index: index,
                   ),

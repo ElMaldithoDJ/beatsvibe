@@ -60,6 +60,8 @@ class _NoSongsState extends State<NoSongs> {
                           await audioVM.fetchSongs();
                         }
                       });
+                } else {
+                  await audioVM.fetchSongs();
                 }
               });
             },

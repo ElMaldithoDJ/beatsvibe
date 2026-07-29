@@ -13,8 +13,6 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:string_normalizer/string_normalizer.dart';
 
-late AudioViewModel globalAudioViewModel;
-
 class AudioViewModel extends ChangeNotifier {
   final HiveService _hiveService = HiveService();
   int _tabIndex = 0;
@@ -42,11 +40,12 @@ class AudioViewModel extends ChangeNotifier {
       );
       _songs = data;
       _songsCopy = data;
+      notifyListeners();
     } else {
       _songs = [];
       _songsCopy = [];
+      notifyListeners();
     }
-    notifyListeners();
     _setLoadingState(false);
   }
 
@@ -54,54 +53,53 @@ class AudioViewModel extends ChangeNotifier {
     String id;
     bool isIncluded;
 
-    FilePicker.platform
-        .getDirectoryPath(
-          dialogTitle: 'Selecciona una carpeta de música',
-          initialDirectory: '/storage/emulated/0/',
-        )
-        .then((dir) async {
-          if (dir != null) {
-            _setLoadingState(true);
-            final RootIsolateToken? token = RootIsolateToken.instance;
-            if (token == null) return;
+    final dir = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: 'Selecciona una carpeta de música',
+      initialDirectory: '/storage/emulated/0/',
+    );
 
-            final Directory appDocDir =
-                await getApplicationDocumentsDirectory();
+    if (dir != null) {
+      _setLoadingState(true);
+      final RootIsolateToken? token = RootIsolateToken.instance;
+      if (token == null) {
+        _setLoadingState(false);
+        return;
+      }
 
-            StorageIsolateModel model = StorageIsolateModel(
-              path: dir,
-              token: token,
-              appDocDir: appDocDir.path,
-            );
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
 
-            try {
-              await compute(scanFiles, model)
-                  .then((data) async {
-                    final existingFolders = await _hiveService.getFilesFolder();
-                    do {
-                      id = IDGenerator.generateId(length: 25);
-                      isIncluded = existingFolders.any((e) => e.id == id);
-                    } while (isIncluded);
+      StorageIsolateModel model = StorageIsolateModel(
+        path: dir,
+        token: token,
+        appDocDir: appDocDir.path,
+      );
 
-                    final folder = FoldersModel(
-                      id: id,
-                      name: dir.split('/').last,
-                      path: dir,
-                      items: data.length,
-                    );
-                    await _hiveService.saveFilesFolder([folder]);
-                    await _hiveService.saveAllSongs(data);
-                  })
-                  .whenComplete(() {
-                    _setLoadingState(false);
-                    onInit();
-                  });
-            } catch (_) {
-              _setLoadingState(false);
-              return;
-            }
-          }
-        });
+      try {
+        final data = await compute(scanFiles, model);
+        final existingFolders = await _hiveService.getFilesFolder();
+        do {
+          id = IDGenerator.generateId(length: 25);
+          isIncluded = existingFolders.any((e) => e.id == id);
+        } while (isIncluded);
+
+        final folder = FoldersModel(
+          id: id,
+          name: dir.split('/').last,
+          path: dir,
+          items: [
+            ...data.map((e) => e.id),
+          ],
+        );
+        await _hiveService.saveFilesFolder([folder]);
+        await _hiveService.saveAllSongs(data);
+      } catch (_) {
+        _setLoadingState(false);
+        return;
+      }
+
+      _setLoadingState(false);
+      onInit();
+    }
   }
 
   void onSearch(String query) {
@@ -135,9 +133,5 @@ class AudioViewModel extends ChangeNotifier {
 
   bool isSongSelected(String id) {
     return _songsSelected.any((e) => e.id == id);
-  }
-
-  Future<void> updateSongs() async {
-    
   }
 }

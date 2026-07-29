@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:beatsvibe/routes.dart';
 import 'package:beatsvibe/theme.dart';
 import 'package:beatsvibe/variables.dart';
+import 'package:beatsvibe/vm/audio_vm.dart';
 import 'package:beatsvibe/vm/favorites_vm.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,9 +24,11 @@ class AudioPlayerComponent extends StatefulWidget {
 class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<PlayerViewModel, FavoritesViewModel>(
-      builder: (context, playerVM, favoritesVM, child) {
-        if (playerVM.currentItem == null) return const SizedBox.shrink();
+    return Consumer3<PlayerViewModel, FavoritesViewModel, AudioViewModel>(
+      builder: (context, playerVM, favoritesVM, audioVM, child) {
+        if (playerVM.currentItem == null || audioVM.songsCopy.isEmpty) {
+          return const SizedBox.shrink();
+        }
         return Container(
           margin: const EdgeInsets.only(
             bottom: 10,

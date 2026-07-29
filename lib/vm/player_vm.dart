@@ -22,13 +22,13 @@ class PlayerViewModel extends ChangeNotifier {
   bool get isFavorite => _isFavorite;
   MediaItem? get lastPlayed => _lastPlayed;
   Duration get duration => _duration;
-  List<MediaItemData>? get queue {
+  List<MediaItemData> get queue {
     if (audioHandler.queue.value.isNotEmpty) {
       return audioHandler.queue.value
           .map((e) => MediaItemData.fromMediaItem(e)!)
           .toList();
     }
-    return null;
+    return [];
   }
 
   RepeatPlayerMode get repeatMode => _repeatMode;
@@ -131,7 +131,7 @@ class PlayerViewModel extends ChangeNotifier {
                 if (lastPlayedData != null) {
                   await audioHandler
                       .jumpToQueueItem(
-                        queue!.indexWhere((e) => e.id == lastPlayedData.id),
+                        queue.indexWhere((e) => e.id == lastPlayedData.id),
                       )
                       .whenComplete(() {
                         seek(Duration(seconds: lastPlayedData.position!));
@@ -265,7 +265,7 @@ class PlayerViewModel extends ChangeNotifier {
     await _hiveService.deleteSong(id);
     if (currentItem?.id == id) {
       //remove current item from queue
-      queue?.removeWhere((e) => e.id == id);
+      queue.removeWhere((e) => e.id == id);
       audioHandler.queue.value.removeWhere((e) => e.id == id);
       skipToNext();
       notifyListeners();
@@ -313,10 +313,10 @@ class PlayerViewModel extends ChangeNotifier {
   // shuffle queue
   void shuffleQueue() {
     audioHandler.shuffleQueue();
-    final currentQueue = queue?.toList();
-    currentQueue?.shuffle();
-    queue?.clear();
-    queue?.addAll(currentQueue!);
+    final currentQueue = queue.toList();
+    currentQueue.shuffle();
+    queue.clear();
+    queue.addAll(currentQueue);
     notifyListeners();
   }
 

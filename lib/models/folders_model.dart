@@ -2,7 +2,7 @@ class FoldersModel {
   final String id;
   final String? name;
   final String? path;
-  final int? items;
+  final List<String>? items;
 
   FoldersModel({required this.id, this.name, this.path, this.items});
 

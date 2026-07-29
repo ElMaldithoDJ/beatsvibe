@@ -21,20 +21,23 @@ class _FolderComponentState extends State<FolderComponent> {
     final audioVM = Provider.of<AudioViewModel>(context, listen: false);
     final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
     return DecoratedBox(
-      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Theme.of(context).scaffoldBackgroundColor,
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         child: Row(
           crossAxisAlignment: .start,
           children: [
-            const Icon(CupertinoIcons.folder),
+            const Icon(CupertinoIcons.folder_fill, color: Colors.amber),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.folder!.name ?? ''),
+                  Text(widget.folder?.name ?? ''),
                   Text(
                     "${widget.folder?.items} canciones",
                     style: const TextStyle(fontSize: 12),
