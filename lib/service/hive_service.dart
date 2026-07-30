@@ -228,6 +228,11 @@ class HiveService {
     await box.delete(id);
   }
 
+  Future<void> updateFilesFolder(FoldersModel folder) async {
+    final box = await Hive.openBox(_filesFolder);
+    await box.put(folder.id, folder.toJson());
+  }
+
   // Get Active Tab Index
   Future<int> getActiveTabIndex() async {
     final box = await Hive.openBox(_activeTabBox);

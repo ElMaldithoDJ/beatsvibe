@@ -54,7 +54,7 @@ class AudioHandlerService extends BaseAudioHandler
       playbackState.value.copyWith(
         controls: [
           MediaControl.skipToPrevious,
-          (player.playing) ? MediaControl.pause : MediaControl.play,
+          if (player.playing) MediaControl.pause else MediaControl.play,
           MediaControl.skipToNext,
         ],
         systemActions: const {
@@ -144,7 +144,12 @@ class AudioHandlerService extends BaseAudioHandler
   }
 
   void shuffleQueue() {
-    player.seek(Duration.zero);
     queue.value.shuffle();
+  }
+
+  void cleanQueue() {
+    queue.value.clear();
+    player.setAudioSources([]);
+    mediaItem.add(null);
   }
 }

@@ -95,7 +95,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
             CupertinoActivityIndicator(color: Theme.of(context).primaryColor),
           const SizedBox(width: 20),
           IconButton(
-            icon: const Icon(CupertinoIcons.gear_alt),
+            icon: Icon(CupertinoIcons.gear_alt_fill, color: Theme.of(context).primaryColor),
             onPressed: () {
               Get.toNamed(AppRoutes.settings);
             },

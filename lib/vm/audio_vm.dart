@@ -33,20 +33,23 @@ class AudioViewModel extends ChangeNotifier {
   }
 
   Future<void> onInit() async {
-    final data = await _hiveService.getAllSongs();
-    if (data.isNotEmpty) {
-      data.sort(
-        (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
-      );
-      _songs = data;
-      _songsCopy = data;
-      notifyListeners();
-    } else {
-      _songs = [];
-      _songsCopy = [];
-      notifyListeners();
-    }
-    _setLoadingState(false);
+    _setLoadingState(true);
+    _hiveService
+        .getAllSongs()
+        .then((data) {
+          if (data.isNotEmpty) {
+            data.sort(
+              (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+            );
+            _songs = data;
+            _songsCopy = data;
+            notifyListeners();
+          }
+        })
+        .whenComplete(() {
+          _setLoadingState(false);
+          updateMusic();
+        });
   }
 
   Future<void> fetchSongs() async {
@@ -86,9 +89,7 @@ class AudioViewModel extends ChangeNotifier {
           id: id,
           name: dir.split('/').last,
           path: dir,
-          items: [
-            ...data.map((e) => e.id),
-          ],
+          items: [...data.map((e) => e.id)],
         );
         await _hiveService.saveFilesFolder([folder]);
         await _hiveService.saveAllSongs(data);
@@ -133,5 +134,102 @@ class AudioViewModel extends ChangeNotifier {
 
   bool isSongSelected(String id) {
     return _songsSelected.any((e) => e.id == id);
+  }
+
+  void updateMusic() async {
+    _setLoadingState(true);
+    final folders = await _hiveService.getFilesFolder();
+    final allExistingSongs = await _hiveService.getAllSongs();
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+
+    bool hasChanges = false;
+
+    for (FoldersModel folder in folders) {
+      final RootIsolateToken? token = RootIsolateToken.instance;
+      if (token == null) {
+        _setLoadingState(false);
+        break;
+      }
+      StorageIsolateModel model = StorageIsolateModel(
+        path: folder.path!,
+        token: token,
+        appDocDir: appDocDir.path,
+      );
+
+      try {
+        final scannedData = await compute(scanFiles, model);
+        
+        List<String> updatedFolderItems = [];
+        List<MediaItemData> songsToSave = [];
+
+        for (var scannedSong in scannedData) {
+          var existingIndex = allExistingSongs.indexWhere(
+            (e) => e.audioUrl == scannedSong.audioUrl,
+          );
+
+          if (existingIndex != -1) {
+            final existingSong = allExistingSongs[existingIndex];
+            updatedFolderItems.add(existingSong.id);
+            
+            final updatedSong = MediaItemData(
+              id: existingSong.id,
+              title: scannedSong.title,
+              audioUrl: scannedSong.audioUrl,
+              artist: scannedSong.artist,
+              album: scannedSong.album,
+              genre: scannedSong.genre,
+              artUri: scannedSong.artUri,
+              duration: scannedSong.duration,
+              format: scannedSong.format,
+              bitrate: scannedSong.bitrate,
+              position: existingSong.position,
+            );
+            songsToSave.add(updatedSong);
+          } else {
+            updatedFolderItems.add(scannedSong.id);
+            songsToSave.add(scannedSong);
+            hasChanges = true;
+          }
+        }
+
+        final existingFolderItems = folder.items ?? [];
+        final deletedSongIds = existingFolderItems.where(
+          (id) => !updatedFolderItems.contains(id),
+        ).toList();
+
+        for (var deletedId in deletedSongIds) {
+          await _hiveService.deleteSong(deletedId);
+          hasChanges = true;
+        }
+
+        await _hiveService.saveAllSongs(songsToSave);
+
+        final updatedFolder = FoldersModel(
+          id: folder.id,
+          name: folder.name,
+          path: folder.path,
+          items: updatedFolderItems,
+        );
+        await _hiveService.updateFilesFolder(updatedFolder);
+
+      } catch (_) {
+        _setLoadingState(false);
+        return;
+      }
+    }
+
+    if (hasChanges) {
+      final updatedSongs = await _hiveService.getAllSongs();
+      if (updatedSongs.isNotEmpty) {
+        updatedSongs.sort(
+          (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+        );
+        _songs = updatedSongs;
+        _songsCopy = updatedSongs;
+        notifyListeners();
+      }
+    }
+    
+    _setLoadingState(false);
   }
 }

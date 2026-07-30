@@ -39,7 +39,7 @@ class _FolderComponentState extends State<FolderComponent> {
                 children: [
                   Text(widget.folder?.name ?? ''),
                   Text(
-                    "${widget.folder?.items} canciones",
+                    "${widget.folder?.items?.length} canciones",
                     style: const TextStyle(fontSize: 12),
                   ),
                 ],
