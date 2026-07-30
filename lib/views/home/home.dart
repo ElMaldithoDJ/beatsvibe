@@ -7,6 +7,7 @@ import 'package:beatsvibe/views/home/favorites.dart';
 import 'package:beatsvibe/views/home/music.dart';
 import 'package:beatsvibe/views/home/playlists.dart';
 import 'package:beatsvibe/vm/audio_vm.dart';
+import 'package:beatsvibe/vm/favorites_vm.dart';
 import 'package:beatsvibe/vm/playlist_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +82,8 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final audioVM = Provider.of<AudioViewModel>(context, listen: true);
-    final playlistVM = Provider.of<PlaylistViewModel>(context, listen: false);
+    final playlistVM = Provider.of<PlaylistViewModel>(context, listen: true);
+    final favoritesVM = Provider.of<FavoritesViewModel>(context, listen: true);
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
@@ -112,6 +114,11 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
                       (btn) => Expanded(
                         child: BottomNavButton(
                           icon: btn.icon,
+                          title: navButtons.indexOf(btn) == 0
+                              ? "${audioVM.songsCopy.length}"
+                              : navButtons.indexOf(btn) == 1
+                                  ? "${playlistVM.playlistsCopy.length}"
+                                  : "${favoritesVM.favorites.length}",
                           activeIcon: btn.activeIcon,
                           page: btn.page,
                           activeColor: btn.activeColor,

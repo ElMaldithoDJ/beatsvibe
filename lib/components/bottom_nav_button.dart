@@ -24,12 +24,13 @@ class BottomNavButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        constraints: BoxConstraints(minWidth: .maxFinite, minHeight: 30),
+        width: .maxFinite,
+        constraints: BoxConstraints(minWidth: 50, minHeight: 30, maxHeight: 40),
         child: Stack(
           children: [
             if (title != null) ...[
               Positioned(
-                bottom: 12,
+                bottom: 10,
                 left: 0,
                 right: 0,
                 child: Align(
@@ -37,8 +38,8 @@ class BottomNavButton extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeOut,
-                    width: isActive == true ? 40 : 0,
-                    height: 25,
+                    width: isActive == true ? 60 : 0,
+                    height: 30,
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor
                           .withValues(alpha: .15),
@@ -48,35 +49,33 @@ class BottomNavButton extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: -5,
+                top: 6,
                 left: 0,
                 right: 0,
                 child: Align(
                   alignment: .topCenter,
-                  child: Icon(
-                    isActive == true ? activeIcon ?? icon : icon,
-                    size: 20,
-                    color: isActive == true
-                        ? activeColor ?? Theme.of(context).primaryColor
-                        : Theme.of(context).textTheme.titleSmall!.color,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: -6,
-                left: 0,
-                right: 0,
-                child: Align(
-                  alignment: .bottomCenter,
-                  child: Text(
-                    title!,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: isActive == true
-                          ? activeColor ?? Theme.of(context).primaryColor
-                          : Theme.of(context).textTheme.titleSmall!.color,
-                      fontWeight: isActive == true ? FontWeight.bold : null,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: .center,
+                    spacing: 5,
+                    children: [
+                      Icon(
+                        isActive == true ? activeIcon ?? icon : icon,
+                        size: 18,
+                        color: isActive == true
+                            ? activeColor ?? Theme.of(context).primaryColor
+                            : Theme.of(context).textTheme.titleSmall!.color,
+                      ),
+                      Text(
+                        title!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isActive == true
+                              ? activeColor ?? Theme.of(context).primaryColor
+                              : Theme.of(context).textTheme.titleSmall!.color,
+                          fontWeight: isActive == true ? FontWeight.bold : null,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

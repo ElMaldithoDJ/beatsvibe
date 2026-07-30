@@ -46,8 +46,8 @@ class AudioViewModel extends ChangeNotifier {
             notifyListeners();
           }
         })
-        .whenComplete(() async {
-          updateMusic();
+        .whenComplete(() {
+          _setLoadingState(false);
         });
   }
 
@@ -160,7 +160,7 @@ class AudioViewModel extends ChangeNotifier {
       try {
         final scannedData = await compute(scanFiles, model);
 
-        List<String> updatedFolderItems = [];
+        List<String> updatedFolderItems = folder.items ?? [];
         List<MediaItemData> songsToSave = [];
 
         for (var scannedSong in scannedData) {
@@ -184,23 +184,11 @@ class AudioViewModel extends ChangeNotifier {
               duration: scannedSong.duration,
               format: scannedSong.format,
               bitrate: scannedSong.bitrate,
-              position: scannedSong.position,
             );
             songsToSave.add(newSong);
             updatedFolderItems.add(songId);
           }
         }
-
-        final existingFolderItems = folder.items ?? [];
-        final deletedSongIds = existingFolderItems
-            .where((id) => !updatedFolderItems.contains(id))
-            .toList();
-
-        for (var deletedId in deletedSongIds) {
-          await _hiveService.deleteSong(deletedId);
-          hasChanges = true;
-        }
-
         await _hiveService.saveAllSongs(songsToSave);
 
         final updatedFolder = FoldersModel(
