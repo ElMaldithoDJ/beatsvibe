@@ -102,7 +102,7 @@ class _HomeRouteState extends State<HomeRoute> with TickerProviderStateMixin {
           ),
           const SizedBox(width: 10),
         ],
-        bottom: audioVM.isLoading || audioVM.songsCopy.isEmpty
+        bottom: audioVM.songsCopy.isEmpty
             ? null
             : PreferredSize(
                 preferredSize: Size(.maxFinite, 25),
