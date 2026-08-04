@@ -46,8 +46,17 @@ class AudioViewModel extends ChangeNotifier {
             notifyListeners();
           }
         })
-        .whenComplete(() {
+        .whenComplete(() async {
           _setLoadingState(false);
+          final folders = await _hiveService.getFilesFolder();
+          if (folders.isNotEmpty) {
+            for (FoldersModel folder in folders) {
+              final files = Directory(folder.path!).listSync();
+              if (folder.items!.length < files.length) {
+                updateMusic(folder);
+              }
+            }
+          }
         });
   }
 
@@ -56,7 +65,7 @@ class AudioViewModel extends ChangeNotifier {
     bool isIncluded;
 
     final dir = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: 'Selecciona una carpeta de música',
+      dialogTitle: 'Selecciona una carpeta',
       initialDirectory: '/storage/emulated/0/',
     );
 
@@ -135,21 +144,19 @@ class AudioViewModel extends ChangeNotifier {
     return _songsSelected.any((e) => e.id == id);
   }
 
-  void updateMusic() async {
+  void updateMusic(FoldersModel folder) async {
     _setLoadingState(true);
     bool isIncluded;
     String songId;
-    final folders = await _hiveService.getFilesFolder();
-    final allExistingSongs = _songsCopy;
+    final allExistingSongs = [..._songsCopy];
     final Directory appDocDir = await getApplicationDocumentsDirectory();
 
     bool hasChanges = false;
 
-    for (FoldersModel folder in folders) {
-      final RootIsolateToken? token = RootIsolateToken.instance;
+    final RootIsolateToken? token = RootIsolateToken.instance;
       if (token == null) {
         _setLoadingState(false);
-        break;
+        return;
       }
       StorageIsolateModel model = StorageIsolateModel(
         path: folder.path!,
@@ -185,7 +192,7 @@ class AudioViewModel extends ChangeNotifier {
               format: scannedSong.format,
               bitrate: scannedSong.bitrate,
             );
-            songsToSave.add(newSong);
+            songsToSave.addAll([...songsCopy, newSong]);
             updatedFolderItems.add(songId);
           }
         }
@@ -202,7 +209,6 @@ class AudioViewModel extends ChangeNotifier {
         _setLoadingState(false);
         return;
       }
-    }
 
     if (hasChanges) {
       final updatedSongs = await _hiveService.getAllSongs();
