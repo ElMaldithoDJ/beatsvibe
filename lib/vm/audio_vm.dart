@@ -32,9 +32,9 @@ class AudioViewModel extends ChangeNotifier {
     onInit();
   }
 
-  Future<void> onInit() async {
+  void onInit() async {
     _setLoadingState(true);
-    _hiveService
+    await _hiveService
         .getAllSongs()
         .then((data) {
           if (data.isNotEmpty) {
@@ -46,17 +46,8 @@ class AudioViewModel extends ChangeNotifier {
             notifyListeners();
           }
         })
-        .whenComplete(() async {
+        .whenComplete(() {
           _setLoadingState(false);
-          final folders = await _hiveService.getFilesFolder();
-          if (folders.isNotEmpty) {
-            for (FoldersModel folder in folders) {
-              final files = Directory(folder.path!).listSync();
-              if (folder.items!.length < files.length) {
-                updateMusic(folder);
-              }
-            }
-          }
         });
   }
 
@@ -99,8 +90,8 @@ class AudioViewModel extends ChangeNotifier {
           path: dir,
           items: [...data.map((e) => e.id)],
         );
-        await _hiveService.saveFilesFolder([folder]);
         await _hiveService.saveAllSongs(data);
+        await _hiveService.saveFilesFolder([folder]);
       } catch (_) {
         _setLoadingState(false);
         return;
@@ -144,60 +135,60 @@ class AudioViewModel extends ChangeNotifier {
     return _songsSelected.any((e) => e.id == id);
   }
 
-  void updateMusic(FoldersModel folder) async {
+  Future<void> updateMusic(FoldersModel folder) async {
     _setLoadingState(true);
-    bool isIncluded;
-    String songId;
-    final allExistingSongs = [..._songsCopy];
+    final songsLocal = await _hiveService.getAllSongs();
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-
-    bool hasChanges = false;
+    bool folderChanged = false;
 
     final RootIsolateToken? token = RootIsolateToken.instance;
-      if (token == null) {
-        _setLoadingState(false);
-        return;
-      }
-      StorageIsolateModel model = StorageIsolateModel(
-        path: folder.path!,
-        token: token,
-        appDocDir: appDocDir.path,
-      );
+    if (token == null) {
+      _setLoadingState(false);
+      return;
+    }
+    StorageIsolateModel model = StorageIsolateModel(
+      path: folder.path!,
+      token: token,
+      appDocDir: appDocDir.path,
+    );
 
-      try {
-        final scannedData = await compute(scanFiles, model);
+    try {
+      final scannedData = await compute(scanFiles, model);
+      List<String> updatedFolderItems = folder.items ?? [];
 
-        List<String> updatedFolderItems = folder.items ?? [];
-        List<MediaItemData> songsToSave = [];
+      for (var scannedSong in scannedData) {
+        bool exist = songsLocal.any((e) => e.title == scannedSong.title);
 
-        for (var scannedSong in scannedData) {
-          bool exists = allExistingSongs.any(
-            (e) => e.title == scannedSong.title,
+        if (!exist) {
+          String id;
+          do {
+            id = IDGenerator.generateId(length: 25);
+          } while (songsLocal.any((e) => e.id == id));
+
+          final newSong = MediaItemData(
+            id: id,
+            title: scannedSong.title,
+            audioUrl: scannedSong.audioUrl,
+            artist: scannedSong.artist,
+            album: scannedSong.album,
+            genre: scannedSong.genre,
+            artUri: scannedSong.artUri,
+            duration: scannedSong.duration,
+            format: scannedSong.format,
+            bitrate: scannedSong.bitrate,
           );
-          if (!exists) {
-            hasChanges = true;
-            do {
-              songId = IDGenerator.generateId(length: 25);
-              isIncluded = allExistingSongs.any((e) => e.id == songId);
-            } while (isIncluded);
-            final newSong = MediaItemData(
-              id: songId,
-              title: scannedSong.title,
-              audioUrl: scannedSong.audioUrl,
-              artist: scannedSong.artist,
-              album: scannedSong.album,
-              genre: scannedSong.genre,
-              artUri: scannedSong.artUri,
-              duration: scannedSong.duration,
-              format: scannedSong.format,
-              bitrate: scannedSong.bitrate,
-            );
-            songsToSave.addAll([...songsCopy, newSong]);
-            updatedFolderItems.add(songId);
+
+          await _hiveService.addSong(newSong);
+          _songsCopy.add(newSong);
+
+          if (!updatedFolderItems.contains(id)) {
+            updatedFolderItems.add(id);
+            folderChanged = true;
           }
         }
-        await _hiveService.saveAllSongs(songsToSave);
+      }
 
+      if (folderChanged) {
         final updatedFolder = FoldersModel(
           id: folder.id,
           name: folder.name,
@@ -205,23 +196,12 @@ class AudioViewModel extends ChangeNotifier {
           items: updatedFolderItems,
         );
         await _hiveService.updateFilesFolder(updatedFolder);
-      } catch (_) {
-        _setLoadingState(false);
-        return;
       }
-
-    if (hasChanges) {
-      final updatedSongs = await _hiveService.getAllSongs();
-      if (updatedSongs.isNotEmpty) {
-        updatedSongs.sort(
-          (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
-        );
-        _songs = updatedSongs;
-        _songsCopy = updatedSongs;
-        notifyListeners();
-      }
+    } catch (_) {
+      _setLoadingState(false);
+      return;
     }
-
     _setLoadingState(false);
+    onInit();
   }
 }

@@ -8,10 +8,14 @@ late AudioHandlerService globalAudioHandler;
 class AudioHandlerService extends BaseAudioHandler
     with SeekHandler, QueueHandler {
   final AudioPlayer player = AudioPlayer();
+  int _currentIndex = - 1;
+  int get currentIndex => _currentIndex;
 
   Stream<Duration> get positionStream => player.positionStream;
   Stream<Duration> get bufferedPositionStream => player.bufferedPositionStream;
   Stream<Duration?> get durationStream => player.durationStream;
+  Stream<bool> get playingStream => player.playingStream;
+  Stream<ProcessingState> get processingStateStream => player.processingStateStream;
 
   RepeatPlayerMode repeatMode = RepeatPlayerMode.noRepeat;
 
@@ -114,31 +118,18 @@ class AudioHandlerService extends BaseAudioHandler
   // Skip song (next or previous)
   @override
   Future<void> skipToNext() async {
-    if (queue.value.isEmpty || player.currentIndex == null) return;
-    if (repeatMode == RepeatPlayerMode.repeatAll) {
-      final nextIndex = player.currentIndex! + 1;
-      if (nextIndex < queue.value.length) {
-        await player.seek(Duration.zero, index: nextIndex);
-      } else {
-        await player.stop();
-        await player.seek(Duration.zero, index: player.currentIndex);
-      }
-    } else if (repeatMode == RepeatPlayerMode.repeatOne) {
+    if (player.currentIndex! < queue.value.length - 1) {
+      await player.seek(Duration.zero, index: player.currentIndex! + 1);
+    } else {
       await player.seek(Duration.zero, index: player.currentIndex);
     }
   }
 
   @override
   Future<void> skipToPrevious() async {
-    if (queue.value.isEmpty || player.currentIndex == null) return;
-    if (repeatMode == RepeatPlayerMode.repeatAll) {
-      final prevIndex = player.currentIndex! - 1;
-      if (prevIndex >= 0) {
-        await player.seek(Duration.zero, index: prevIndex);
-      } else {
-        await player.seek(Duration.zero, index: queue.value.length - 1);
-      }
-    } else if (repeatMode == RepeatPlayerMode.repeatOne) {
+    if (currentIndex > queue.value.length - 1) {
+      await player.seek(Duration.zero, index: currentIndex - 1);
+    } else {
       await player.seek(Duration.zero, index: player.currentIndex);
     }
   }
@@ -149,7 +140,7 @@ class AudioHandlerService extends BaseAudioHandler
 
   void cleanQueue() {
     queue.value.clear();
-    player.setAudioSources([]);
+    player.clearAudioSources();
     mediaItem.add(null);
   }
 }

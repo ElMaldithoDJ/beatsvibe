@@ -28,12 +28,17 @@ class HiveService {
     return [];
   }
 
+  // Save all songs to hive
   Future<void> saveAllSongs(List<MediaItemData> songs) async {
     final box = await Hive.openBox(_songsBox);
     await box.clear();
-    for (var song in songs) {
-      await box.put(song.id, song.toJson());
-    }
+    await box.putAll(songs.asMap());
+  }
+
+  // Add a song to hive
+  Future<void> addSong(MediaItemData newSong) async {
+    final box = await Hive.openBox(_songsBox);
+    await box.put(newSong.id, newSong.toJson());
   }
 
   // Delete song from hive
@@ -108,7 +113,11 @@ class HiveService {
   // Update playlist
   Future<void> updatePlaylist(PlaylistModelData playlist) async {
     final box = await Hive.openBox(_playlistsBox);
-    await box.put(playlist.id, playlist.toJson());
+    final index = box.values
+        .map((e) => PlaylistModelData.fromJson(e as Map<dynamic, dynamic>))
+        .toList()
+        .indexWhere((e) => e.id == playlist.id);
+    box.putAt(index, playlist.songs?.asMap());
   }
 
   // save last playlist
@@ -118,10 +127,7 @@ class HiveService {
     final box = await Hive.openBox(_lastPlayedPlaylistBox);
     await box.clear();
     if (playlist.id == null) {
-      final pls = PlaylistModelData(
-        id: "root",
-        songs: playlist.songs,
-      );
+      final pls = PlaylistModelData(id: "root", songs: playlist.songs);
       await box.put(pls.id, pls.toJson());
     } else {
       do {
@@ -218,7 +224,9 @@ class HiveService {
     final box = await Hive.openBox(_filesFolder);
     final folderData = box.get(id);
     if (folderData != null) {
-      FoldersModel? folder = FoldersModel.fromJson(folderData as Map<dynamic, dynamic>);
+      FoldersModel? folder = FoldersModel.fromJson(
+        folderData as Map<dynamic, dynamic>,
+      );
       final boxSongs = await Hive.openBox(_songsBox);
       if (folder != null) {
         for (String songId in folder.items!) {
@@ -229,9 +237,14 @@ class HiveService {
     await box.delete(id);
   }
 
+  // Update files folder items
   Future<void> updateFilesFolder(FoldersModel folder) async {
     final box = await Hive.openBox(_filesFolder);
-    await box.put(folder.id, folder.toJson());
+    final index = box.values
+        .map((e) => FoldersModel.fromJson(e as Map<dynamic, dynamic>))
+        .toList()
+        .indexWhere((e) => e!.id == folder.id);
+    box.putAt(index, folder.items?.asMap());
   }
 
   // Get Active Tab Index

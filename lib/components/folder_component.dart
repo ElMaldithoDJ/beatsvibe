@@ -50,8 +50,8 @@ class _FolderComponentState extends State<FolderComponent> {
               onPressed: () async {
                 await settingsVM.deleteFolder(widget.folder!.id).whenComplete(
                   () async {
-                    await audioVM.onInit();
                     await playerVM.removeDeletedSongsFromQueue();
+                    audioVM.onInit();
                   },
                 );
               },

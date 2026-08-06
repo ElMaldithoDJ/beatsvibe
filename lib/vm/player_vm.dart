@@ -69,24 +69,29 @@ class PlayerViewModel extends ChangeNotifier {
     await _loadLastPlayedPlaylist();
     _listenQueue();
     _listenPosition();
+    _listenDuration();
     _listenPlaybackState();
     _listenCompleted();
-    audioHandler.durationStream.listen((duration) {
-      if (duration != null) {
-        _duration = duration;
-        notifyListeners();
-      }
-    });
+  }
+
+  void _listenDuration() {
+    try {
+      audioHandler.durationStream.listen((duration) {
+        if (duration != null) {
+          _duration = duration;
+          notifyListeners();
+        }
+      });
+    } catch (e) {
+      debugPrint("Error al iniciar stream de duracion: ${e.toString()}");
+    }
   }
 
   void _listenPlaybackState() {
     try {
-      audioHandler.playbackState.listen((playbackState) {
-        final playing = playbackState.playing;
-        if (_isPlaying != playing) {
-          _isPlaying = playing;
-          notifyListeners();
-        }
+      audioHandler.playingStream.listen((playing) {
+        _isPlaying = playing;
+        notifyListeners();
       });
     } catch (e) {
       debugPrint("Error al iniciar stream de playbackState: ${e.toString()}");

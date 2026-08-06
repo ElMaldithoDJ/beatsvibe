@@ -25,12 +25,11 @@ class _SplashScreenState extends State<SplashScreen> {
         Provider.of<AudioViewModel>(
           context,
           listen: false,
-        ).onInit().whenComplete(() {
-          Future.delayed(
-            const Duration(milliseconds: 1500),
-            () => Get.offNamed(AppRoutes.home),
-          );
-        });
+        ).onInit();
+        Future.delayed(
+          const Duration(milliseconds: 1500),
+          () => Get.offNamed(AppRoutes.home),
+        );
       });
     }
   }
