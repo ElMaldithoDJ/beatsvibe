@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:beatsvibe/components/player/artwork_player.dart';
 import 'package:beatsvibe/components/player/artwork_schema_color.dart';
 import 'package:beatsvibe/components/player/audiocontrols_players.dart';
@@ -12,7 +10,6 @@ import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_color_scheme/image_color_scheme.dart';
 import 'package:provider/provider.dart';
 
 class PlayerView extends StatefulWidget {
@@ -114,7 +111,7 @@ class _PlayerViewState extends State<PlayerView>
                           const SizedBox(height: 20),
                           const AudioInfoPlayer(),
                           const ProgressPlayer(),
-                          const Spacer(),
+                          const SizedBox(height: 185),
                           Padding(
                             padding: const .symmetric(horizontal: 15),
                             child: Center(
@@ -240,7 +237,7 @@ class _PlayerViewState extends State<PlayerView>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 50),
+                          Spacer(),
                         ],
                       ),
                     ),

@@ -34,7 +34,7 @@ class AudioViewModel extends ChangeNotifier {
 
   void onInit() async {
     _setLoadingState(true);
-    await _hiveService
+    _hiveService
         .getAllSongs()
         .then((data) {
           if (data.isNotEmpty) {
@@ -44,6 +44,7 @@ class AudioViewModel extends ChangeNotifier {
             _songs = data;
             _songsCopy = data;
             notifyListeners();
+            debugPrint(_songs[0].toString());
           }
         })
         .whenComplete(() {

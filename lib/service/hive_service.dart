@@ -32,7 +32,9 @@ class HiveService {
   Future<void> saveAllSongs(List<MediaItemData> songs) async {
     final box = await Hive.openBox(_songsBox);
     await box.clear();
-    await box.putAll(songs.asMap());
+    for (MediaItemData song in songs) {
+      await box.put(song.id, song.toJson());
+    }
   }
 
   // Add a song to hive
@@ -212,7 +214,7 @@ class HiveService {
   // Save Files Folder
   Future<void> saveFilesFolder(List<FoldersModel> folderPath) async {
     final box = await Hive.openBox(_filesFolder);
-    for (var folder in folderPath) {
+    for (FoldersModel folder in folderPath) {
       if (!box.containsKey(folder.id)) {
         await box.put(folder.id, folder.toJson());
       }

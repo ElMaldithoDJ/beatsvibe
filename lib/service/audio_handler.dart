@@ -143,4 +143,8 @@ class AudioHandlerService extends BaseAudioHandler
     player.clearAudioSources();
     mediaItem.add(null);
   }
+
+  void addToCurrentQueue({required MediaItemData song}) {
+    queue.value.add(song.toMediaItem());
+  }
 }

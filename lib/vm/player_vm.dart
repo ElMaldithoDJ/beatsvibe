@@ -91,6 +91,7 @@ class PlayerViewModel extends ChangeNotifier {
     try {
       audioHandler.playingStream.listen((playing) {
         _isPlaying = playing;
+        _shouldPlay = playing;
         notifyListeners();
       });
     } catch (e) {
@@ -213,9 +214,7 @@ class PlayerViewModel extends ChangeNotifier {
         await audioHandler.initPlayer(songs: playlist);
         if (!_shouldPlay) return;
         if (song != null) {
-          await audioHandler.skipToQueueItem(
-            playlist.indexWhere((e) => e.id == song.id),
-          );
+          await audioHandler.playFromMediaId(song.id);
           if (!_shouldPlay) return;
         }
       }
