@@ -103,6 +103,14 @@ class AudioHandlerService extends BaseAudioHandler
   @override
   Future<void> seek(Duration position) => player.seek(position);
 
+  // Play a song from the queue by its media ID
+  Future<void> playFromId(String mediaId) async {
+    int index = queue.value.indexWhere((e) => e.id == mediaId);
+    if (index != -1) {
+      await skipToQueueItem(index);
+    }
+  }
+
   // Skip to a specific song in the queue
   @override
   Future<void> skipToQueueItem(int index) async {

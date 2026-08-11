@@ -214,7 +214,7 @@ class PlayerViewModel extends ChangeNotifier {
         await audioHandler.initPlayer(songs: playlist);
         if (!_shouldPlay) return;
         if (song != null) {
-          await audioHandler.playFromMediaId(song.id);
+          await audioHandler.playFromId(song.id);
           if (!_shouldPlay) return;
         }
       }
