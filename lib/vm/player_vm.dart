@@ -10,9 +10,11 @@ import 'package:flutter/material.dart';
 class PlayerViewModel extends ChangeNotifier {
   final _hiveService = HiveService();
   final audioHandler = globalAudioHandler;
+  
 
   bool _isPlaying = false;
   bool _isFavorite = false;
+  int _currentIndex = -1;
   MediaItem? _lastPlayed;
   RepeatPlayerMode _repeatMode = RepeatPlayerMode.repeatAll;
   Duration _currentPosition = Duration.zero;
@@ -20,6 +22,7 @@ class PlayerViewModel extends ChangeNotifier {
 
   bool get isPlaying => _isPlaying;
   bool get isFavorite => _isFavorite;
+  int get currentIndex => _currentIndex;
   MediaItem? get lastPlayed => _lastPlayed;
   Duration get duration => _duration;
   List<MediaItemData> get queue {
@@ -162,6 +165,7 @@ class PlayerViewModel extends ChangeNotifier {
         if (mediaItem != null) {
           _lastPlayed = mediaItem;
           _isFavorite = await _hiveService.isFavorite(mediaItem.id);
+          _currentIndex = queue.indexWhere((e) => e.id == mediaItem.id);
           notifyListeners();
         }
       });

@@ -89,9 +89,9 @@ class ArtworkSchemaColor extends StatelessWidget {
                   begin: begin,
                   end: end,
                   colors: [
-                    colorScheme.primaryContainer.withValues(alpha: 0.3),
+                    colorScheme.primary,
                     colorScheme.primaryFixed,
-                    colorScheme.secondaryContainer,
+                    colorScheme.primaryFixedDim,
                   ],
                 ),
               ),

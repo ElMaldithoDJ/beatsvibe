@@ -166,12 +166,11 @@ class _MusicViewState extends State<MusicView>
                             ],
                             child: AudioItem(
                               song: song,
-                              index: index,
                               isFavorite: favoriteVM.favorites.any(
                                 (e) => e.id == song.id,
                               ),
                               isSelected: audioVM.isSongSelected(song.id),
-                              showIsPlaying: true,
+                              isPlaying: playerVM.currentIndex == index,
                             ),
                           ),
                         ),

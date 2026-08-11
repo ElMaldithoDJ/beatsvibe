@@ -14,19 +14,17 @@ class AudioItem extends StatefulWidget {
   final bool isSelected;
   final bool isFavorite;
   final bool showIsSelected;
-  final bool? showIsPlaying;
-  final int index;
+  final bool isPlaying;
   final List<MediaItemData>? playlist;
 
   const AudioItem({
     super.key,
     required this.song,
-    required this.index,
     this.isSelected = false,
     this.playlist,
     this.showIsSelected = true,
     this.isFavorite = false,
-    this.showIsPlaying = false,
+    this.isPlaying = false,
   });
 
   @override
@@ -127,7 +125,7 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
                             gaplessPlayback: true,
                           ),
                   ),
-                  if ((player.currentItem?.id == widget.song.id)) ...[
+                  if (widget.isPlaying == true) ...[
                     DecoratedBox(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
@@ -137,7 +135,7 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
                                   .withValues(alpha: .15),
                       ),
                       child: Center(
-                        child: player.isPlaying && widget.showIsPlaying!
+                        child: player.isPlaying
                             ? Icon(
                                 CupertinoIcons.play_arrow_solid,
                                 size: 20,
@@ -170,14 +168,14 @@ class _AudioItemState extends State<AudioItem> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  if ((player.currentItem?.id == widget.song.id)) ...[
+                  if (widget.isPlaying == true) ...[
                     DecoratedBox(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.black45,
                       ),
                       child: Center(
-                        child: player.isPlaying && widget.showIsPlaying!
+                        child: player.isPlaying
                             ? Icon(
                                 CupertinoIcons.play_arrow_solid,
                                 size: 20,

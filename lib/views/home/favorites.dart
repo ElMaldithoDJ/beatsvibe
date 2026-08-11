@@ -105,7 +105,7 @@ class _FavoritesViewState extends State<FavoritesView> with AutomaticKeepAliveCl
                     },
                   ),
                 ],
-                child: AudioItem(song: song, index: index, showIsPlaying: true,),
+                child: AudioItem(song: song, isPlaying: playerVM.currentIndex == index,),
               ),
             );
           },

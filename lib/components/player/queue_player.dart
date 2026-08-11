@@ -1,4 +1,6 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:beatsvibe/components/audio_item.dart';
+import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,12 +15,19 @@ class QueuePlayer extends StatefulWidget {
 class _QueuePlayerState extends State<QueuePlayer> {
   final ScrollController _scrollController = ScrollController();
   final Map<String, GlobalKey> _itemKeys = {};
+  List<MediaItemData> queue = [];
+  MediaItem? currentItem;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToCurrentPlaying();
+      final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
+      setState(() {
+        queue = playerVM.queue;
+        currentItem = playerVM.currentItem;
+      });
     });
   }
 
@@ -38,10 +47,8 @@ class _QueuePlayerState extends State<QueuePlayer> {
         if (index != -1 && _scrollController.hasClients) {
           // Altura aproximada de un AudioItem (40 imagen + 12 padding) = 52.0
           final offset = index * 52.0;
-          _scrollController.animateTo(
+          _scrollController.jumpTo(
             offset,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
           );
         }
       }
@@ -81,23 +88,23 @@ class _QueuePlayerState extends State<QueuePlayer> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              itemCount: playerVM.queue.length,
+              itemCount: queue.length,
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               itemBuilder: (context, index) {
-                final song = playerVM.queue[index];
+                final song = queue[index];
                 final key = _itemKeys.putIfAbsent(song.id, () => GlobalKey());
                 return GestureDetector(
                   onTap: () {
-                    if (song.id != playerVM.currentItem?.id) {
-                      playerVM.play(song: song, playlist: playerVM.queue);
+                    if (song.id != currentItem?.id) {
+                      playerVM.play(song: song, playlist: queue);
                     }
                   },
                   child: AudioItem(
                     key: key,
                     song: song,
-                    index: index,
+                    isPlaying: playerVM.currentIndex == index,
                   ),
                 );
               },

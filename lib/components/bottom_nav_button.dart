@@ -41,8 +41,10 @@ class BottomNavButton extends StatelessWidget {
                     width: isActive == true ? 60 : 0,
                     height: 30,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor
-                          .withValues(alpha: .15),
+                      color: activeColor != null
+                          ? activeColor!.withValues(alpha: .15)
+                          : Theme.of(context).primaryColor
+                              .withValues(alpha: .15),
                       borderRadius: BorderRadius.circular(360),
                     ),
                   ),
