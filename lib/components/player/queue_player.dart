@@ -63,7 +63,7 @@ class _QueuePlayerState extends State<QueuePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
+    final playerVM = Provider.of<PlayerViewModel>(context);
     return Container(
       width: .maxFinite,
       constraints: BoxConstraints(maxHeight: 520),

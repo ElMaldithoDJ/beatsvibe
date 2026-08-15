@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:beatsvibe/models/colors_model.dart';
 import 'package:beatsvibe/models/lastplayed_model.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/models/playlist_data.dart';
@@ -10,12 +11,12 @@ import 'package:flutter/material.dart';
 class PlayerViewModel extends ChangeNotifier {
   final _hiveService = HiveService();
   final audioHandler = globalAudioHandler;
-  
 
   bool _isPlaying = false;
   bool _isFavorite = false;
   int _currentIndex = -1;
   MediaItem? _lastPlayed;
+  ColorsModel? _artColors;
   RepeatPlayerMode _repeatMode = RepeatPlayerMode.repeatAll;
   Duration _currentPosition = Duration.zero;
   Duration _duration = Duration.zero;
@@ -25,6 +26,7 @@ class PlayerViewModel extends ChangeNotifier {
   int get currentIndex => _currentIndex;
   MediaItem? get lastPlayed => _lastPlayed;
   Duration get duration => _duration;
+  ColorsModel? get artColors => _artColors;
   List<MediaItemData> get queue {
     if (audioHandler.queue.value.isNotEmpty) {
       return audioHandler.queue.value
@@ -68,8 +70,8 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   void onInit() async {
-    _listenCurrentItem();
     await _loadLastPlayedPlaylist();
+    _listenCurrentItem();
     _listenQueue();
     _listenPosition();
     _listenDuration();
@@ -142,8 +144,18 @@ class PlayerViewModel extends ChangeNotifier {
                       .jumpToQueueItem(
                         queue.indexWhere((e) => e.id == lastPlayedData.id),
                       )
-                      .whenComplete(() {
+                      .whenComplete(() async {
                         seek(Duration(seconds: lastPlayedData.position!));
+                        int idx = queue.indexWhere(
+                          (e) => e.id == lastPlayedData.id,
+                        );
+                        if (queue[idx].artUri != null) {
+                          _artColors = await ColorsModel.fromImagePath(queue[idx].artUri!,);
+                          debugPrint("Art Colors: ${_artColors?.toString()}");
+                          notifyListeners();
+                        }
+                        _currentIndex = idx;
+                        notifyListeners();
                       });
                 }
               });
@@ -219,6 +231,10 @@ class PlayerViewModel extends ChangeNotifier {
         if (!_shouldPlay) return;
         if (song != null) {
           await audioHandler.playFromId(song.id);
+          int index = queue.indexWhere((e) => e.id == song.id);
+          if (queue[index].artUri != null) {
+            generateColorsPalette(queue[index].artUri!);
+          }
           if (!_shouldPlay) return;
         }
       }
@@ -242,11 +258,19 @@ class PlayerViewModel extends ChangeNotifier {
   //skip
   void skipToNext() async {
     await audioHandler.skipToNext();
+    int index = queue.indexWhere((e) => e.id == currentItem?.id);
+    if (queue[index].artUri != null) {
+      generateColorsPalette(queue[index].artUri!);
+    }
   }
 
   //back
   void skipToPrevious() async {
     await audioHandler.skipToPrevious();
+    int index = queue.indexWhere((e) => e.id == currentItem?.id);
+    if (queue[index].artUri != null) {
+      generateColorsPalette(queue[index].artUri!);
+    }
   }
 
   // repeat mode
@@ -334,5 +358,16 @@ class PlayerViewModel extends ChangeNotifier {
     audioHandler.queue.close();
     audioHandler.playbackState.close();
     super.dispose();
+  }
+
+  // Generate colors palette from image
+  Future<void> generateColorsPalette(Uri imageUrl) async {
+    try {
+      final colors = await ColorsModel.fromImagePath(imageUrl);
+      _artColors = colors;
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error al generar colores palette: ${e.toString()}");
+    }
   }
 }

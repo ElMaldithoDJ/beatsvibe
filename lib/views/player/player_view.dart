@@ -1,5 +1,4 @@
 import 'package:beatsvibe/components/player/artwork_player.dart';
-import 'package:beatsvibe/components/player/artwork_schema_color.dart';
 import 'package:beatsvibe/components/player/audiocontrols_players.dart';
 import 'package:beatsvibe/components/player/audioinfo_player.dart';
 import 'package:beatsvibe/components/player/progress_player.dart';
@@ -21,33 +20,17 @@ class PlayerView extends StatefulWidget {
 
 class _PlayerViewState extends State<PlayerView>
     with SingleTickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
   bool _canPop = false;
+
+  Color defaultColor = AppTheme.playerDarkBgColor;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-      reverseDuration: const Duration(milliseconds: 150),
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInCubic),
-    );
-    _fadeController.forward();
-  }
-
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    super.dispose();
   }
 
   void _onBackPressed() async {
     if (_canPop) return;
-    await _fadeController.reverse();
     if (mounted) {
       setState(() {
         _canPop = true;
@@ -67,183 +50,253 @@ class _PlayerViewState extends State<PlayerView>
       child: Consumer<PlayerViewModel>(
         builder: (context, playerVM, child) {
           return Scaffold(
-            backgroundColor: AppTheme.darkBackgroundColor,
-            body: FadeTransition(
-              opacity: _fadeAnimation,
-              child: Stack(
-                children: [
-                  Positioned.fill(child: ArtworkSchemaColor()),
-                  Positioned(
-                    child: SafeArea(
-                      child: Column(
-                        children: [
-                          Consumer<PlayerViewModel>(
-                            builder: (context, playerVM, child) {
-                              return Padding(
-                                padding: const .symmetric(
-                                  horizontal: 10,
-                                  vertical: 10,
+            backgroundColor: playerVM.currentItem!.artUri == null
+                ? defaultColor
+                : null,
+            appBar: AppBar(
+              toolbarHeight: 0,
+              elevation: 0,
+              backgroundColor: playerVM.currentItem!.artUri == null
+                  ? defaultColor
+                  : Colors.transparent,
+              flexibleSpace: AnimatedCrossFade(
+                firstCurve: Curves.easeOutCubic,
+                secondCurve: Curves.easeOutCubic,
+                crossFadeState: playerVM.currentItem!.artUri == null
+                    ? .showFirst
+                    : .showSecond,
+                duration: const Duration(milliseconds: 800),
+                firstChild: Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.playerDarkBgColor.withValues(alpha: .85),
+                  ),
+                ),
+                secondChild: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        playerVM.artColors?.dominantColor?.withValues(
+                              alpha: .85,
+                            ) ??
+                            AppTheme.playerDarkBgColor.withValues(alpha: .85),
+                        playerVM.artColors?.dominantColor?.withValues(
+                              alpha: .84,
+                            ) ??
+                            AppTheme.playerDarkBgColor.withValues(alpha: .85),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            body: Stack(
+              children: [
+                Positioned.fill(
+                  child: AnimatedCrossFade(
+                    firstCurve: Curves.easeInOutBack,
+                    secondCurve: Curves.easeInOutBack,
+                    crossFadeState: playerVM.currentItem!.artUri == null
+                        ? .showFirst
+                        : .showSecond,
+                    duration: const Duration(milliseconds: 800),
+                    firstChild: Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.playerDarkBgColor.withValues(
+                          alpha: .85,
+                        ),
+                      ),
+                    ),
+                    secondChild: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            playerVM.artColors?.darkDominantColor!.withValues(
+                                  alpha: .85,
+                                ) ??
+                                AppTheme.playerDarkBgColor.withValues(
+                                  alpha: .85,
                                 ),
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 45,
-                                      height: 45,
-                                      child: IconButton(
-                                        onPressed: _onBackPressed,
-                                        icon: Icon(
-                                          CupertinoIcons.chevron_back,
-                                          color: Colors.white,
-                                        ),
-                                        style: IconButton.styleFrom(
-                                          backgroundColor: Colors.white
-                                              .withValues(alpha: 0),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                            playerVM.artColors?.darkDominantColor!.withValues(
+                                  alpha: .80,
+                                ) ??
+                                AppTheme.playerDarkBgColor.withValues(
+                                  alpha: .85,
                                 ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 40),
-                          Center(child: ArtworkPlayer()),
-                          const SizedBox(height: 20),
-                          const AudioInfoPlayer(),
-                          const ProgressPlayer(),
-                          const SizedBox(height: 185),
-                          Padding(
-                            padding: const .symmetric(horizontal: 15),
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: .center,
-                                children: [
-                                  SizedBox(
-                                    width: 45,
-                                    height: 45,
-                                    child: Consumer<PlayerViewModel>(
-                                      builder: (context, playerVM, child) =>
-                                          GestureDetector(
-                                            onTap: () {
-                                              playerVM.setRepeatMode();
-                                            },
-                                            child: DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    playerVM
-                                                            .currentItem
-                                                            ?.artUri !=
-                                                        null
-                                                    ? Colors.white.withValues(
-                                                        alpha: .15,
-                                                      )
-                                                    : Theme.brightnessOf(
-                                                            context,
-                                                          ) ==
-                                                          .dark
-                                                    ? Colors.white.withValues(
-                                                        alpha: .2,
-                                                      )
-                                                    : Colors.grey.withValues(
-                                                        alpha: .1,
-                                                      ),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Center(
-                                                child: Icon(
-                                                  playerVM.repeatMode ==
-                                                          RepeatPlayerMode
-                                                              .repeatAll
-                                                      ? CupertinoIcons.repeat
-                                                      : playerVM.repeatMode ==
-                                                            RepeatPlayerMode
-                                                                .repeatOne
-                                                      ? CupertinoIcons.repeat_1
-                                                      : CupertinoIcons.shuffle,
-                                                  size: 25,
-                                                  color:
-                                                      playerVM
-                                                              .currentItem
-                                                              ?.artUri !=
-                                                          null
-                                                      ? Colors.white
-                                                      : Theme.brightnessOf(
-                                                              context,
-                                                            ) ==
-                                                            .dark
-                                                      ? Colors.white
-                                                      : Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  const AudioControlsPlayer(),
-                                  Spacer(),
-                                  SizedBox(
-                                    width: 45,
-                                    height: 45,
-                                    child: Consumer<PlayerViewModel>(
-                                      builder: (context, playerVM, child) =>
-                                          GestureDetector(
-                                            onTap: () => openQueue(context),
-                                            child: DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    playerVM
-                                                            .currentItem
-                                                            ?.artUri !=
-                                                        null
-                                                    ? Colors.white.withValues(
-                                                        alpha: .15,
-                                                      )
-                                                    : Theme.brightnessOf(
-                                                            context,
-                                                          ) ==
-                                                          .dark
-                                                    ? Colors.white.withValues(
-                                                        alpha: .2,
-                                                      )
-                                                    : Colors.grey.withValues(
-                                                        alpha: .1,
-                                                      ),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Center(
-                                                child: Icon(
-                                                  CupertinoIcons.music_albums,
-                                                  size: 25,
-                                                  color:
-                                                      playerVM
-                                                              .currentItem
-                                                              ?.artUri !=
-                                                          null
-                                                      ? Colors.white
-                                                      : Theme.brightnessOf(
-                                                              context,
-                                                            ) ==
-                                                            .dark
-                                                      ? Colors.white
-                                                      : Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Spacer(),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Positioned(
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const .symmetric(
+                            horizontal: 10,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 45,
+                                height: 45,
+                                child: IconButton(
+                                  onPressed: _onBackPressed,
+                                  icon: Icon(
+                                    CupertinoIcons.chevron_back,
+                                    color: Colors.white,
+                                  ),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: Colors.white.withValues(
+                                      alpha: 0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        Center(child: ArtworkPlayer()),
+                        const SizedBox(height: 20),
+                        const AudioInfoPlayer(),
+                        const ProgressPlayer(),
+                        const SizedBox(height: 185),
+                        Padding(
+                          padding: const .symmetric(horizontal: 15),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: .center,
+                              children: [
+                                SizedBox(
+                                  width: 45,
+                                  height: 45,
+                                  child: Consumer<PlayerViewModel>(
+                                    builder: (context, playerVM, child) =>
+                                        GestureDetector(
+                                          onTap: () {
+                                            playerVM.setRepeatMode();
+                                          },
+                                          child: DecoratedBox(
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  playerVM
+                                                          .currentItem
+                                                          ?.artUri !=
+                                                      null
+                                                  ? Colors.white.withValues(
+                                                      alpha: .15,
+                                                    )
+                                                  : Theme.brightnessOf(
+                                                          context,
+                                                        ) ==
+                                                        .dark
+                                                  ? Colors.white.withValues(
+                                                      alpha: .2,
+                                                    )
+                                                  : Colors.grey.withValues(
+                                                      alpha: .1,
+                                                    ),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Center(
+                                              child: Icon(
+                                                playerVM.repeatMode ==
+                                                        RepeatPlayerMode
+                                                            .repeatAll
+                                                    ? CupertinoIcons.repeat
+                                                    : playerVM.repeatMode ==
+                                                          RepeatPlayerMode
+                                                              .repeatOne
+                                                    ? CupertinoIcons.repeat_1
+                                                    : CupertinoIcons.shuffle,
+                                                size: 25,
+                                                color:
+                                                    playerVM
+                                                            .currentItem
+                                                            ?.artUri !=
+                                                        null
+                                                    ? Colors.white
+                                                    : Theme.brightnessOf(
+                                                            context,
+                                                          ) ==
+                                                          .dark
+                                                    ? Colors.white
+                                                    : Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                  ),
+                                ),
+                                Spacer(),
+                                const AudioControlsPlayer(),
+                                Spacer(),
+                                SizedBox(
+                                  width: 45,
+                                  height: 45,
+                                  child: Consumer<PlayerViewModel>(
+                                    builder: (context, playerVM, child) =>
+                                        GestureDetector(
+                                          onTap: () => openQueue(context),
+                                          child: DecoratedBox(
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  playerVM
+                                                          .currentItem
+                                                          ?.artUri !=
+                                                      null
+                                                  ? Colors.white.withValues(
+                                                      alpha: .15,
+                                                    )
+                                                  : Theme.brightnessOf(
+                                                          context,
+                                                        ) ==
+                                                        .dark
+                                                  ? Colors.white.withValues(
+                                                      alpha: .2,
+                                                    )
+                                                  : Colors.grey.withValues(
+                                                      alpha: .1,
+                                                    ),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Center(
+                                              child: Icon(
+                                                CupertinoIcons.music_albums,
+                                                size: 25,
+                                                color:
+                                                    playerVM
+                                                            .currentItem
+                                                            ?.artUri !=
+                                                        null
+                                                    ? Colors.white
+                                                    : Theme.brightnessOf(
+                                                            context,
+                                                          ) ==
+                                                          .dark
+                                                    ? Colors.white
+                                                    : Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Spacer(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         },

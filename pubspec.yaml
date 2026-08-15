@@ -19,7 +19,7 @@ dependencies:
   hive_flutter:
   just_audio:
   audio_service:
-  image_color_scheme:
+  palette_generator_master:
   provider:
   file_picker: ^10.3.8
   rxdart:

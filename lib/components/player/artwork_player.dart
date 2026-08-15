@@ -45,7 +45,6 @@ class _ArtworkPlayerState extends State<ArtworkPlayer> {
                                 width: double.maxFinite,
                                 height: double.maxFinite,
                                 fit: BoxFit.cover,
-                                gaplessPlayback: true,
                               )
                             : Image.memory(
                                 base64Decode(
@@ -54,7 +53,6 @@ class _ArtworkPlayerState extends State<ArtworkPlayer> {
                                 width: double.maxFinite,
                                 height: double.maxFinite,
                                 fit: BoxFit.cover,
-                                gaplessPlayback: true,
                               ),
                       ),
                     ] else ...[
