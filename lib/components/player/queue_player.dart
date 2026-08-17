@@ -1,4 +1,3 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:beatsvibe/components/audio_item.dart';
 import 'package:beatsvibe/models/mediaitem_data.dart';
 import 'package:beatsvibe/vm/player_vm.dart';
@@ -16,18 +15,18 @@ class _QueuePlayerState extends State<QueuePlayer> {
   final ScrollController _scrollController = ScrollController();
   final Map<String, GlobalKey> _itemKeys = {};
   List<MediaItemData> queue = [];
-  MediaItem? currentItem;
+  int? currentIndex = -1;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToCurrentPlaying();
       final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
       setState(() {
         queue = playerVM.queue;
-        currentItem = playerVM.currentItem;
+        currentIndex = playerVM.currentIndex;
       });
+      _scrollToCurrentPlaying();
     });
   }
 
@@ -63,7 +62,7 @@ class _QueuePlayerState extends State<QueuePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    final playerVM = Provider.of<PlayerViewModel>(context);
+    final playerVM = Provider.of<PlayerViewModel>(context, listen: false);
     return Container(
       width: .maxFinite,
       constraints: BoxConstraints(maxHeight: 520),
@@ -97,14 +96,17 @@ class _QueuePlayerState extends State<QueuePlayer> {
                 final key = _itemKeys.putIfAbsent(song.id, () => GlobalKey());
                 return GestureDetector(
                   onTap: () {
-                    if (song.id != currentItem?.id) {
-                      playerVM.play(song: song, playlist: queue);
+                    if (playerVM.currentItem?.id != song.id) {
+                      playerVM.play(id: song.id, playlist: queue);
+                      setState(() {
+                        currentIndex = index;
+                      });
                     }
                   },
                   child: AudioItem(
                     key: key,
                     song: song,
-                    isPlaying: playerVM.currentIndex == index,
+                    isPlaying: currentIndex == index,
                   ),
                 );
               },

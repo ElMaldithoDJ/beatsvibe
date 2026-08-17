@@ -76,7 +76,7 @@ class _FavoritesViewState extends State<FavoritesView> with AutomaticKeepAliveCl
             return GestureDetector(
               onTap: () {
                 if (playerVM.currentItem?.id != song.id) {
-                  playerVM.play(song: song, playlist: favoritesVM.favorites);
+                  playerVM.play(id: song.id, playlist: favoritesVM.favorites);
                 }
               },
               child: AudioCupertinoContextMenu(

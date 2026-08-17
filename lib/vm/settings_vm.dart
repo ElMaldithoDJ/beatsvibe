@@ -12,6 +12,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 
 class SettingsViewModel extends ChangeNotifier {
@@ -113,6 +114,20 @@ class SettingsViewModel extends ChangeNotifier {
           id = IDGenerator.generateId(length: 25);
           isIncluded = existingFolders.any((e) => e.id == id);
         } while (isIncluded);
+
+        if (existingFolders.any((e) => e.name == dir.split('/').last)) {
+          Fluttertoast.showToast(
+            msg: 'La carpeta ya existe',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          _setLoadingState(false);
+          return;
+        }
 
         final folder = FoldersModel(
           id: id,

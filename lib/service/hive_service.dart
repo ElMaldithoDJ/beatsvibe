@@ -31,7 +31,6 @@ class HiveService {
   // Save all songs to hive
   Future<void> saveAllSongs(List<MediaItemData> songs) async {
     final box = await Hive.openBox(_songsBox);
-    await box.clear();
     for (MediaItemData song in songs) {
       await box.put(song.id, song.toJson());
     }

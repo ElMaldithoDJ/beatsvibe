@@ -20,6 +20,7 @@ class PlayerViewModel extends ChangeNotifier {
   RepeatPlayerMode _repeatMode = RepeatPlayerMode.repeatAll;
   Duration _currentPosition = Duration.zero;
   Duration _duration = Duration.zero;
+  List<MediaItemData> _queue = [];
 
   bool get isPlaying => _isPlaying;
   bool get isFavorite => _isFavorite;
@@ -33,7 +34,7 @@ class PlayerViewModel extends ChangeNotifier {
           .map((e) => MediaItemData.fromMediaItem(e)!)
           .toList();
     }
-    return [];
+    return _queue;
   }
 
   RepeatPlayerMode get repeatMode => _repeatMode;
@@ -150,8 +151,9 @@ class PlayerViewModel extends ChangeNotifier {
                           (e) => e.id == lastPlayedData.id,
                         );
                         if (queue[idx].artUri != null) {
-                          _artColors = await ColorsModel.fromImagePath(queue[idx].artUri!,);
-                          debugPrint("Art Colors: ${_artColors?.toString()}");
+                          _artColors = await ColorsModel.fromImagePath(
+                            queue[idx].artUri!,
+                          );
                           notifyListeners();
                         }
                         _currentIndex = idx;
@@ -220,21 +222,19 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   //Play
-  Future<void> play({
-    MediaItemData? song,
-    List<MediaItemData>? playlist,
-  }) async {
+  Future<void> play({String? id, List<MediaItemData>? playlist}) async {
     _shouldPlay = true;
     try {
       if (playlist != null) {
-        await audioHandler.initPlayer(songs: playlist);
         if (!_shouldPlay) return;
-        if (song != null) {
-          await audioHandler.playFromId(song.id);
-          int index = queue.indexWhere((e) => e.id == song.id);
+        if (id != null) {
+          int index = queue.indexWhere((e) => e.id == id);
+          _currentIndex = index;
+          notifyListeners();
           if (queue[index].artUri != null) {
             generateColorsPalette(queue[index].artUri!);
           }
+          await audioHandler.playFromId(id);
           if (!_shouldPlay) return;
         }
       }

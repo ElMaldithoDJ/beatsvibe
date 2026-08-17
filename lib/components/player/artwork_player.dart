@@ -89,14 +89,20 @@ class _ArtworkPlayerState extends State<ArtworkPlayer> {
                                 );
                               }
                             },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(360),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                                child: Container(
-                                  color: Theme.brightnessOf(context) == .dark
-                                      ? Colors.white.withValues(alpha: .1)
-                                      : Colors.black12.withValues(alpha: .05),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.brightnessOf(context) == .dark
+                                    ? Colors.white.withValues(alpha: .1)
+                                    : Colors.black12.withValues(alpha: .05),
+                                borderRadius: BorderRadius.circular(360),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(360),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 5,
+                                    sigmaY: 5,
+                                  ),
                                   child: Center(
                                     child: Icon(
                                       favoritesVM.favorites.any(

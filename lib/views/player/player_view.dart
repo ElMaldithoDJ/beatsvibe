@@ -50,9 +50,9 @@ class _PlayerViewState extends State<PlayerView>
       child: Consumer<PlayerViewModel>(
         builder: (context, playerVM, child) {
           return Scaffold(
-            backgroundColor: playerVM.currentItem!.artUri == null
+            backgroundColor: playerVM.currentItem?.artUri == null
                 ? defaultColor
-                : null,
+                : playerVM.artColors?.darkDominantColor,
             appBar: AppBar(
               toolbarHeight: 0,
               elevation: 0,
@@ -73,18 +73,7 @@ class _PlayerViewState extends State<PlayerView>
                 ),
                 secondChild: Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        playerVM.artColors?.dominantColor?.withValues(
-                              alpha: .85,
-                            ) ??
-                            AppTheme.playerDarkBgColor.withValues(alpha: .85),
-                        playerVM.artColors?.dominantColor?.withValues(
-                              alpha: .84,
-                            ) ??
-                            AppTheme.playerDarkBgColor.withValues(alpha: .85),
-                      ],
-                    ),
+                    color: Colors.transparent
                   ),
                 ),
               ),
@@ -109,17 +98,17 @@ class _PlayerViewState extends State<PlayerView>
                     secondChild: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          begin: Alignment.topLeft,
+                          begin: Alignment.topCenter,
                           end: Alignment.bottomRight,
                           colors: [
-                            playerVM.artColors?.darkDominantColor!.withValues(
+                            playerVM.artColors?.darkDominantColor?.withValues(
                                   alpha: .85,
                                 ) ??
                                 AppTheme.playerDarkBgColor.withValues(
                                   alpha: .85,
                                 ),
-                            playerVM.artColors?.darkDominantColor!.withValues(
-                                  alpha: .80,
+                            playerVM.artColors?.darkDominantColor?.withValues(
+                                  alpha: .1,
                                 ) ??
                                 AppTheme.playerDarkBgColor.withValues(
                                   alpha: .85,

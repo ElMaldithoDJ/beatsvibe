@@ -22,6 +22,7 @@ class _MusicViewState extends State<MusicView>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   final PageStorageBucket _bucket = PageStorageBucket();
+  int currentIndex = -1;
 
   @override
   bool get wantKeepAlive => true;
@@ -102,9 +103,12 @@ class _MusicViewState extends State<MusicView>
                             if (playerVM.currentItem?.id != song.id ||
                                 playerVM.lastPlayed?.id != song.id) {
                               playerVM.play(
-                                song: song,
+                                id: song.id,
                                 playlist: audioVM.songsCopy,
                               );
+                              setState(() {
+                                currentIndex = index;
+                              });
                             } else if (!playerVM.isPlaying &&
                                 (playerVM.currentItem?.id == song.id ||
                                     playerVM.lastPlayed?.id == song.id)) {
@@ -170,7 +174,7 @@ class _MusicViewState extends State<MusicView>
                                 (e) => e.id == song.id,
                               ),
                               isSelected: audioVM.isSongSelected(song.id),
-                              isPlaying: playerVM.currentIndex == index,
+                              isPlaying: currentIndex == index,
                             ),
                           ),
                         ),
