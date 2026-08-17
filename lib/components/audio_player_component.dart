@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:beatsvibe/models/colors_model.dart';
 import 'package:beatsvibe/routes.dart';
 import 'package:beatsvibe/theme.dart';
 import 'package:beatsvibe/variables.dart';
@@ -39,10 +40,16 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
           clipBehavior: Clip.none,
           padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
-            color: Theme.brightnessOf(context) == .dark
-                ? AppTheme.playerDarkBgColor
-                : AppTheme.playerLightBgColor,
             borderRadius: BorderRadius.circular(360),
+            color: playerVM.currentItem?.artUri == null? AppTheme.playerDarkBgColor: null,
+            gradient: playerVM.currentItem?.artUri != null? LinearGradient(
+              begin: .topCenter,
+              end: .bottomCenter,
+              colors: [
+                playerVM.artColors?.darkDominantColor ?? AppTheme.playerDarkBgColor,
+                playerVM.artColors?.dominantColor ?? AppTheme.playerDarkBgColor,
+              ],
+            ) : null,
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).brightness == .dark
@@ -76,7 +83,10 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                         child: CircularProgressIndicator(
                           value: playerVM.progress,
                           strokeWidth: 2,
-                          color: Theme.of(context).primaryColor,
+                          color: ColorsModel.getFilteredColor(
+                            playerVM.artColors?.lightDominantColor ??
+                                Colors.white,
+                          ),
                           strokeCap: .round,
                           backgroundColor: Theme.brightnessOf(context) == .dark
                               ? Colors.white10
