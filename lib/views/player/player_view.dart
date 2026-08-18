@@ -52,7 +52,7 @@ class _PlayerViewState extends State<PlayerView>
           return Scaffold(
             backgroundColor: playerVM.currentItem?.artUri == null
                 ? defaultColor
-                : playerVM.artColors?.darkDominantColor,
+                : playerVM.artColors?.dominantColor,
             appBar: AppBar(
               toolbarHeight: 0,
               elevation: 0,
@@ -99,9 +99,9 @@ class _PlayerViewState extends State<PlayerView>
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
-                          end: Alignment.bottomRight,
+                          end: Alignment.bottomCenter,
                           colors: [
-                            playerVM.artColors?.darkDominantColor?.withValues(
+                            playerVM.artColors?.dominantColor?.withValues(
                                   alpha: .85,
                                 ) ??
                                 AppTheme.playerDarkBgColor.withValues(

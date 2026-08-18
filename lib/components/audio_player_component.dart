@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 
 class AudioPlayerComponent extends StatefulWidget {
@@ -41,15 +42,31 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
           padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(360),
-            color: playerVM.currentItem?.artUri == null? AppTheme.playerDarkBgColor: null,
-            gradient: playerVM.currentItem?.artUri != null? LinearGradient(
-              begin: .topCenter,
-              end: .bottomCenter,
-              colors: [
-                playerVM.artColors?.darkDominantColor ?? AppTheme.playerDarkBgColor,
-                playerVM.artColors?.dominantColor ?? AppTheme.playerDarkBgColor,
-              ],
-            ) : null,
+            color: playerVM.currentItem?.artUri == null
+                ? Theme.brightnessOf(context) == .light
+                      ? Colors.white
+                      : AppTheme.playerDarkBgColor
+                : null,
+            gradient: playerVM.currentItem?.artUri != null
+                ? LinearGradient(
+                    begin: .topCenter,
+                    end: .bottomCenter,
+                    colors: [
+                      playerVM.artColors?.dominantColor != null
+                          ? ColorsModel.lighten(
+                              playerVM.artColors!.dominantColor!,
+                              .35,
+                            )
+                          : AppTheme.playerDarkBgColor,
+                      playerVM.artColors?.lightDominantColor != null
+                          ? ColorsModel.lighten(
+                              playerVM.artColors!.dominantColor!,
+                              .2,
+                            )
+                          : AppTheme.playerDarkBgColor,
+                    ],
+                  )
+                : null,
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).brightness == .dark
@@ -83,12 +100,15 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                         child: CircularProgressIndicator(
                           value: playerVM.progress,
                           strokeWidth: 2,
-                          color: ColorsModel.getFilteredColor(
-                            playerVM.artColors?.lightDominantColor ??
-                                Colors.white,
-                          ),
+                          color: playerVM.currentItem?.artUri != null
+                              ? Colors.white
+                              : Theme.brightnessOf(context) == .light
+                              ? Colors.black26
+                              : Colors.white,
                           strokeCap: .round,
-                          backgroundColor: Theme.brightnessOf(context) == .dark
+                          backgroundColor: playerVM.currentItem?.artUri != null
+                              ? playerVM.artColors!.dominantColor?.withValues(alpha: .2)
+                              : Theme.brightnessOf(context) == .dark
                               ? Colors.white10
                               : Colors.black12,
                         ),
@@ -184,16 +204,22 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        playerVM.currentItem?.title ?? "some thing",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: .w700,
-                          color: Theme.brightnessOf(context) == .dark
-                              ? Colors.white
-                              : Colors.black87,
+                      SizedBox(
+                        height: 18,
+                        child: Marquee(
+                          text: playerVM.currentItem?.title ?? "some thing",
+                          velocity: 30,
+                          scrollAxis: Axis.horizontal,
+                          blankSpace: 20,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: .w700,
+                            color: playerVM.currentItem?.artUri != null
+                                ? Colors.white
+                                : Theme.brightnessOf(context) == .dark
+                                ? Colors.white
+                                : Colors.black87,
+                          ),
                         ),
                       ),
                       Text(
@@ -203,7 +229,9 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: .w400,
-                          color: Theme.brightnessOf(context) == .dark
+                          color: playerVM.currentItem?.artUri != null
+                              ? Colors.white
+                              : Theme.brightnessOf(context) == .dark
                               ? Colors.white
                               : Colors.black54,
                         ),
@@ -217,7 +245,11 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                   playerVM.isPlaying
                       ? CupertinoIcons.pause
                       : CupertinoIcons.play,
-                  color: Theme.of(context).primaryColor,
+                  color: playerVM.currentItem?.artUri != null
+                      ? Colors.white
+                      : Theme.brightnessOf(context) == .light
+                      ? Colors.black26
+                      : Colors.white,
                 ),
                 onPressed: () {
                   if (playerVM.isPlaying) {
@@ -235,7 +267,9 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                       )
                       ? CupertinoIcons.heart_fill
                       : CupertinoIcons.heart,
-                  color: Theme.brightnessOf(context) == .dark
+                  color: playerVM.currentItem?.artUri != null
+                      ? Colors.white
+                      : Theme.brightnessOf(context) == .dark
                       ? Colors.white
                       : favoritesVM.isFavorite(playerVM.currentItem!.id)
                       ? Colors.pinkAccent

@@ -16,6 +16,7 @@ class ColorsModel {
   final Color? filteredColor;
   final List<Color> palette;
 
+
   const ColorsModel({
     this.vibrant,
     this.filteredColor,
@@ -45,6 +46,21 @@ class ColorsModel {
           await PaletteGeneratorMaster.fromImageProvider(
             imageProvider,
             maximumColorCount: 16,
+            targets: [
+              // Create custom target
+              PaletteTargetMaster(
+                saturationWeight: 0.8,
+                lightnessWeight: 0.6,
+                populationWeight: 0.4,
+                minimumSaturation: 0.3,
+                maximumSaturation: 0.9,
+                minimumLightness: 0.2,
+                maximumLightness: 0.8,
+                targetSaturation: 0.6,
+                targetLightness: 0.5,
+                isExclusive: true,
+              ),
+            ],
           );
       return ColorsModel(
         vibrant: generator.vibrantColor?.color,
@@ -155,5 +171,38 @@ class ColorsModel {
       end: Alignment.bottomRight,
       colors: colors,
     );
+  }
+  /// Aclara [color] en el espacio HSL.
+  ///
+  /// [amount] va de `0.0` (sin cambio) a `1.0` (blanco puro).
+  /// Internamente incrementa la luminosidad HSL y recorta el resultado entre 0 y 1.
+  ///
+  /// Ejemplo:
+  /// ```dart
+  /// final lighter = ColorsModel.lighten(Colors.blue, 0.3);
+  /// ```
+  static Color lighten(Color color, double amount) {
+    assert(amount >= 0.0 && amount <= 1.0, 'amount debe estar entre 0.0 y 1.0');
+    final hsl = HSLColor.fromColor(color);
+    return hsl
+        .withLightness((hsl.lightness + amount).clamp(0.0, 1.0))
+        .toColor();
+  }
+
+  /// Oscurece [color] en el espacio HSL.
+  ///
+  /// [amount] va de `0.0` (sin cambio) a `1.0` (negro puro).
+  /// Internamente decrementa la luminosidad HSL y recorta el resultado entre 0 y 1.
+  ///
+  /// Ejemplo:
+  /// ```dart
+  /// final darker = ColorsModel.darken(Colors.blue, 0.3);
+  /// ```
+  static Color darken(Color color, double amount) {
+    assert(amount >= 0.0 && amount <= 1.0, 'amount debe estar entre 0.0 y 1.0');
+    final hsl = HSLColor.fromColor(color);
+    return hsl
+        .withLightness((hsl.lightness - amount).clamp(0.0, 1.0))
+        .toColor();
   }
 }

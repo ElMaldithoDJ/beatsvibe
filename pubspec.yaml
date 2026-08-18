@@ -33,6 +33,7 @@ dependencies:
   string_normalizer:
   flutter_svg:
   flutter_widget_from_html:
+  marquee:
 
 dev_dependencies:
   flutter_test:

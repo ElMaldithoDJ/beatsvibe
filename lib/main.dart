@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:get/route_manager.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   globalAudioHandler = await AudioService.init(
