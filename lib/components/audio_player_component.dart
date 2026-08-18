@@ -107,7 +107,12 @@ class _AudioPlayerComponentState extends State<AudioPlayerComponent> {
                               : Colors.white,
                           strokeCap: .round,
                           backgroundColor: playerVM.currentItem?.artUri != null
-                              ? playerVM.artColors!.dominantColor?.withValues(alpha: .2)
+                              ? playerVM.artColors?.dominantColor != null
+                                    ? playerVM.artColors!.dominantColor
+                                          ?.withValues(alpha: .2)
+                                    : Theme.brightnessOf(context) == .dark
+                                    ? Colors.white10
+                                    : Colors.black12
                               : Theme.brightnessOf(context) == .dark
                               ? Colors.white10
                               : Colors.black12,
